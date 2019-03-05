@@ -1,0 +1,25 @@
+---
+title: "Test Rmd slides"
+author: "Alberto Torres"
+date: ''
+output:
+  ioslides_presentation: default
+  beamer_presentation: default
+always_allow_html: yes
+---
+
+<link href="slides.css" rel="stylesheet">
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Un gráfico
+
+```{r}
+plot(mtcars)
+```
+
+## LaTeX
+
+Una ecuación: $$f(x\mid \mu ,\sigma ^{2})={\frac {1}{\sqrt {2\pi \sigma ^{2}}}}e^{-{\frac {(x-\mu )^{2}}{2\sigma ^{2}}}}$$
