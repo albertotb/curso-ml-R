@@ -3,23 +3,23 @@
 ## Índice
  
  1. Fundamentos de Aprendizaje Automático
-   * Conceptos generales de aprendizaje bayesiano y Montecarlo
-   * Conceptos generales  sobre aprendizaje supervisado: GLMs
-   * Conceptos generales sobre aprendizaje no supervisado: PCA
+    * Conceptos generales de aprendizaje bayesiano y Montecarlo
+    * Conceptos generales  sobre aprendizaje supervisado: GLMs
+    * Conceptos generales sobre aprendizaje no supervisado: PCA
  
  2. Aplicaciones prácticas aprendizaje automático
-   * Algoritmos de regresión: Ridge, Lasso, ElasticNet, PCR, PLS, etc..
-   * Algoritmos de clasificación: KNN, Naive Bayes, ...
-   * Support vector machines
-   * Arboles de decision, bosques aleatorios y boosting
-   * Análisis de conglomerados: cuantización vectorial
-   * Modelos gráficos probabilisticos
-   * Algoritmos bayesianos para clasificación y regresión
-   * DLMs
+    * Algoritmos de regresión: Ridge, Lasso, ElasticNet, PCR, PLS, etc..
+    * Algoritmos de clasificación: KNN, Naive Bayes, ...
+    * Support vector machines
+    * Arboles de decision, bosques aleatorios y boosting
+    * Análisis de conglomerados: cuantización vectorial
+    * Modelos gráficos probabilisticos
+    * Algoritmos bayesianos para clasificación y regresión
+    * DLMs
    
  3. Aprendizaje profundo
-   * Redes neuronales 
-   * Introducción al aprendizaje profundo
+    * Redes neuronales 
+    * Introducción al aprendizaje profundo
 
 ## Bibliografía
 
