@@ -1,12 +1,5 @@
 # Curso Machine Learning en R
 
-Materiales: varias opciones para las diapositivas:
-  * Beamer (directamente con LaTeX o via RMarkdown)
-  * RMarkdown, [ioslides](https://bookdown.org/yihui/rmarkdown/ioslides-presentation.html)
-  * RMarkdown, [xaringan](https://yihui.name/en/2017/08/why-xaringan-remark-js/)
-
-`ioslides` parece una buena opción de compromiso, permite añadir código R y Latex de forma sencilla aunque admite poca personalización. `xaringan` es totalmente personalizable usando CSS, si `ioslides` no es suficiente se puede considerar. Ver ejemplos en el directorio `/slides`
-
 ## Índice
 
  1. Fundamentos de Aprendizaje Automático
