@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Conceptos generales de aprendizaje supervisado</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alberto Torres" />
+    <meta name="date" content="2019-03-21" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Conceptos generales de aprendizaje supervisado
+## Curso de aprendizaje automático para el INE
+### Alberto Torres
+### 2019-03-21
+
+---
+
+
+# ¿Qué es el Aprendizaje Automático? 
+
+De la Wikipedia:
+
+*Machine learning is a subfield of **computer science** that evolved from the study of **pattern recognition** and computational learning theory in artificial intelligence. In 1959, Arthur Samuel defined machinelearning as a “Field of study that gives computers the ability to learn without being **explicitly programmed**”. Machine learning explores the study and construction of algorithms that can learn from and make predictions on **data**.*
+
+---
+class: center, middle
+
+![:scale 60%](./img/machine_learning_2x.png)
+
+Fuente: [xkcd #1838](https://xkcd.com/1838/)
+
+---
+class: center
+
+# Flujo de trabajo
+
+![:scale 75%](./img/data-science.png)
+
+Fuente: [R for Data Science](http://r4ds.had.co.nz/)
+
+---
+
+# Referencias
+
+   1. Jerome H. Friedman. [Data Mining and Statistics: What's the Connection? (1998)](http://statweb.stanford.edu/~jhf/ftp/dm-stat.pdf)
+   
+   2. Leo Breiman. [Statistical Modeling: The Two Cultures (2001)](http://projecteuclid.org/download/pdf_1/euclid.ss/1009213726)
+   
+   3. Cross Validated. [What is the difference between data mining, statistics, machine learning and AI (2010).](http://stats.stackexchange.com/questions/5026/what-is-the-difference-between-data-mining-statistics-machine-learning-and-ai)
+   
+   4. Sakthi Dasan Sekar. [What is the difference between Artificial Intelligence, Machine Learning, Statistics, and Data Mining (2014)](http://shakthydoss.com/what-is-the-difference-between-artificial-intelligence-machine-learning-statistics-and-data-mining/)
+   
+   5. Cross Validated. [What exactly is Big Data? (2015)](http://stats.stackexchange.com/questions/173060/what-exactly-is-big-data)
+   
+   6. David Donoho. [50 years of Data Science (2015)](http://pages.cs.wisc.edu/~anhai/courses/784-fall15/50YearsDataScience.pdf)
+
+---
+
+# Tipos de aprendizaje
+
+Existen diversos tipos de tareas, dependiendo de la información disponible:
+
+- **supervisado**: tenemos acceso a pares de ejemplos entrada-salida
+
+- **no supervisado**: no tenemos acceso a las salidas
+
+- otros (limitando de alguna forma el acceso a las salidas):
+  
+  * *activo*: el algoritmo puede acceder a la salida para nuevos datos de entrada
+  
+  * *semi-supervisado*: solo se tienen salidas para algunos datos
+  
+  * *refuerzo*: no se tiene el valor de la salida, pero si una indicación de lo lejos o cerca que se encuentra
+
+---
+
+class: middle, center
+
+# Aprendizaje supervisado
+
+---
+
+## Definiciones
+
+* Tenemos disponibles datos con múltiples observaciones:
+   
+   * ejemplos (*examples*)
+   * muestras (*samples*)
+   * ...
+
+--
+
+* Varias variables por observación:
+  
+  * predictores
+  * atributos (*atributes*)
+  * características (*features*)
+  * covariables (*covariates*)
+  * variables independientes
+  * variables explicativas
+  * ...
+
+--
+
+* Una de ellas es de especial interés: 
+  
+  * variable respuesta
+  * variable dependiente
+  * objetivo (*target*)
+  * salida (*output*)
+  * etiqueta (*label*)
+  * ...
+  
+---
+
+## Objetivos
+
+  1. Predecir el valor de la variable respuesta para nuevas observaciones
+   
+  2. Obtener información sobre la relación entre las variables independientes y la salida
+
+---
+
+## Tipos de problemas
+
+  1. Regresión, si la variable respuesta es continua
+  
+  2. Clasificación, si la variable respuesta es discreta
+  
+---
+
+## Aprendizaje estadístico
+
+**Dados**:
+* Espacio de las muestras de entrada: `\(\mathcal{X}\)`
+
+* Conjunto de posibles salidas: `\(\mathcal{Y}\)`
+
+* Conjunto de **entrenamiento**: `\(S = \{x_i,\, y_i\}_{i=1}^n\)`, contenido en el espacio `\(\mathcal{X} \times \mathcal{Y}\)`
+
+--
+
+**Objetivo**: 
+
+  * Aprender una regla de predicción (hipótesis), `\(h: \mathcal{X} \rightarrow \mathcal{Y}\)`
+  
+--
+
+**Asumimos**:
+  
+  * Los ejemplos se han generado por una distribución de probabilidad desconocida  `\(\mathcal{P}\)`
+  
+  * Existe una función de pérdida `\(L: \mathcal{Y} \times \mathcal{Y} \rightarrow \mathbb{R}\)` que mide como de lejos se encuentra `\(h(x)\)` de `\(y\)`
+  
+  * El conjunto posible de hipótesis `\((\mathcal{F})\)` es finito
+  
+  
+---
+
+## Minimización del riesgo empírico
+
+Elegir `\(h\)` tal que minimice el riesgo esperado 
+`$$R(h) = \int_{\mathcal{X} \times \mathcal{Y}} L(h(x), y)\, dP(x, y)$$`
+
+**Problema**: cómo podemos calcular `\(R\)` si `\(P\)` es desconocida? 
+
+Podemos evaluar la función de pérdida en el conjunto `\(S\)` (riesgo empírico):
+
+`$$\hat{R}(h) = \frac{1}{n}\sum_{i=1}^{n} L(h(x_i), y_i)$$`
+
+Si `\(n\)` suficientemente grande, esperamos que `\(\hat{R}(x) \sim R(x)\)`  `\(\rightarrow\)`
+minimizar el riesgo empírico es una buena aproximación de minimizar el riesgo esperado
+
+---
+
+## Descomposición del error
+
+Minimizador del riesgo: `$$h^* = \arg\min_{h \in \mathcal{F}}\, R(h)$$`
+
+Minimizador del riesgo empírico: `$$\hat{h}^* = \arg\min_{h \in \mathcal{F}}\, \hat{R}(h)$$`
+
+Riesgo de Bayes o error de Bayes: `$$R^* = \inf_h\, R(h)$$`
+
+*Nota*: sobre todas las funciones `\(h: \mathcal{X} \rightarrow \mathcal{Y}\)`, no solo las contenidas en `\(\mathcal{F}\)`!!
+
+---
+
+La differencia entre el riesgo y el error de Bayes es:
+
+`$$R(h) - R^* = \underbrace{\big(R(h) - R(\hat{h}^*)\big)}_\text{error optimización} + \underbrace{\big(R(\hat{h}^*) - R(h^*)\big)}_\text{error estimación} + \underbrace{\big(R(h^*) - R^*\big)}_\text{error aproximación}$$` 
+
+--
+
+ **Error optimización**: como de buena es la optimización que llevó a la hipótesis `\(h\)`, relativa a al óptimo del riesgo empírico
+   
+   * Este error disminuye al mejorar el algoritmo de optimización
+ 
+--
+ 
+**Error de estimación**: surge por aproximar el riesgo esperado con el riesgo empírico
+ 
+   * Este error disminuye si aumentamos el conjunto de datos de entrenamiento `\(n\)`
+   
+--
+
+**Error de aproximación**: surge por aproximar la mejor función posible por la mejor función dentro de `\(\mathcal{F}\)`
+ 
+   * Este error disminuye si reemplazamos `\(\mathcal{F}\)` por otra clase más flexible
+   
+---
+
+## Selección de modelos
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
