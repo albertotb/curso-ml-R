@@ -20,9 +20,11 @@ Herramientas de entrenamiento, validación cruzada, búsqueda de parámetros
  * modelMetrics: métricas
  * modelr: funciones auxiliares para modelizar
  * broom: extraer y ordenar info de los modelos
+ * fastDummies: crear variables dummy
 
 Modelos
 -------
+ * class: knn
  * glmnet: penalized regression (Lasso, ElasticNet)
  * glmnetUtils: interfaz de formula para glmnet
  * MASS: ridge regression

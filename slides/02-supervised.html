@@ -65,6 +65,11 @@ class: center
 
 Fuente: [R for Data Science](http://r4ds.had.co.nz/)
 
+???
+
+Machine learning == parte de modelado
+Data Science == todos los pasos
+
 ---
 
 ## Casos de éxito
@@ -478,7 +483,42 @@ Ejemplo de clasificación en 2 dimensiones [ESL]
 
 ---
 
-&lt;img src="02-supervised_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+```r
+library(class)
+
+n &lt;- nrow(iris)
+
+# muestreo aleatorio
+idx &lt;- sample(n, n*0.75)
+
+# partir en conjuntos de entrenamiento y test
+train &lt;- iris[idx, ]
+test &lt;- iris[-idx, ]
+
+# separar variables indenpendientes de la clase (variable respuesta)
+# entrenamiento
+y_train &lt;- train[,  5]
+X_train &lt;- train[, -5]
+
+# test
+y_test &lt;- test[,  5]
+X_test &lt;- test[, -5]
+
+# modelo knn
+y_pred &lt;- knn(X_train, X_test, y_train, k=3)
+
+# tasa acierto
+mean(y_test == y_pred)*100
+```
+
+```
+## [1] 97.36842
+```
+
+---
+
+&lt;img src="02-supervised_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -499,15 +539,15 @@ Ejemplo de clasificación en 2 dimensiones [ESL]
 ## Vecinos próximos: dependencia de `\(k\)`
 
 
-&lt;img src="02-supervised_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
-
----
-
 &lt;img src="02-supervised_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
 &lt;img src="02-supervised_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="02-supervised_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -569,12 +609,174 @@ BLUE = Best linear unbiased estimator (teorema de Gauss)
 
 Ahora siempre es invertible para `\(\lambda &gt; 0\)`
 
-&lt;!-- class: middle, center, inverse
+Funcion en R: lm.ridge(), paquete MASS
 
-# Modelos lineales generalizados 
+---
+
+## Regresión ridge en R
+
+* La función `lm.ridge()` de la librería `MASS` entrena una regresión lineal con regularización *ridge* para varios valores del parámetro `\(\lambda\)`
+
+* La librería `ridge` implementa la función `linearRidge()` que selecciona automáticamente el valor óptimo del parámetro `\(\lambda\)` usando el método propuesto en [Cule et al (2012)](https://arxiv.org/pdf/1205.0686.pdf)
+
+---
+
+class: middle, center, inverse
 
 # Aprendizaje supervisado en la práctica
---&gt;
+
+---
+
+## Primeros pasos
+
+* Los datos a analizar a menudo provienen de fuentes
+variadas (redes sociales, sensores, encuestas, ...) y están
+almacenados en diferentes soportes (ficheros de texto, base
+de datos, ficheros binarios, streams...)
+
+* Lo primero es identificar el problema qué queremos resolver
+y cuales son las variables que tenemos disponibles y pueden
+aportar información
+
+* Ante la duda, no descartar variables/información ni
+observaciones antes de tiempo
+
+* Lo segundo es combinar todas esa información y
+transformarla en una mezcla de variables numéricas
+(valores continuos) y categóricas (valores discretos)
+
+* El objetivo final del preproceso es organizar esos datos en
+un formato tabular (filas y columnas)
+
+
+---
+
+## Distintos tipos de información
+
+* En ocasiones no es trivial transformar ciertos tipos de información en variables numéricas y/o categóricas
+
+* Para estos casos a menudo es necesario un preproceso extra, muy dependiente del problema a resolver y específico del dominio
+
+* Ejemplos:
+
+  1. Texto (tweets, páginas web, documentos): word2vec, bag-of-words, modelos n-gram
+ 
+  2. Imágenes: valores RGB de los píxeles, intensidad de gris
+
+  3. Audio: transformada de Fourier, coeficientes MFCC
+
+  4. Video: secuencia de frames
+  
+  5. Series temporales: añadir *lags* como variables
+
+
+---
+  
+## Valores que faltan
+
+* Es importante distinguir cuando una variable tiene valor 0 o no conocido
+
+* Estos valores pueden venir representados por múltiples caracteres (“*”, “-”, campo vacio, etc.)
+
+* Hay que codificarlos de manera especial para tenerlos en cuenta en los análisis
+
+* En general,
+   1. Si tenemos suficientes datos, podemos simplemente ignorar las observaciones en las que falte alguno
+  2. Sino, podemos completar dichas observaciones que faltan con, por ejemplo, la mediana del resto
+  
+**Ejemplo**: en datos que provienen de un reconocimiento
+médico varios pacientes no tienen ningún valor en el campo
+de “Fármacos”. ¿No toman ninguna medicación o el médico
+no ha registrado la respuesa?
+
+---
+
+## Valores extremos
+
+* Distinguir si un valor es erróneo o válido pero extremo es muy complicado y dependiente del dominio
+
+* Existen diversas reglas para identificarlos
+
+* Pueden perjudicar a ciertos algoritmos de aprendizaje, mientras que otros son robustos frente a este tipo de datos
+
+Ejemplo: en datos provenientes de un reconocimiento
+médico, aparece un paciente con un IMC de 50
+
+
+---
+
+## Normalización
+
+* Las variables numéricas suelen tener rangos muy diversos
+
+* **Ejemplo**: salario (10,000 – 100,000 EUR) y edad (0–100)
+
+* Algunos modelos interpretan esta diferencia de escalas como que unas variables son más importantes que otras
+
+* Existen varias normalizaciones para que estas variables
+sean comparables:
+  
+  * Media 0 varianza 1
+  
+  * Escalar al intervalo −1, 1
+I 
+  * ...
+
+* En ocasiones normalizar las variables tambié puede ayudar a que el proceso de aprendizaje sea más rápido
+
+* Cuidado al analizar los resultados, ya que están en los nuevos rangos
+
+---
+
+## Variables categóricas
+
+* Muy comunes en todo tipo de fuentes de datos
+
+* Muy pocos algoritmos de aprendizaje son capaces de tratarlas directamente
+
+* Por tanto, tenemos que convertirlas en numéricas
+
+* La transformación donde se asigna a cada uno de sus valores un número entero no suele ser buena idea, ya que crea una relación artificial de orden y falsea las distancias
+
+* Lo más utilizar una codificación *dummy* o *one-hot encoding*
+
+---
+
+## Codificación *dummy*
+
+![](./img/dummy.png)
+
+* Finalmente, podemos eliminar una de las dos nuevas variables puesto que tienen correlación 1
+
+* En general, para una variable categórica con `\(p\)` valores añadimos `\(p−1\)` variables nuevas
+
+???
+
+En R, la funcion `dummy_cols()` de la libreria `fastDummies`
+
+---
+
+## Otras codificaciones
+
+* Si en la semántica de la variable hay implícita una relación de orden: Puntuación {baja, media, alta} `\(\Rightarrow\)` {1,2,3}
+
+* Cuidado con las distancias!
+
+* Ejemplo si hay relación de orden y no queremos falsear las distancias:
+
+![](./img/cat.png)
+
+---
+
+## Variables categóricas en R
+
+* Las variables categóricas en R se codifican con el tipo `factor`
+
+* Muchas funciones que implementan algoritmos de aprendizaje con interfaz para fórmulas aceptan factores directamente y los convierte usando una codificación *dummy*
+
+* Si el algoritmo no tiene interfaz para fórmula y solo acepta variables numéricas, tenemos que convertirlas explicitamente
+
+* Una opción es la función `dummy_cols()` de la librería `fastDummies`
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

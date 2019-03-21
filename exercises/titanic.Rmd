@@ -2,7 +2,9 @@
 title: "Titanic"
 author: "Alberto Torres Barrán"
 date: "21/3/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 Vamos a intentar predecir la supervivencia de las víctimas del Titanic a partir de las siguientes variables:
