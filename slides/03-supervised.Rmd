@@ -1,7 +1,7 @@
 ---
 title: "Conceptos generales de aprendizaje no supervisado"
 subtitle: "Curso de aprendizaje automático para el INE"
-author: "Víctor Gallego y Roi naveiro""
+author: "Víctor Gallego y Roi Naveiro"
 date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
