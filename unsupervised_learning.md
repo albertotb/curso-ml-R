@@ -24,5 +24,7 @@
 # Ejercicios
 
 1. Proyectar MNIST en 2D (PCA+TSNE) (A)
+
 2. Compresión de caras (B)
+
 3. Recomendación de películas con NMF
