@@ -1,5 +1,5 @@
 ---
-title: "Conceptos generales de aprendizaje supervisado"
+title: "Conceptos generales de aprendizaje no supervisado"
 subtitle: "Curso de aprendizaje automático para el INE"
 author: "Víctor Gallego y Roi Naveiro"
 date: "`r Sys.Date()`"
@@ -12,16 +12,12 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       beforeInit: "macros.js"
+  pdf_document:
+    includes:
+      in_header: mystyles.sty
 ---
 
-# Repaso de Álgebra Lineal
 
-SVD
-
-
-
-
----
 
 # ¿Qué es el Aprendizaje Automático? 
 
@@ -29,7 +25,203 @@ De la Wikipedia:
 
 *Machine learning is a subfield of **computer science** that evolved from the study of **pattern recognition** and computational learning theory in artificial intelligence. In 1959, Arthur Samuel defined machinelearning as a “Field of study that gives computers the ability to learn without being **explicitly programmed**”. Machine learning explores the study and construction of algorithms that can learn from and make predictions on **data**.*
 
+      
 ---
+
+## Aprendizaje Supervisado
+
+
+* Espacio de las muestras de entrada: $\mathcal{X}$
+
+* Espacio de las salidas: $\mathcal{Y}$
+
+**Dados**:
+
+* Conjunto de **entrenamiento**: $S = \{x_i,\, y_i\}_{i=1}^N$, con $x_i, y_i \in \mathcal{X} \times \mathcal{Y}$
+
+* Visión probabilística: $x_i, y_i \sim P(X,Y)$
+
+
+**Objetivo**: 
+
+  * Aprender una regla de predicción (hipótesis), $h: \mathcal{X} \rightarrow \mathcal{Y}$
+  
+  * Visión probabilística: estimar $P(Y|X)$
+  
+---
+
+## Aprendizaje Supervisado
+**Estrategia básica**: 
+
+  * MLE de algún modelo paramétrico
+  
+  $$\arg\max_{w} \prod_{i=1}^N P(y_i|x_i, w)$$
+  
+**Facilidades**:
+
+  * $\mathcal{Y}$ es tiene dimensión baja
+  
+  * Es sencillo cuantificar el error
+  
+
+---
+
+## Aprendizaje No Supervisado
+
+**Dados**:
+
+* No hay salidas: $S = \lbrace x_i \rbrace_{i=1}^N$, con $x_i \in \mathcal{X}$
+
+* Visión probabilística: $x_i \sim P(X)$
+
+**Objetivo**: 
+
+  * Estimar $P(X)$
+  
+  * Inferir alguna propiedad de $P(X)$
+
+
+---
+
+## Retos del Aprendizaje No Supervisado
+
+* $X$ generalmente es de alta dimensión
+
+* Propiedades de interés que queremos inferir son más complejas que simples parámetros
+
+* No hay una medida directa de cuantificar el error
+
+* Métodos heurísticos no solo para motivar los algoritmos sino también para medir la calidad de los resultados
+
+```{r, fig.height=3.5, fig.align='center', echo=F}
+library(ggplot2)
+pages = c(0.1, 0.9, 0.23, 0.77)
+Topico = c("UL", "SL", "UL", "SL")
+Libro = c("ESL", "ESL", "Bishop", "Bishop")
+data = data.frame(pages, Topico, Libro)
+p = ggplot(data, aes(x=Libro, y=pages, fill=Topico)) + 
+  geom_bar(stat = "identity", position = "dodge")
+p = p + xlab("Libro")+ ylab("Proporción de páginas")
+p
+```
+
+**Buen proxy de la dificultad de cada área !!**
+---
+
+## Una taxonomía de algoritmos de aprendizaje no supervisado según su objetivo
+
+* Métodos de estimación de densidades
+
+* Manifold learning: PCA, PCA no lineal, self-organizing maps, modelos de variables latentes, ...
+
+* Encontrar regiones convexas del espacio que contengan modas de $P(X)$: análisis de cluster, modelos de mixturas,
+...
+
+* Muestrear de $P(X)$: GAN, autoencoders, autoencoders variacionales, ...
+
+---
+
+class: middle, center, inverse
+
+# Repaso de Álgebra Lineal y Optimización
+
+
+---
+
+## SVD
+
+## Appendix C
+
+## Multiplicadores de Lagrange
+
+
+
+
+---
+
+class: middle, center, inverse
+
+# Análisis de Componentes Principales 
+
+---
+
+## Formulación por Máxima Varianza
+
+
+---
+
+## Ejemplo de proyección
+
+---
+
+## Cuestiones sobre implementación
+
+### Datos de alta dimensionalidad
+
+* En muchos casos $D > N$, por ejemplo imágenes: $|D| = \mbox{ancho} \times \mbox{alto} \times 3$.
+
+* La complejidad de calcular los autovectores de una matriz $D\times D$ escala según $\mathcal{O}(D^3)$. 
+
+* $N$ puntos en un espacio de dimensión $D > N$ forman un subespacio de dimensión $N-1$ (¡o menos!).
+
+
+* No tiene sentido aplicar PCA con $M > N-1$: saldrán autovalores $0$.
+
+---
+
+### Datos de alta dimensionalidad
+
+* Consideramos $\boldsymbol{X} \in \mathbb{R}^{N \times D}$ cuya fila n-ésima es $x_n - \bar{x}$. 
+
+* La matriz de covarianzas es $\boldsymbol{S} = N^{-1}\boldsymbol{X}^\intercal \boldsymbol{X}$, luego obtenemos autovectores mediante
+
+$$
+\frac{1}{N}\boldsymbol{X}^\intercal \boldsymbol{X} \boldsymbol{u}_i = \lambda_i \boldsymbol{u}_i
+$$
+
+* Multiplicando ambos miembros por la izquierda por $\boldsymbol{X}$ llegamos a
+
+$$
+\frac{1}{N}\boldsymbol{X} \boldsymbol{X}^\intercal (\boldsymbol{X} \boldsymbol{u}_i) = \lambda_i (\boldsymbol{X} \boldsymbol{u}_i)
+$$
+con lo que $\boldsymbol{v}_i = \boldsymbol{X} \boldsymbol{u}_i$ es un autovector de la matriz $N^{-1}\boldsymbol{X} \boldsymbol{X}^\intercal$, de tamaño $N \times N$.
+
+
+* ¡La complejidad ahora es $\mathcal{O}(N^3)!$
+
+
+---
+
+### Datos de alta dimensionalidad
+
+* Pero tenemos que obtener los autovectores en el espacio original... 
+
+* Multiplicando ahora por $\boldsymbol{X}^\intercal$:
+
+$$
+(\frac{1}{N}\boldsymbol{X}^\intercal \boldsymbol{X}) (\boldsymbol{X}^\intercal \boldsymbol{v}_i) = \lambda_i (\boldsymbol{X}^\intercal \boldsymbol{v}_i)
+$$
+
+* Con lo que $\boldsymbol{X}^\intercal \boldsymbol{v}_i$ es autovector de $\boldsymbol{S}$ con mismo autovalor $\lambda_i$.
+
+En resumen:
+
+1. Calculamos autovectores $\boldsymbol{v}_i$.
+
+2. $\boldsymbol{u}_i =  \boldsymbol{X}^\intercal \boldsymbol{v}_i$ y normalizamos $\boldsymbol{u}_i$.
+
+3. En concreto, $$\boldsymbol{u}_i = \frac{1}{(N\lambda_i)^2} \boldsymbol{X}^\intercal \boldsymbol{v}_i   $$
+
+
+
+
+---
+
+### Datos de alta dimensionalidad. Ejemplo práctico
+
+---
+
+
 class: center, middle
 
 ![:scale 60%](./img/machine_learning_2x.png)
