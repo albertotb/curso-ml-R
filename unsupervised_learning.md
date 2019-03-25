@@ -7,11 +7,13 @@
     1. Repaso de algebra lineal y SVD (pizarra?) (B)
 
     2. Dos enfoques del análisis de componentes principales
-      1. PCA como algoritmo de compresión (pizarra?) (A)
-      2. Formulación de máxima varianza (pizarra?) (B)
+    
+       1. PCA como algoritmo de compresión (pizarra?) (A)
+       2. Formulación de máxima varianza (pizarra?) (B)
 
     3. Cuestiones sobre implementación (B)
-      1. PCA para datos de alta dimensionalidad
+    
+       1. PCA para datos de alta dimensionalidad
 
     4. Factorización de matrices no negativas (A)
 
