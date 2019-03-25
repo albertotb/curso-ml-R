@@ -147,6 +147,81 @@ class: middle, center, inverse
 
 ## Formulación por Máxima Varianza
 
+* Dados: $x_n \in \mathbb{R}^D,\quad n = 1, \ldots, N$
+
+* Objetivo: encontrar proyección lineal $\pi: \mathbb{R}^D \rightarrow \mathbb{R}^M$ tal que $M < D$ y se maximize la varianza de los datos proyectados. 
+
+--
+
+* Ejemplo $\mathbb{R}^2 \rightarrow \mathbb{R}^1$:
+
+![:scale 100%](./img/pca_anim.gif)
+---
+
+
+## Formulación por Máxima Varianza
+
+* Empezamos considerando proyección a $\mathbb{R}$ ( $M = 1$ ).
+
+* Una proyección viene representada por su dirección, esto es, un vector $\boldsymbol{u}_1 \in \mathbb{R}^D$. Como sólo nos interesa la dirección, imponemos $\boldsymbol{u}_1^\intercal \boldsymbol{u}_1 = 1$.
+
+* $\boldsymbol{u}_1^\intercal x_n$ es la proyección del n-ésimo punto.
+
+* También nos interesa calcular:
+  
+  * La media de los datos proyectados
+    $$ \frac{1}{N} \sum_{n=1}^N \boldsymbol{u}_1^\intercal x_n = \boldsymbol{u}_1 \bar{x}  $$
+    
+  * La varianza de los datos proyectados
+  
+    $$  \frac{1}{N} \sum_{n=1}^N (\boldsymbol{u}_1^\intercal x_n - \boldsymbol{u}_1^\intercal \bar{x})^2 = \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 $$
+    
+    
+
+---
+
+
+## Formulación por Máxima Varianza
+
+* Ahora ya podemos plantear un problema de optimización, con objetivo:
+
+$$
+\max_{\boldsymbol{u}_1} \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1
+$$
+
+* con la restricción:
+
+$$
+\boldsymbol{u}_1^\intercal \boldsymbol{u}_1
+$$
+
+* Para resolverlo, utilizamos la formulación Lagrangiana, con lo que lo convertimos al siguiente problema de optimización sin restricciones:
+
+$$
+\max_{\boldsymbol{u}_1} \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 + \lambda_1 (\boldsymbol{u}_1^\intercal \boldsymbol{u}_1 - 1)
+$$
+
+* Derivamos...
+
+---
+
+## Formulación por Máxima Varianza
+
+* Queda que
+
+$$
+\boldsymbol{S} \boldsymbol{u}_1 = \lambda_1 \boldsymbol{u}_1
+$$
+es decir, $\boldsymbol{u}_1$ es *autovector de la matriz de covarianzas* $\boldsymbol{S}$.
+
+* Más aún,
+
+$$
+\boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 = \lambda_1
+$$
+la *varianza es precisamente el mayor autovalor* 
+
+* El autovector $\boldsymbol{u}_1$ asociado al mayor autovalor, $\lambda_1$ es conocido como *primera componente principal*.
 
 ---
 
@@ -218,6 +293,31 @@ En resumen:
 ---
 
 ### Datos de alta dimensionalidad. Ejemplo práctico
+
+
+---
+
+class: middle, center, inverse
+
+# Métodos no lineales para reducción de dimensionalidad
+
+---
+
+# Métodos no lineales
+
+
+
+---
+
+# t-SNE
+
+
+
+---
+
+# Ejercicio
+
+
 
 ---
 
