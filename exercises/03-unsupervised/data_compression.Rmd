@@ -45,11 +45,12 @@ rgb.pca <- list(ine.r.pca, ine.g.pca, ine.b.pca)
 Comprimimos escogiendo un número M de componentes principales
 
 ```{r, echo=F}
-compress = function(M=3, pca_obj){
+compress = function(M=1200, pca_obj){
   pca.img <- sapply(pca_obj, function(j) {
     compressed.img <- j$x[,1:M] %*% t(j$rotation[,1:M])
   }, simplify = 'array')
   pca.img[pca.img<0] = 0
+  pca.img[pca.img>1] = 1
   return(pca.img)
 }
 ```

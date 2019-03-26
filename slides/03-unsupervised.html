@@ -4,7 +4,7 @@
     <title>Conceptos generales de aprendizaje no supervisado</title>
     <meta charset="utf-8" />
     <meta name="author" content="Víctor Gallego y Roi Naveiro" />
-    <meta name="date" content="2019-03-25" />
+    <meta name="date" content="2019-03-26" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Conceptos generales de aprendizaje no supervisado
 ## Curso de aprendizaje automático para el INE
 ### Víctor Gallego y Roi Naveiro
-### 2019-03-25
+### 2019-03-26
 
 ---
 
@@ -367,22 +367,108 @@ Para un producto dado, la matriz reconstruida dará mucho peso a los clientes qu
 Para minería de textos, cada columnda de X es un documento y cada fila una palabra. Los elementos de X son número de apariciones. Las variables ocultas o segmentos pueden identificarse con distintas temáticas. Entonces cada documento se expresa como combinación lineal de temáticas.
 
 ---
+
+class: middle, center, inverse
+
+# Análisis de Componentes Principales Probabilístico
+
+---
+# PCA Probabilístico
+
+* PCA = solución de máxima verosimilitud de modelo probabilístico de variables latentes. 
+
+* Permite tratamiento natural de datos ausentes.
+
+* Permite la formulación Bayesiana en la que la dimensión del subespacio principal puede ser aprendida de los datos.
+
+* Permite modelizar densidades condicionadas a clases y por tanto clasificar.
+
+* Puede generar muestras de la distribución de interés.
+
+---
+# PPCA - Modelo Generativo
+
+* Idea: explicar cómo los datos observados se han generado a partir de variables latentes.
+
+* Cada dato observado `\(\textbf{x}\)` se ha generado de esta manera:
+
+  1. Se muestrea la variable latente `\(\textbf{z} \sim  \mathcal{N}(\textbf{z} \vert 0, \textbf{I})\)`.
+  
+  2. `\(\textbf{x} = \textbf{W} \boldsymbol{z} + \boldsymbol{\mu} + \boldsymbol{\epsilon}\)`. Donde `\(\boldsymbol{\epsilon}\)` sigue una distribución normal de media 0 y covarianza `\(\sigma^2\textbf{I}\)`. 
+  
+--
+
+* Ahora, supongamos que queremos determinar `\(\textbf{W}, \boldsymbol{\mu}\)` y `\(\sigma^2\)` usando máxima verosimilitd. Necesitamos escribir la distribución marginal `\(p(\textbf{x})\)`.
+
+`\begin{equation}
+p(\boldsymbol{x}) = \int p(\boldsymbol{x}|\boldsymbol{z})p(\boldsymbol{z})d\boldsymbol{z} 
+\end{equation}`
+
+--
+
+* Como estamos ante un modelo lineal-Gaussiano, la marginal seguirá una distribución normal con
+
+
+`\begin{eqnarray}
+\mathbb{E}[\boldsymbol{x}] &amp;=&amp; \mathbb{E}[\boldsymbol{Wz} + \boldsymbol{\mu} + \boldsymbol{\epsilon}] = \boldsymbol{\mu} \\
+\text{cov}[\boldsymbol{x}] &amp;=&amp; \mathbb{E}[(\boldsymbol{Wz} + \boldsymbol{\epsilon})(\boldsymbol{Wz} + \boldsymbol{\epsilon})^\top] = \mathbb{E}[\boldsymbol{Wz} \boldsymbol{z}^\top \boldsymbol{W}^\top] + \mathbb{E}[\boldsymbol{\epsilon} \boldsymbol{\epsilon}^\top] = \boldsymbol{W} \boldsymbol{W}^\top + \sigma^2 \boldsymbol{I} = \boldsymbol{C}
+\end{eqnarray}`
+
+---
+# PPCA - Solución de máxima verosimilitud
+
+* Dado un conjunto de datos observados `\(\boldsymbol(X) = \lbrace \boldsymbol{x_n} \rbrace\)`, la log-verosimilitud viene dada por
+
+`\begin{eqnarray}
+\log p(\boldsymbol X \vert \boldsymbol W ,\boldsymbol \mu ,\sigma^2) &amp;=&amp;\sum_{n=1}^N \log p(\boldsymbol{x}_n \vert \boldsymbol W,\boldsymbol \mu,\sigma^2) \\
+&amp;=&amp; -\frac{ND}{2} \log(2\pi)-\frac{N}{2} \log(|\boldsymbol{C}|) - \frac{1}{2} \sum_{n=1}^N (\boldsymbol{x}_n - \boldsymbol \mu )^\top \boldsymbol{C}^{-1} (\boldsymbol{x}_n - \boldsymbol \mu )
+\end{eqnarray}`
+
+--
+
+* Tipping and Bishop, [Probabilistic principal component analysis](https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/1467-9868.00196) resuelven el problema de optimización.
+
+`\begin{eqnarray}
+\boldsymbol{\mu} &amp;=&amp; \bar{\boldsymbol{x}} \\
+\boldsymbol{W}_{ML} &amp;=&amp; \boldsymbol{U}_M (\boldsymbol{L}_M - \sigma^2 \boldsymbol{I})^{1/2} \boldsymbol{R} \\
+\sigma_{ML}^2 &amp;=&amp; \frac{1}{D-M} \sum_{i=M+1}^D \lambda_i
+\end{eqnarray}`
+
+donde `\(\lambda_i\)` son los `\(D-M\)` autovalores de la matriz de covarianza de menor valor, `\(\boldsymbol{U}_M\)` es una matriz formada por los `\(M\)` autovectores de mayor autovalor y `\(\boldsymbol{L}_M\)` es una matriz diagonal con estos autovectores.
+
+---
+# PPCA - Recuperando PCA
+
+* PCA: proyección de puntos de un espacio `\(D\)`-dimensional a uno `\(M\)`-dimensional.
+
+* PPCA: al revés. Para aplicaciones, invertimos esta proyección usando el teorema de Bayes.
+
+--
+
+* Cualquier punto `\(\boldsymbol{x}\)`, puede ser resumido usando media y covarianza a posteriori.
+
+`\begin{eqnarray}
+\mathbb{E}[\boldsymbol{z} \vert \boldsymbol{x}] &amp;=&amp; \boldsymbol{M}^{-1}\boldsymbol{W}_{ML}^\top (\boldsymbol{x} -\boldsymbol{\bar{x}})
+\text{cov}[]\boldsymbol{z} \vert \boldsymbol{x} &amp;=&amp; \sigma^2 \boldsymbol{M}^{-1}
+\end{eqnarray}`
+
+con `\(\boldsymbol{M} = \boldsymbol{W}^\top  \boldsymbol{W} + \sigma^2 \boldsymbol{I}\)`.
+
+--
+
+* En el límite `\(\sigma^2 \rightarrow 0\)`, la media a posteriori representa una proyección ortogonal del punto al espacio latente y la covarianza es cero, por tanto la densidad es singular, recuperando PCA.
+
+* **IMPORTANTE**: PPCA permite definir una distribución Gaussiana multivariante en la que el número de grados de libertad, puede ser contralado y al mismo tiempo capturar correlaciones en los datos.
+
+
+---
 # Referencias
 
    1. Randal J. Barnes [Matrix Differentiation (and some othe stuff)](https://atmos.washington.edu/~dennis/MatrixCalculus.pdf)
    
    2. Lee and Seung [Algorithms for Non-negative Matrix Factorization](https://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf)
    
-   
-
-
-
-???
-
-Dos culturas:
-
-Una asume que los datos han sido generados por un modelo estocástico específico. 
-Otra usa modelos algorítmicos y asume que el mecanismo de generación de los datos es desconocido
+   3. Tipping and Bishop, [Probabilistic principal component analysis](https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/1467-9868.00196)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
