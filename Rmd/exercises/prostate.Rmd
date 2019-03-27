@@ -1,0 +1,15 @@
+---
+title: "Prostate"
+author: "Alberto Torres Barrán"
+date: "21/3/2019"
+output: pdf_document
+---
+
+Con los datos `prostate.data`:
+
+  1. Cargar fichero en R
+  2. Separar en train/test de acuerdo con los valores de la columna `train`
+  3. Ajustar un modelo de regresión ridge, donde la variable respuesta es `lpsa`
+  4. Probar distintos valores del parámetro de regularización
+  5. Ajustar un modelo ElasticNet, obteniendo el valor óptimo de $\alpha$ usando validación cruzada
+  6. ¿Cuál es el patrón de dispersión de los coeficientes?
