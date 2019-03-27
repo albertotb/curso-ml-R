@@ -37,7 +37,7 @@ class: middle, center, inverse
 
 ---
 
-##Ejemplo: distribución de Bernoulli
+##Ejemplo: distribución binomial
 
 * La regresión logística es un caso particular de GLM donde la distribución de $Y$ es la binomial
 
