@@ -12,6 +12,8 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       beforeInit: "macros.js"
+    includes:
+      before_body: mathjax.html
 ---
 
 # ¿Qué es el Aprendizaje Automático? 
@@ -473,6 +475,12 @@ Ejemplo de clasificación en 2 dimensiones [ESL]
 
 ---
 
+class: center, middle
+
+![:scale 75%](./img/knn_class.png)
+
+---
+
 ```{r}
 library(class)
 
@@ -527,6 +535,38 @@ plot_knn <- function(k) {
 
 plot_knn(15)
 ```
+
+---
+
+class: center
+
+## Maldición de la dimensionalidad
+
+![:scale 90%](./img/curse_dim.png)
+
+---
+
+* En 2 dimensiones, para capturar un 10% del volumen necesitamos cubrir aprox. el 25% del rango de cada coordenada
+
+* En 10 dimensiones, necesitamos el 80%
+
+* Otro problema relacionado es la densidad del muestreo:
+
+  * Si en 1 dimensión necesitamos $n=100$ muestras para cubrir el espacio, en 10 dimensiones necesitamos $n=100^{10}$ para tener la misma densidad de muestreo (crecimiento exponencial)
+
+* A medida que la dimensión crece, las observaciones están mas cerca de las esquinas del hipercubo que del centro
+
+   * Observaciones cercanas a las esquinas son más difíciles de clasificar porque el valor de sus atributos cambia muy bruscamente
+
+* Resumiendo, si $d$ es muy grande, métodos como KNN basados en distancias tienen problemas  
+
+???
+
+Observaciones uniformes en un hipercubo de dimension d
+
+Cambio brusco: ejemplos en esquinas opuestas del cuadrado unidad
+
+los puntos que te pueden decir algo de valores tan extremos estan lejos: tienes que extrapolar de ejemplos cercanos no tan extremos en lugar de interpolar
 
 ---
 
@@ -589,8 +629,34 @@ plot_knn(50)
  * **Solución**: crear un tercer conjunto, conjunto de validación, para seleccionar hiper-parámetros y comparar modelos
  
  * Finalmente, reportar el error de test como estimación del poder de generalización del modelo
- 
- * Existen otras formas que veremos más adelante (por ej. validación cruzada)
+
+---
+
+## Validación cruzada
+
+* Se divide el conjunto de entrenamiento en $K$ particiones
+
+* Usar $K-1$ particiones como entrenamiento y la otra como test para ajustar $K$ modelos
+
+* $\hat{f}^{-k}(x)$ es el modelo entrenado con todas las particiones menos la $k$
+
+* Calcular el error de validación cruzada: $$\text{CV}(\hat{f}) = \frac{1}{n}\sum_{i=1}^n{L(y_i, \hat{f}^{-\kappa(i)}(x_i))}$$
+donde $\kappa: \{1, \dots, n\} \rightarrow \{1, \dots, K\}$ es una función que indica a que partición pertenece cada observación $i$ 
+
+* Cuando $K = n$ se conoce como validación cruzada *leave-one-out*
+
+???
+
+Tipicos valores para $K$ son 5 o 10
+LOOCV el estimador del error de generalizacion es aprox. no sesgado pero puede tener mucha varianza. Tambien es computacionalmente muy costoso
+
+---
+
+class: middle, center
+
+![](./img/crossval.jpg)
+
+Wikipedia. [Cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics))
 
 ---
 
@@ -632,6 +698,192 @@ Funcion en R: lm.ridge(), paquete MASS
 * La función `lm.ridge()` de la librería `MASS` entrena una regresión lineal con regularización *ridge* para varios valores del parámetro $\lambda$
 
 * La librería `ridge` implementa la función `linearRidge()` que selecciona automáticamente el valor óptimo del parámetro $\lambda$ usando el método propuesto en [Cule et al (2012)](https://arxiv.org/pdf/1205.0686.pdf)
+
+---
+
+## Regresión logística
+
+Equivalente a la regresión lineal para problemas de clasificación
+
+**Objetivo**: estimar la probabilidad a posteriori de pertenencia a cada clase
+
+Función logística o sigmoidea: $$\sigma(a) = \frac{1}{1 + \exp{(-a)}}$$
+
+Para 2 clases con etiquetas $\{0, 1\}$, definimos: 
+$$p(y_i = 1\,|\, x_i) = \sigma(w^Tx_i)$$ 
+
+Por tanto
+$$p(y_i = 0\,|\, x_i) = 1 - \sigma(w^T x_i) = \sigma(-w^Tx_i)$$
+                    
+???
+
+La funcion logistica es conveniente porque toma un argumento en el rango $[-\inf, \inf]$ y tiene como salida un numero en el rango $[0, 1]$
+
+Ademas, satura muy pronto gracias a la exponencial
+
+---
+
+class: center, middle
+
+## Curva logística
+
+![](./img/Logistic-curve.svg)
+
+Wikipedia, [Logistic function](https://en.wikipedia.org/wiki/Logistic_function)
+
+---
+
+## Interpretación: odds ratio
+
+* Dado un modelo lineal con una única variable independiente, el **odds ratio** se define como $$\text{OR} = \frac{\exp(w_0 + w_1 (x + 1))}{\exp(w_0 + w_1 x)} = \exp(w_1)$$
+
+* Es decir, como cambian las probabilidades de la salida cuando la variable $x$ aumenta una unidad:
+  
+  1. Si $\text{OR} = 1$ la variable x no tiene ninguna asociación con la salida
+
+  2. Si $\text{OR} > 1$ la variable está asociada con una mayor probabilidad de la salida
+
+  3. Si $\text{OR} < 1$ la variable está asociada con una menor probabilidad de la salida
+
+---
+
+## Calidad modelos clasificación
+
+.pull-left[
+![](./img/confusion_matrix.png)
+]
+
+.pull-right[
+
+Medidas:
+* Tasa de acierto: $\frac{\text{TP} + \text{TN}}{\text{P} + \text{N}}$
+
+* Sensitividad, recall, TPR: $\frac{\text{TP}}{\text{TP} + \text{FN}}$
+
+* Especificidad, TNR: $\frac{\text{TN}}{\text{TN} + \text{FP}}$
+
+* Precisión, PPV: $\frac{\text{TP}}{\text{TP} + \text{FP}}$
+
+* F1-score: $2\times \frac{\text{PPV} \times \text{TPR}}{\text{PPV} + \text{TPR}}$
+]
+---
+
+## Regresión logística: optimización
+
+Estos modelos se optimizan usando el log de la verosimilitud condicionada a $\Xbf$: 
+$$\mathcal{L}(w) = \sum_{i=1}^n{y_i \log [\sigma(w^T x_i)] + (1-y_i)\log[ \sigma(-w^T x_i)]} = y_i(w^Tx_i)+\log[\sigma(-w^T x_i)]$$
+
+Derivada: $$\partial_w \mathcal{L}(w) = x_i(y_i - \sigma(w^T x_i))$$
+
+Son $d+1$ ecuaciones no lineales en $w$
+
+Se pueden resolver usando una variante específica de Newton-Raphson: Iteratively Re-weighted Least Squares (IRLS)
+
+Segunda derivada: $$\partial^2 \mathcal{L}(w) = -\sum_{i=1}^n{x_i x_i^T \sigma(w^T x_i)(1-\sigma(w^T x_i))}$$
+
+---
+
+class: middle, center, inverse
+
+# Optimización numérica: Introducción
+
+---
+
+## Descenso por gradiente
+
+* Dada una función convexa y diferenciable $f(w)$, podemos encontrar su mínimo iterando: $$w^{k+1} = w^k - \eta \nabla f(w^k)$$
+
+* $\eta$ es un parámetro que controla la longitud del paso
+
+* Si $\eta$ es suficientemente pequeño, el valor de $f(w)$ decrece de forma monótona en cada paso
+
+* También se puede demostrar que la secuencia $\{w^k\}$ converge al óptimo $w^*$
+
+* Método de primer orden, ya que solo usa información de la primera derivada (gradiente)
+
+???
+
+En R la función `lm()` usa descomposición QR, no descenso por gradiente
+[ref](https://stats.stackexchange.com/questions/94496/lm-function-in-r)
+
+---
+
+class: middle, center
+
+![:scale 75%](./img/Gradient_descent.svg)
+
+---
+
+## Newton-Raphson (N-R)
+
+* Queremos minimizar una función convexa dos veces diferenciable, $f: \Rbb^d \rightarrow \Rbb$
+
+* Expansión de Taylor de segundo orden de $f$ en $x$: $$f(x+h) \approx f(x) + \nabla f(x)^T h + \frac{1}{2}h^T \Hbf h$$ donde $\Hbf$ es la matriz de segundas derivadas (Hessiana)
+
+* Entonces $$\nabla_h f(x+h) = \nabla f(x) + \Hbf h$$
+
+* Por tanto el $h$ que minmiza la aproximación de segundo orden es $$h^* = -\Hbf^{-1}\nabla f(x)$$
+
+* Iteramos: $$x^{k+1} = x^k -\Hbf^{-1}\nabla f(x)$$
+
+---
+
+## N-R para regresión logística
+
+Resscribimos las derivadas en notación matricial: 
+\begin{align}
+\partial   \mathcal{L}(w) &= \Xbf^T(y - p) \\
+\partial^2 \mathcal{L}(w) &= -\Xbf^T\mathbf{W}\Xbf
+\end{align}
+
+donde $p_i = \sigma(w^T x_i)$ y $\mathbf{W}_{ii} = \sigma(w^T x_i)(1 - \sigma(w^T x_i))$
+
+Actualización de N-R: 
+\begin{align}
+w^{k+1} &= w^k + (\Xbf^T\mathbf{W}\Xbf)^{-1} \Xbf^T(y - p) \\
+        &= (\Xbf^T\mathbf{W}\Xbf^T) \Xbf^T\mathbf{W} z
+\end{align}
+con $z = \Xbf w^k + \mathbf{W}^{-1}(y - p)$
+
+Es decir, en cada iteración se resuelve el problema de mínimos cuadrados $$w^{k+1} = \arg\min_w\; (z - \Xbf w)^T \mathbf{W} (z - \Xbf w)$$ 
+
+---
+
+## *Iteratively Re-weighted Least Squares*
+
+* Dado un valor inicial $w^0$
+
+* Iterar para $k=0, 1, 2, 3, \dots$
+  
+  1. Calcular $p^k$ con $p_i = \sigma((w^k)^T x_i)$
+  
+  2. Calcular $\mathbf{W}^k$ con elementos diagonales $\mathbf{W}_{ii}^k = \sigma((w^k)^T x_i)(1 - \sigma((w^k)^T x_i)$
+  
+  3. Calcular $z^k = \Xbf w^k + (\mathbf{W}^k)^{-1}(y - p^k)$
+
+  4. Actualizar pesos $w$ $$w^{k+1} = \arg\min_{w^k}\; (z^k - \Xbf w^k)^T \mathbf{W}^k (z^k - \Xbf w^k)$$
+
+* Hay que establecer un criterio de parada
+
+* Puede tener problemas de convergencia dependiendo del valor inicial
+
+???
+
+Parar si el gradiente es muy pequeño
+
+Parar si la diferencia entre dos valores consecutivos de f(x) esta por debajo de un umbral
+
+---
+
+class: center, middle
+
+![:scale 60%](./img/Newton_optimization_vs_grad_descent.svg)
+
+???
+
+Descenso por gradiente (verde)
+Newton (rojo)
+Newton toma un camino mas directo al optimo porque puede usar información de la curvatura
 
 ---
 
@@ -688,20 +940,63 @@ un formato tabular (filas y columnas)
   
 ## Valores que faltan
 
-* Es importante distinguir cuando una variable tiene valor 0 o no conocido
+* Es importante distinguir cuando una variable tiene valor 0 de "no conocido"
+
+* Si es posible, nos gustaría saber también el mecanismo que origina el valor que falta:
+  
+  1. MCAR (*Missing Completely At Random*): el motivo por el que falta un valor no está relacionado con otras variables 
+  
+  2. MAR (*Missing At Random*): el motivo está relacionado con otras variables 
+  
+  3. NMAR (*Not Missing At Random*): no sabemos el motivo por el que falta
 
 * Estos valores pueden venir representados por múltiples caracteres (“*”, “-”, campo vacio, etc.)
 
-* Hay que codificarlos de manera especial para tenerlos en cuenta en los análisis
+* Hay que codificarlos de manera especial para tenerlos en cuenta en los análisis (en R `NA`)
 
-* En general,
-   1. Si tenemos suficientes datos, podemos simplemente ignorar las observaciones en las que falte alguno
-  2. Sino, podemos completar dichas observaciones que faltan con, por ejemplo, la mediana del resto
+
+**Ejemplo**: en datos que provienen de un reconocimiento médico varios pacientes no tienen ningún valor en el campo de “Fármacos”. ¿No toman ninguna medicación o el médico no ha registrado la respuesa?
+
+???
+
+MCAR: se pueden ignorar o completar con los valores de esa variable
+MAR: se pueden completar con los valores de esa variable teniendo en cuenta los valores de las variables con las que asumimos que está relacionado
+NMAR: no podemos hacer gran cosa
+
+---
+
+## Completar valores que faltan
+
+1. Ignorar observaciones donde falte alguna variable
   
-**Ejemplo**: en datos que provienen de un reconocimiento
-médico varios pacientes no tienen ningún valor en el campo
-de “Fármacos”. ¿No toman ninguna medicación o el médico
-no ha registrado la respuesa?
+2. Completar observaciones con:
+
+  * media o mediana, datos continuos
+  
+  * moda, datos categóricos
+
+  usando:
+    
+  * todas las observaciones de esa variable
+  
+  * observaciones pero agrupadas por otras variables
+
+3. Modelos predictivos
+  
+  * Paquete `mice` en R
+
+  * KNN: usar solo observaciones cercanas
+
+
+Otras [librerías](https://medium.com/coinmonks/dealing-with-missing-data-using-r-3ae428da2d17)
+
+???
+
+1. se pierden datos, solo es completamente seguro para MCAR
+
+2. para datos MAR, dificil saber de antemano por que variables hay que agrupar
+
+3. KNN: muy costoso si hay muchas observaciones, elegir valor de k es critico
 
 ---
 
@@ -709,13 +1004,28 @@ no ha registrado la respuesa?
 
 * Distinguir si un valor es erróneo o válido pero extremo es muy complicado y dependiente del dominio
 
-* Existen diversas reglas para identificarlos
+* Existen diversas reglas para identificarlos (paquete `outliers`)
 
 * Pueden perjudicar a ciertos algoritmos de aprendizaje, mientras que otros son robustos frente a este tipo de datos
+
+* Comprobar siempre que no hay valores imposibles
 
 Ejemplo: en datos provenientes de un reconocimiento
 médico, aparece un paciente con un IMC de 50
 
+---
+
+## Tratamiento valores extremos
+
+1. Eliminar la observación
+
+2. Asignar como nuevo valor el límite inferior/superior de los valores normales
+
+3. Asignar al valor extremo `NA` e imputar su nuevo valor usando las técnicas para valores que faltan
+
+???
+
+Ejemplo, distancia de Cooke?
 
 ---
 
@@ -725,20 +1035,29 @@ médico, aparece un paciente con un IMC de 50
 
 * **Ejemplo**: salario (10,000 – 100,000 EUR) y edad (0–100)
 
-* Algunos modelos interpretan esta diferencia de escalas como que unas variables son más importantes que otras
+* Algunos modelos interpretan esta diferencia de escalas como que unas variables son más importantes que otras o las observaciones están más próximas
 
-* Existen varias normalizaciones para que estas variables
-sean comparables:
-  
-  * Media 0 varianza 1
-  
-  * Escalar al intervalo −1, 1
-I 
-  * ...
-
-* En ocasiones normalizar las variables tambié puede ayudar a que el proceso de aprendizaje sea más rápido
+* En ocasiones normalizar las variables también puede ayudar a que el algoritmo de optimización converja más rápido
 
 * Cuidado al analizar los resultados, ya que están en los nuevos rangos
+
+---
+
+## Métodos
+
+* Media 0 varianza 1 (estandarizar): $$z = \frac{x - \text{mean}(x)}{\text{std}(x)}$$
+  
+* Escalar a un intervalo, por ej. $[−1,\, 1]$: $$z = \frac{x - \min(x)}{\max(x) - \min(x)}$$
+
+* Estandarización robusta: $$z = \frac{x - \text{median}(x)}{\text{IQR(x)}}$$
+
+* Otros
+
+???
+
+Se puede escalar a otro rango arbitrario
+
+Escalar a [-1, 1] preserva los 0, pero es sensible a outliers
 
 ---
 
@@ -752,7 +1071,7 @@ I
 
 * La transformación donde se asigna a cada uno de sus valores un número entero no suele ser buena idea, ya que crea una relación artificial de orden y falsea las distancias
 
-* Lo más utilizar una codificación *dummy* o *one-hot encoding*
+* Estándar: utilizar una codificación *dummy* (*one-hot encoding*)
 
 ---
 
@@ -772,9 +1091,23 @@ En R, la funcion `dummy_cols()` de la libreria `fastDummies`
 
 ## Otras codificaciones
 
-* Si en la semántica de la variable hay implícita una relación de orden: Puntuación {baja, media, alta} $\Rightarrow$ {1,2,3}
 
-* Cuidado con las distancias!
+* Codificación **ordinal**: variables ordinales, por ej. puntuación: {baja, media, alta} $\Rightarrow$ {1,2,3} (cuidado con las distancias!)
+
+* Codificación **binaria**: variables ordinales con alta dimensión, transformar la codificación a código binario
+
+* **Hashing**: codificar los valores usando una función de *hash*, que transforma cualquier valor a un número fijo de bits (columnas)
+
+
+* **Leave One Out**: el valor $C$ de la variable categórica para la observación $i$ se codifica como la media de la salida para todas las observaciones con valor $C$ en la variable categórica, excluyendo $i$
+
+* [Codificación de similitud](https://arxiv.org/pdf/1806.00979.pdf)
+
+* ...
+
+---
+
+## Codificaciones específicas del dominio
 
 * Ejemplo si hay relación de orden y no queremos falsear las distancias:
 
@@ -788,6 +1121,83 @@ En R, la funcion `dummy_cols()` de la libreria `fastDummies`
 
 * Muchas funciones que implementan algoritmos de aprendizaje con interfaz para fórmulas aceptan factores directamente y los convierte usando una codificación *dummy*
 
-* Si el algoritmo no tiene interfaz para fórmula y solo acepta variables numéricas, tenemos que convertirlas explicitamente
+* Tenemos que hacer la codificación explícitamente si:
+  
+  1. el algoritmo no tiene interfaz para fórmulas y solo acepta variables numéricas
+  
+  2. queremos usar otra codificación distinta de la codificación *dummy*
 
-* Una opción es la función `dummy_cols()` de la librería `fastDummies`
+* Función `dummy_cols()` de la librería [`fastDummies`](https://cran.r-project.org/web/packages/fastDummies/index.html)
+
+* Librería [`vtreat`](https://arxiv.org/abs/1611.09477)
+
+---
+
+class: middle, center, inverse
+
+# Generalized Linear Models
+
+---
+
+## GLMs
+
+* Generalización de la regresión lineal que permite distribuciones de errores distintas de la distribución normal.
+
+* Componentes:
+  
+  * Distribución de $Y_i$ con media $\mu_i$
+  * Predictor lineal, $$g(\mu_i) = w^T x_i$$ donde $g(\cdot)$ es la función de media
+
+* La función de media proporciona la relación entre la media de la distribución y el predictor lineal
+
+* El inverso de la función de media, $g^{-1}(\cdot)$ se conoce con el nombre de **función de enlace**
+
+---
+
+##Ejemplo: distribución de Bernoulli
+
+* La regresión logística es un caso particular de GLM donde la distribución de $Y$ es la binomial
+
+* La función de media es la logística,
+
+$$\mu = g^{-1}(w^T x_i) = \frac{1}{1 + \exp(-w^T x_i)}$$
+
+* La función de enlace es la inversa de la anterior,
+
+$$w^T x_i = g(\mu) = \ln\left(\frac{\mu}{1 - \mu}\right)$$
+
+* Para cada distribución, hay una función de enlace "canónica" que es la que se usa habitualmente
+
+---
+
+## Ejemplo: distribución de Poisson
+
+* Esta distribución está indicada cuando queremos modelizar una variable de salida entera y no real (por ej. conteos)
+
+* Función de media
+
+$$\mu = \exp(w^T x_i)$$
+
+* Función de enlace
+
+$$w^T x_i = \ln(\mu)$$
+
+* Otras distribuciones posibles son la Gamma, Exponencial, Multinomial, etc.
+
+---
+
+## GLMs en R
+
+* La función para ajustar modelos lineales generalizados es `glm()`
+
+* Tiene los mismos argumentos principales que `lm()`, pero además tenemos que especificar la distribución de la variables dependiente con el parámetro `family`
+
+* Por defecto se usa la función de enlace ""canónica", pero esto se puede modificar (ver ayuda)
+
+* Implementa el algoritmo IRLS (Newton-Raphson), que se puede generalizar para cualquier GLM donde la distribución pertenece a la familia exponencial
+
+Ejemplo: regresión logística
+
+```{r message=FALSE, warning=FALSE}
+fit <- glm(Species ~ Petal.Length, data=iris, family=binomial)
+```
