@@ -16,12 +16,6 @@ output:
       before_body: mathjax.html
 ---
 
-class: middle, center, inverse
-
-# Generalized Linear Models
-
----
-
 ## GLMs
 
 * Generalización de la regresión lineal que permite distribuciones de errores distintas de la distribución normal.
