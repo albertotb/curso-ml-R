@@ -54,17 +54,30 @@ test  = load_image_file("../../src/t10k-images.idx3-ubyte")
 test$y  = as.factor(load_label_file("../../src/t10k-labels.idx1-ubyte"))
 ```
 
-Esta base de datos consta de 10000 imágenes en escala de gris a 28 x 28, de los dígitos del 0 al 9 (escritos a mano). Explora la base de datos y visualiza algunos ejemplos usando la función show_digit.
+Esta base de datos consta de 10000 imágenes en escala de gris a 28 x 28, de los dígitos del 0 al 9 (escritos a mano).
 
 ```{r, message=F}
-## CÓDIGO
+dim(test)
 ```
+
+Visualizamos algunos ejemplos 
+
+```{r, message=F}
+show_digit(test[1, ])
+show_digit(test[100, ])
+show_digit(test[500, ])
+```
+
 
 ## Proyección a 2D usando PCA
 
-Usando el paquete prcomp de R base, proyecta las imágenes de los dígitos a 2 dimensiones. Muestra una gráfica de los puntos proyectados, etiquetando cada punto con el nombre del dígito correspondiente
+Usaremos el paquete prcomp
 ```{r, message=F}
-## CÓDIGO
+proy_pca <- prcomp(test[, 1:28^2], retx = T) ## Ojo, quitar LABEL, sino son trampas
+# Representamos las dos primeras componentes
+plot(proy_pca$x[, 1:2], type = 'n')
+text(proy_pca$x[, 1:2], labels = test$y, cex = 0.5,
+     col = rainbow(length(levels(test$y)))[test$y])
 ```
 
 ### Pregunta
@@ -72,15 +85,26 @@ Usando el paquete prcomp de R base, proyecta las imágenes de los dígitos a 2 d
 Pinta la curva de número de componentes frente a proporción de varianza explicada varianza explicada. ¿Cuántas componentes son necesarias para explicar el 99% de la varianza?
 
 ```{r, message=F}
-## CÓDIGO
+library(ggplot2)
+eigs = summary(proy_pca)$sdev^2
+#
+max_ncom = dim(test)[2]-1
+df = data.frame( 1:max_ncom, eigs, eigs/sum(eigs), cumsum(eigs)/sum(eigs))
+colnames(df) = c("N_comp", "Eigenvalues", "ExpVar", "CumuExpVar")
+p = ggplot(data=df) + geom_line(aes(x = N_comp, y = CumuExpVar) )
+p
 ```
 
 
 
 ## Proyección a 2D usando t-SNE
-Usando el paquete Rtsne, proyecta las imágenes de los dígitos a 2 dimensiones. Muestra una gráfica de los puntos proyectados, etiquetando cada punto con el nombre del dígito correspondiente. ¿Observas algún patrón?
+
 ```{r, message=F}
-# CÓDIGO
+library(Rtsne)
+proy_tsne <- Rtsne(test[, 1:28^2], num_threads = 16)
+plot(proy_tsne$Y[, 1:2], type = 'n')
+text(proy_tsne$Y[, 1:2], labels = test$y, cex = 0.5,
+     col = rainbow(length(levels(test$y)))[test$y])
 ```
 
 
