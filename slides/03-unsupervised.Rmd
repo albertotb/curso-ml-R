@@ -129,11 +129,69 @@ class: middle, center, inverse
 
 ---
 
-## SVD
+## Aplicaciones lineales
 
-## Appendix C
 
-## Multiplicadores de Lagrange
+
+* Dado $\boldsymbol{x} \in \mathbb{R}^D$, una **aplicación (función) lineal**  $ f : \mathbb{R}^N \rightarrow \mathbb{R}^M se expresa como
+$$
+f(\boldsymbol{x}) = W \boldsymbol{x}
+$$
+donde $W$ es una matriz de tamaño $M \times N$.
+
+* Para el caso $M = N$, los **autovalores** $\lambda \in \mathbb{R}$ y los **autovectores** $\boldsymbol{v} \in \mathbb{R}^M$ son los elementos que cumplen
+
+$$
+W \boldsymbol{v} = \lambda \boldsymbol{v}
+$$
+
+
+* Si los vectores columna de $W = \left[ w_1, \ldots, w_M \right]$ son ortonormales (esto es, $w_i^{\intercal} w_j = 0, w_i^{\intercal} w_i = 1$), se dice que $W$ es una proyección ortonormal. En este caso, los vectores $\left[ w_1, \ldots, w_M \right]$ forman una base ortonormal.
+
+
+---
+
+
+## Derivadas matriciales
+
+* Será necesario considerar derivadas de vectores respecto a escalares. En este caso,
+
+$$
+\left( \frac{\partial \boldsymbol{a}}{\partial x}  \right)_i = \frac{\partial \boldsymbol{a}_i}{\partial x}
+$$
+
+* También podemos derivar respecto a vectores o matrices:
+
+$$
+\left( \frac{\partial x}{\partial \boldsymbol{a}}  \right)_i = \frac{\partial x}{\partial \boldsymbol{a}_i}, \left( \frac{\partial \boldsymbol{a}}{\partial \boldsymbol{b}}  \right)_{i,j} = \frac{\partial \boldsymbol{a}_i}{\partial \boldsymbol{b}_j} 
+$$
+
+* *Ejercicio*. Probar que
+
+$$
+\frac{\partial \boldsymbol{x}^{\intercal} \boldsymbol{a}}{\partial \boldsymbol{x}} = \frac{\partial \boldsymbol{a}^{\intercal} \boldsymbol{x}}{\partial \boldsymbol{x}} = \boldsymbol{a}
+$$
+y que
+$$
+\frac{\partial \boldsymbol{A} \boldsymbol{B}}{\partial \boldsymbol{x}} = \frac{\partial \boldsymbol{A}}{\partial \boldsymbol{x}}\boldsymbol{B} + \frac{\partial \boldsymbol{B}}{\partial \boldsymbol{x}}\boldsymbol{A}.
+$$
+
+---
+
+
+## Optimización
+
+* Queremos optimizar una función diferenciable $f(\boldsymbol{x})$ tal que $f : \mathbb{R}^N \rightarrow \mathbb{R}$. Los **óptimos locales** verifican
+
+$$
+\frac{\partial f(\boldsymbol{x})}{\partial \boldsymbol{x}} = 0
+$$
+
+* En el caso de querer optimizar $f(\boldsymbol{x})$ sujeto a demás a una restricción $g(\boldsymbol{x}) = 0$, podemos utilizar el **Teorema de los multiplicadores de Lagrange** y optimizar la siguiente función objetivo (ya sin restricciones):
+
+$$
+f(\boldsymbol{x}) + \lambda g(\boldsymbol{x})
+$$
 
 
 
@@ -150,157 +208,7 @@ class: middle, center, inverse
 ---
 
 <<<<<<< HEAD
-## Formulación por Máxima Varianza
 
-* Dados: $x_n \in \mathbb{R}^D,\quad n = 1, \ldots, N$
-
-* Objetivo: encontrar proyección lineal $\pi: \mathbb{R}^D \rightarrow \mathbb{R}^M$ tal que $M < D$ y se maximize la varianza de los datos proyectados. 
-
---
-
-* Ejemplo $\mathbb{R}^2 \rightarrow \mathbb{R}^1$:
-
-![:scale 100%](./img/pca_anim.gif)
----
-
-
-## Formulación por Máxima Varianza
-
-* Empezamos considerando proyección a $\mathbb{R}$ ( $M = 1$ ).
-
-* Una proyección viene representada por su dirección, esto es, un vector $\boldsymbol{u}_1 \in \mathbb{R}^D$. Como sólo nos interesa la dirección, imponemos $\boldsymbol{u}_1^\intercal \boldsymbol{u}_1 = 1$.
-
-* $\boldsymbol{u}_1^\intercal x_n$ es la proyección del n-ésimo punto.
-
-* También nos interesa calcular:
-  
-  * La media de los datos proyectados
-    $$ \frac{1}{N} \sum_{n=1}^N \boldsymbol{u}_1^\intercal x_n = \boldsymbol{u}_1 \bar{x}  $$
-    
-  * La varianza de los datos proyectados
-  
-    $$  \frac{1}{N} \sum_{n=1}^N (\boldsymbol{u}_1^\intercal x_n - \boldsymbol{u}_1^\intercal \bar{x})^2 = \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 $$
-    
-    
-
----
-
-
-## Formulación por Máxima Varianza
-
-* Ahora ya podemos plantear un problema de optimización, con objetivo:
-
-$$
-\max_{\boldsymbol{u}_1} \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1
-$$
-
-* con la restricción:
-
-$$
-\boldsymbol{u}_1^\intercal \boldsymbol{u}_1
-$$
-
-* Para resolverlo, utilizamos la formulación Lagrangiana, con lo que lo convertimos al siguiente problema de optimización sin restricciones:
-
-$$
-\max_{\boldsymbol{u}_1} \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 + \lambda_1 (\boldsymbol{u}_1^\intercal \boldsymbol{u}_1 - 1)
-$$
-
-* Derivamos...
-
----
-
-## Formulación por Máxima Varianza
-
-* Queda que
-
-$$
-\boldsymbol{S} \boldsymbol{u}_1 = \lambda_1 \boldsymbol{u}_1
-$$
-es decir, $\boldsymbol{u}_1$ es *autovector de la matriz de covarianzas* $\boldsymbol{S}$.
-
-* Más aún,
-
-$$
-\boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 = \lambda_1
-$$
-la *varianza es precisamente el mayor autovalor* 
-
-* El autovector $\boldsymbol{u}_1$ asociado al mayor autovalor, $\lambda_1$ es conocido como *primera componente principal*.
-
----
-
-## Ejemplo de proyección
-
----
-
-## Cuestiones sobre implementación
-
-### Datos de alta dimensionalidad
-
-* En muchos casos $D > N$, por ejemplo imágenes: $|D| = \mbox{ancho} \times \mbox{alto} \times 3$.
-
-* La complejidad de calcular los autovectores de una matriz $D\times D$ escala según $\mathcal{O}(D^3)$. 
-
-* $N$ puntos en un espacio de dimensión $D > N$ forman un subespacio de dimensión $N-1$ (¡o menos!).
-
-
-* No tiene sentido aplicar PCA con $M > N-1$: saldrán autovalores $0$.
-
----
-
-### Datos de alta dimensionalidad
-
-* Consideramos $\boldsymbol{X} \in \mathbb{R}^{N \times D}$ cuya fila n-ésima es $x_n - \bar{x}$. 
-
-* La matriz de covarianzas es $\boldsymbol{S} = N^{-1}\boldsymbol{X}^\intercal \boldsymbol{X}$, luego obtenemos autovectores mediante
-
-$$
-\frac{1}{N}\boldsymbol{X}^\intercal \boldsymbol{X} \boldsymbol{u}_i = \lambda_i \boldsymbol{u}_i
-$$
-
-* Multiplicando ambos miembros por la izquierda por $\boldsymbol{X}$ llegamos a
-
-$$
-\frac{1}{N}\boldsymbol{X} \boldsymbol{X}^\intercal (\boldsymbol{X} \boldsymbol{u}_i) = \lambda_i (\boldsymbol{X} \boldsymbol{u}_i)
-$$
-con lo que $\boldsymbol{v}_i = \boldsymbol{X} \boldsymbol{u}_i$ es un autovector de la matriz $N^{-1}\boldsymbol{X} \boldsymbol{X}^\intercal$, de tamaño $N \times N$.
-
-
-* ¡La complejidad ahora es $\mathcal{O}(N^3)!$
-
-
----
-
-### Datos de alta dimensionalidad
-
-* Pero tenemos que obtener los autovectores en el espacio original... 
-
-* Multiplicando ahora por $\boldsymbol{X}^\intercal$:
-
-$$
-(\frac{1}{N}\boldsymbol{X}^\intercal \boldsymbol{X}) (\boldsymbol{X}^\intercal \boldsymbol{v}_i) = \lambda_i (\boldsymbol{X}^\intercal \boldsymbol{v}_i)
-$$
-
-* Con lo que $\boldsymbol{X}^\intercal \boldsymbol{v}_i$ es autovector de $\boldsymbol{S}$ con mismo autovalor $\lambda_i$.
-
-En resumen:
-
-1. Calculamos autovectores $\boldsymbol{v}_i$.
-
-2. $\boldsymbol{u}_i =  \boldsymbol{X}^\intercal \boldsymbol{v}_i$ y normalizamos $\boldsymbol{u}_i$.
-
-3. En concreto, $$\boldsymbol{u}_i = \frac{1}{(N\lambda_i)^2} \boldsymbol{X}^\intercal \boldsymbol{v}_i   $$
-
-
-
-
----
-
-### Datos de alta dimensionalidad. Ejemplo práctico
-
-
----
 
 
 class: center, middle
@@ -519,6 +427,157 @@ plot_jpeg( compress(200, rgb.pca) )
 ```
 
 
+
+---
+## Formulación por Máxima Varianza
+
+* Dados: $x_n \in \mathbb{R}^D,\quad n = 1, \ldots, N$
+
+* Objetivo: encontrar proyección lineal $\pi: \mathbb{R}^D \rightarrow \mathbb{R}^M$ tal que $M < D$ y se maximize la varianza de los datos proyectados. 
+
+--
+
+* Ejemplo $\mathbb{R}^2 \rightarrow \mathbb{R}^1$:
+
+![:scale 100%](./img/pca_anim.gif)
+---
+
+
+## Formulación por Máxima Varianza
+
+* Empezamos considerando proyección a $\mathbb{R}$ ( $M = 1$ ).
+
+* Una proyección viene representada por su dirección, esto es, un vector $\boldsymbol{u}_1 \in \mathbb{R}^D$. Como sólo nos interesa la dirección, imponemos $\boldsymbol{u}_1^\intercal \boldsymbol{u}_1 = 1$.
+
+* $\boldsymbol{u}_1^\intercal x_n$ es la proyección del n-ésimo punto.
+
+* También nos interesa calcular:
+  
+  * La media de los datos proyectados
+    $$ \frac{1}{N} \sum_{n=1}^N \boldsymbol{u}_1^\intercal x_n = \boldsymbol{u}_1 \bar{x}  $$
+    
+  * La varianza de los datos proyectados
+  
+    $$  \frac{1}{N} \sum_{n=1}^N (\boldsymbol{u}_1^\intercal x_n - \boldsymbol{u}_1^\intercal \bar{x})^2 = \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 $$
+    
+    
+
+---
+
+
+## Formulación por Máxima Varianza
+
+* Ahora ya podemos plantear un problema de optimización, con objetivo:
+
+$$
+\max_{\boldsymbol{u}_1} \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1
+$$
+
+* con la restricción:
+
+$$
+\boldsymbol{u}_1^\intercal \boldsymbol{u}_1
+$$
+
+* Para resolverlo, utilizamos la formulación Lagrangiana, con lo que lo convertimos al siguiente problema de optimización sin restricciones:
+
+$$
+\max_{\boldsymbol{u}_1} \boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 + \lambda_1 (\boldsymbol{u}_1^\intercal \boldsymbol{u}_1 - 1)
+$$
+
+* Derivamos...
+
+---
+
+## Formulación por Máxima Varianza
+
+* Queda que
+
+$$
+\boldsymbol{S} \boldsymbol{u}_1 = \lambda_1 \boldsymbol{u}_1
+$$
+es decir, $\boldsymbol{u}_1$ es *autovector de la matriz de covarianzas* $\boldsymbol{S}$.
+
+* Más aún,
+
+$$
+\boldsymbol{u}_1^\intercal \boldsymbol{S} \boldsymbol{u}_1 = \lambda_1
+$$
+la *varianza es precisamente el mayor autovalor* 
+
+* El autovector $\boldsymbol{u}_1$ asociado al mayor autovalor, $\lambda_1$ es conocido como *primera componente principal*.
+
+---
+
+
+## Cuestiones sobre implementación
+
+### Datos de alta dimensionalidad
+
+* En muchos casos $D > N$, por ejemplo imágenes: $|D| = \mbox{ancho} \times \mbox{alto} \times 3$.
+
+* La complejidad de calcular los autovectores de una matriz $D\times D$ escala según $\mathcal{O}(D^3)$. 
+
+* $N$ puntos en un espacio de dimensión $D > N$ forman un subespacio de dimensión $N-1$ (¡o menos!).
+
+
+* No tiene sentido aplicar PCA con $M > N-1$: saldrán autovalores $0$.
+
+---
+
+### Datos de alta dimensionalidad
+
+* Consideramos $\boldsymbol{X} \in \mathbb{R}^{N \times D}$ cuya fila n-ésima es $x_n - \bar{x}$. 
+
+* La matriz de covarianzas es $\boldsymbol{S} = N^{-1}\boldsymbol{X}^\intercal \boldsymbol{X}$, luego obtenemos autovectores mediante
+
+$$
+\frac{1}{N}\boldsymbol{X}^\intercal \boldsymbol{X} \boldsymbol{u}_i = \lambda_i \boldsymbol{u}_i
+$$
+
+* Multiplicando ambos miembros por la izquierda por $\boldsymbol{X}$ llegamos a
+
+$$
+\frac{1}{N}\boldsymbol{X} \boldsymbol{X}^\intercal (\boldsymbol{X} \boldsymbol{u}_i) = \lambda_i (\boldsymbol{X} \boldsymbol{u}_i)
+$$
+con lo que $\boldsymbol{v}_i = \boldsymbol{X} \boldsymbol{u}_i$ es un autovector de la matriz $N^{-1}\boldsymbol{X} \boldsymbol{X}^\intercal$, de tamaño $N \times N$.
+
+
+* ¡La complejidad ahora es $\mathcal{O}(N^3)!$
+
+
+---
+
+### Datos de alta dimensionalidad
+
+* Pero tenemos que obtener los autovectores en el espacio original... 
+
+* Multiplicando ahora por $\boldsymbol{X}^\intercal$:
+
+$$
+(\frac{1}{N}\boldsymbol{X}^\intercal \boldsymbol{X}) (\boldsymbol{X}^\intercal \boldsymbol{v}_i) = \lambda_i (\boldsymbol{X}^\intercal \boldsymbol{v}_i)
+$$
+
+* Con lo que $\boldsymbol{X}^\intercal \boldsymbol{v}_i$ es autovector de $\boldsymbol{S}$ con mismo autovalor $\lambda_i$.
+
+En resumen:
+
+1. Calculamos autovectores $\boldsymbol{v}_i$.
+
+2. $\boldsymbol{u}_i =  \boldsymbol{X}^\intercal \boldsymbol{v}_i$ y normalizamos $\boldsymbol{u}_i$.
+
+3. En concreto, $$\boldsymbol{u}_i = \frac{1}{(N\lambda_i)^2} \boldsymbol{X}^\intercal \boldsymbol{v}_i   $$
+
+
+
+
+---
+
+### Datos de alta dimensionalidad. Ejemplo práctico
+
+
+
+
 ---
 
 class: middle, center, inverse
@@ -692,18 +751,97 @@ donde $\sigma$ es una función no lineal (por ejemplo $\sigma(z) = \max \lbrace 
 # t-distributed Stochastic Neighbor Embedding (tSNE)
 
 
-
-
+* TODO 1-2 slides con teoría
 
 
 
 
 ---
 
-# Ejercicio
+# Ejemplo práctico
 
+* Código en *src/tSNE_coil20R.R*.
+
+* Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
+
+```{r, fig.height=5.5, fig.align='center', echo=F, cache=T, message=F}
+library(coil20)
+# coil20 <- download_coil20(verbose = TRUE)  # Tarda unos 3 min, solo hacerlo la primera vez
+# Para que vaya más rápido, cargamos uno ya descargado antes
+# saveRDS(coil20, file = "coil20.rds")
+coil20 <- readRDS(file = '../src/coil20.rds')
+
+#1440 imagenes en escala de gris a 128 x 128  
+# (20 objetos con 72 poses cada), 
+# con 16,384 features (128 x 128 px). 
+#dim(coil20)
+
+show_object(coil20, object = 4, pose = 0)
+
+```
 
 
 ---
+
+# Ejemplo práctico
+
+* Código en *src/tSNE_coil20R.R*.
+
+* Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
+
+```{r, fig.height=5.5, fig.align='center', echo=F, cache=T, message=F}
+
+
+show_object(coil20, object = 4, pose = 1)
+
+```
+
+---
+
+# Ejemplo práctico
+
+* Código en *src/tSNE_coil20R.R*.
+
+* Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
+
+```{r, fig.height=5.5, fig.align='center', echo=F, cache=T, message=F}
+
+
+show_object(coil20, object = 4, pose = 2)
+
+```
+
+---
+
+# Ejemplo práctico
+
+* Código en *src/tSNE_coil20R.R*.
+
+* Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
+
+```{r, fig.height=5.5, fig.align='center', echo=F, cache=T, message=F}
+
+
+show_object(coil20, object = 4, pose = 3)
+
+```
+
+---
+
+# Ejemplo práctico
+
+* Proyección a 2D mediante PCA:
+
+![:scale 100%](./img/COIL_PCA.png)
+
+---
+
+# Ejemplo práctico
+
+* Proyección a 2D mediante tSNE:
+
+![:scale 100%](./img/COIL_TSNE.png)
+
+
 
 

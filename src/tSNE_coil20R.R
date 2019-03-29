@@ -35,7 +35,7 @@ library(Rtsne)
 
 proy_tsne <- Rtsne(coil20[, 1:128^2], num_threads = 16)
 
-plot(proy_tsne$Y[, 1:2], type = 'n')
+plot(proy_tsne$Y[, 1:2], type = 'n', xlab = 'TSNE1', ylab='TSNE2')
 text(proy_tsne$Y[, 1:2], labels = coil20$Label, cex = 0.5,
      col = rainbow(length(levels(coil20$Label)))[coil20$Label])
 

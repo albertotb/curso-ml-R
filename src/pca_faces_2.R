@@ -19,7 +19,7 @@ eigvals <- proy_faces$sdev^2
 ratio <- eigvals / sum(eigvals)
 ratio_acum <- cumsum(ratio)
 
-M = 1000
+M = which(ratio_acum >= 0.99)[1]
 faces_recons_flat <- proy_faces$x[,1:M] %*% t(proy_faces$rotation[,1:M])
 faces_recons_flat[faces_recons_flat<0] <- 0
 faces_recons_flat[faces_recons_flat>1] <- 1
