@@ -6,6 +6,10 @@ Importar y transformar datos
  * stringr: manipular texto
  * lubridate: fechas
  * forcats: factores
+ 
+ Visualization
+ -------------
+ * ggplot2: todo tipo de gráficos
 
  Web scraping
  ------------
@@ -38,3 +42,10 @@ Modelos
  * gbm: gradient boosting
  * xgboost: extreme gradient boosting
  * kernlab: procesos gaussianos, reducción de dimensionalidad
+ * Rtsne: fast tSNE using C optimization routines
+ * NMF: non-negative matrix factorization for recommendations and clustering
+ 
+Datasets
+-------
+ * coil20: images of objects taken from various angles
+ * snedata: repo with wrappers around many datasets
