@@ -69,8 +69,8 @@ show_digit(test[500, ])
 ## Proyección a 2D usando PCA
 
 Usaremos el paquete prcomp
-```{r, cache=True, message=F}
-proy_pca <- prcomp(test[, 1:28^2], retx = TRUE) ## Ojo, quitar LABEL, sino son trampas
+```{r, message=F}
+proy_pca <- prcomp(test[, 1:28^2], retx = T) ## Ojo, quitar LABEL, sino son trampas
 # Representamos las dos primeras componentes
 plot(proy_pca$x[, 1:2], type = 'n')
 text(proy_pca$x[, 1:2], labels = test$y, cex = 0.5,
@@ -96,7 +96,7 @@ p
 
 ## Proyección a 2D usando t-SNE
 
-```{r, cache=True, message=F}
+```{r, message=F}
 library(Rtsne)
 proy_tsne <- Rtsne(test[, 1:28^2], num_threads = 16)
 plot(proy_tsne$Y[, 1:2], type = 'n')
