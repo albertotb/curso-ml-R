@@ -419,62 +419,31 @@ class: middle, center, inverse
 \tilde{x}_n = \bar{x} \sum_{i=1}^M (x_n^\top - \bar{x}^\top u_i)u_i
 \end{equation}
 
+---
+
+## Aplicación: compresión de datos
+
 * M = 1
-```{r, fig.height=5.5, fig.align='center', echo=F, cache=T, message=F}
-library(jpeg)
-#
-plot_jpeg = function(jpg, add=FALSE)
-{
-  require('jpeg')
-  res = dim(jpg)[2:1] # get the resolution, [x, y]
-  if (!add) # initialize an empty plot area if add==FALSE
-    plot(1,1,xlim=c(1,res[1]),ylim=c(1,res[2]),asp=1,type='n',xaxs='i',yaxs='i',xaxt='n',yaxt='n',xlab='',ylab='',bty='n')
-  rasterImage(jpg,1,1,res[1],res[2])
-}
-##
-ine = readJPEG("img/ine.jpg")
-##
-r = ine[,,1]
-g = ine[,,2]
-b = ine[,,3]
-##
-ine.r.pca <- prcomp(r, center = FALSE)
-ine.g.pca <- prcomp(g, center = FALSE)
-ine.b.pca <- prcomp(b, center = FALSE)
-##
-rgb.pca <- list(ine.r.pca, ine.g.pca, ine.b.pca)
-##
-compress = function(M=2, pca_obj){
-  pca.img <- sapply(pca_obj, function(j) {
-    compressed.img <- j$x[,1:M] %*% t(j$rotation[,1:M])
-  }, simplify = 'array')
-  pca.img[pca.img<0] = 0
-  pca.img[pca.img>1] = 1
-  return(pca.img)
-}
-##
-plot_jpeg( compress(1, rgb.pca) )
-```
+
+![:scale 70%](img/ine_alt1.png)
 
 ---
 
 ## Aplicación: compresión de datos
 
 * M = 3
-```{r, fig.height=7.5, fig.align='center', echo=F, message=F}
-#
-plot_jpeg( compress(3, rgb.pca) )
-```
+
+![:scale 70%](./img/ine_alt2.png)
+
 
 ---
 
 ## Aplicación: compresión de datos
 
 * M = 10
-```{r, fig.height=7.5, fig.align='center', echo=F, message=F}
-#
-plot_jpeg( compress(10, rgb.pca) )
-```
+
+![:scale 70%](./img/ine_alt3.png)
+
 
 
 ---
@@ -482,10 +451,9 @@ plot_jpeg( compress(10, rgb.pca) )
 ## Aplicación: compresión de datos
 
 * M = 20
-```{r, fig.height=7.5, fig.align='center', echo=F, message=F}
-#
-plot_jpeg( compress(20, rgb.pca) )
-```
+
+![:scale 70%](./img/ine_alt4.png)
+
 
 
 ---
@@ -493,20 +461,17 @@ plot_jpeg( compress(20, rgb.pca) )
 ## Aplicación: compresión de datos
 
 * M = 50
-```{r, fig.height=7.5, fig.align='center', echo=F, message=F}
-#
-plot_jpeg( compress(50, rgb.pca) )
-```
+
+![:scale 70%](./img/ine_alt5.png)
+
 
 ---
 
 ## Aplicación: compresión de datos
 
 * M = 200
-```{r, fig.height=7.5, fig.align='center', echo=F, message=F}
-#
-plot_jpeg( compress(200, rgb.pca) )
-```
+
+![:scale 70%](./img/ine_alt6.png)
 
 
   
@@ -542,7 +507,7 @@ library(coil20)
 # coil20 <- download_coil20(verbose = TRUE)  # Tarda unos 3 min, solo hacerlo la primera vez
 # Para que vaya más rápido, cargamos uno ya descargado antes
 # saveRDS(coil20, file = "coil20.rds")
-coil20 <- readRDS(file = '../src/coil20.rds')
+coil20 <- readRDS(file = '../../exercises/03-unsupervised/src/coil20.rds')
 
 #1440 imagenes en escala de gris a 128 x 128  
 # (20 objetos con 72 poses cada), 
@@ -566,7 +531,7 @@ library(coil20)
 # coil20 <- download_coil20(verbose = TRUE)  # Tarda unos 3 min, solo hacerlo la primera vez
 # Para que vaya más rápido, cargamos uno ya descargado antes
 # saveRDS(coil20, file = "coil20.rds")
-coil20 <- readRDS(file = '../src/coil20.rds')
+coil20 <- readRDS(file = '../../exercises/03-unsupervised/src/coil20.rds')
 
 #1440 imagenes en escala de gris a 128 x 128  
 # (20 objetos con 72 poses cada), 
@@ -590,7 +555,7 @@ library(coil20)
 # coil20 <- download_coil20(verbose = TRUE)  # Tarda unos 3 min, solo hacerlo la primera vez
 # Para que vaya más rápido, cargamos uno ya descargado antes
 # saveRDS(coil20, file = "coil20.rds")
-coil20 <- readRDS(file = '../src/coil20.rds')
+coil20 <- readRDS(file = '../../exercises/03-unsupervised/src/coil20.rds')
 
 #1440 imagenes en escala de gris a 128 x 128  
 # (20 objetos con 72 poses cada), 
@@ -614,7 +579,7 @@ library(coil20)
 # coil20 <- download_coil20(verbose = TRUE)  # Tarda unos 3 min, solo hacerlo la primera vez
 # Para que vaya más rápido, cargamos uno ya descargado antes
 # saveRDS(coil20, file = "coil20.rds")
-coil20 <- readRDS(file = '../src/coil20.rds')
+coil20 <- readRDS(file = '../../exercises/03-unsupervised/src/coil20.rds')
 
 #1440 imagenes en escala de gris a 128 x 128  
 # (20 objetos con 72 poses cada), 
