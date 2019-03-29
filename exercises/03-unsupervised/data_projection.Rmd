@@ -50,8 +50,8 @@ load_label_file = function(filename) {
 Cargamos el dataset MNIST.
 
 ```{r, message=F}
-test  = load_image_file("../../src/t10k-images.idx3-ubyte")
-test$y  = as.factor(load_label_file("../../src/t10k-labels.idx1-ubyte"))
+test  = load_image_file("src/t10k-images.idx3-ubyte")
+test$y  = as.factor(load_label_file("src/t10k-labels.idx1-ubyte"))
 ```
 
 Esta base de datos consta de 10000 imágenes en escala de gris a 28 x 28, de los dígitos del 0 al 9 (escritos a mano). Explora la base de datos y visualiza algunos ejemplos usando la función show_digit.

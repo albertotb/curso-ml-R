@@ -18,7 +18,7 @@ library(EBImage)
 
 # Descargar datos desde
 # y descomprimir, luego poner ruta en path:
-faces_files <- list.files(path = "../../src/data/thumbnails128x128", pattern = ".png", 
+faces_files <- list.files(path = "src/data/thumbnails128x128", pattern = ".png", 
                         all.files = TRUE,full.names = TRUE,no.. = TRUE)
 
 faces <- readImage(faces_files)
