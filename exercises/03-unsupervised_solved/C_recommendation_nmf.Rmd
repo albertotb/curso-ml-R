@@ -35,6 +35,9 @@ mario <- c(0, 0, 0, 0, 1)
 X <- cbind(irene, pepe, fran, luisa, cayetano, eva, eugenia, mario)
 rownames(X) = c("Ps", "PSOE", "Cs", "PP", "Vox")
 
+print("Matriz de datos")
+
+print(X)
 ```
 
 2. Factorizar la matrix **X** para distintas dimensiones latentes
@@ -49,6 +52,7 @@ fit(pol_nmf)
 # Factores
 print("Matrix de factores")
 W <- basis(pol_nmf)
+print(W)
 #dim(W)
 
 print("Matrix de coeficientes")

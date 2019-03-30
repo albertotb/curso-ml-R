@@ -54,7 +54,7 @@ class: middle, center, inverse
 
   * $\mathcal{Y}$ es tiene dimensión baja
   
-  * Es sencillo cuantificar el error
+  * Es sencillo cuantificar el error: natural definir función de coste. Error = valor esperado de coste bajo $P(X,Y)$.
   
 
 ---
@@ -72,13 +72,15 @@ class: middle, center, inverse
   * Estimar $P(X)$
   
   * Inferir alguna propiedad de $P(X)$
+  
+  * Muestrear de $P(X)$
 
 
 ---
 
 ## Retos del Aprendizaje No Supervisado
 
-* $X$ generalmente es de alta dimensión
+* $X$ generalmente es de alta dimensión (piensa en imágenes: $128 \times 128 \times 3 = 49152)
 
 * Propiedades de interés que queremos inferir son más complejas que simples parámetros
 
@@ -416,7 +418,7 @@ class: middle, center, inverse
 * Cada punto de dimensión $D$ se representa como vector de dimensión $M$
 
 \begin{equation}
-\tilde{x}_n = \bar{x} \sum_{i=1}^M (x_n^\top - \bar{x}^\top u_i)u_i
+\tilde{x}_n = \bar{x} + \sum_{i=1}^M (x_n^\top - \bar{x}^\top u_i)u_i
 \end{equation}
 
 ---
