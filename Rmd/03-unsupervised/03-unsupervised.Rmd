@@ -663,7 +663,7 @@ En resumen:
 
 2. $\boldsymbol{u}_i =  \boldsymbol{X}^\intercal \boldsymbol{v}_i$ y normalizamos $\boldsymbol{u}_i$.
 
-3. En concreto, $$\boldsymbol{u}_i = \frac{1}{(N\lambda_i)^2} \boldsymbol{X}^\intercal \boldsymbol{v}_i   $$
+3. En concreto, $$\boldsymbol{u}_i = \frac{1}{(N\lambda_i)^{1/2}} \boldsymbol{X}^\intercal \boldsymbol{v}_i   $$
 
 ---
 
