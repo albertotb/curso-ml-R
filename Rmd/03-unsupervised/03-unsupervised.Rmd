@@ -890,7 +890,7 @@ donde $\sigma$ es una función no lineal (por ejemplo $\sigma(z) = \max \lbrace 
 
 ---
 
-# t-distributed Stochastic Neighbor Embedding (tSNE)
+## t-distributed Stochastic Neighbor Embedding (tSNE)
 
 
 * Usaremos técnicas de reducción de dimensionalidad, concretamente aquellas que:
@@ -899,8 +899,62 @@ donde $\sigma$ es una función no lineal (por ejemplo $\sigma(z) = \max \lbrace 
   
   2. Preserven topologías.
   
-* TODO 1-2 slides con teoría
+* Problema original: encontrar una transformación (no lineal)
 
+$$
+\mathcal{X} := \lbrace x_1, \ldots, x_N \in \mathbb{R}^D \rbrace \rightarrow
+\mathcal{Y} := \lbrace y_1, \ldots, y_N \in \mathbb{R}^M \rbrace
+$$
+
+de forma que ambas distribuciones *se parezcan* lo más posible
+
+$$
+\min_{\mathcal{Y}} C(\mathcal{X}, \mathcal{Y})
+$$
+* donde $\mathcal{C}$ será una **divergencia** (mide similaridad entre distribuciones).
+
+---
+
+##  Stochastic Neighbor Embedding (SNE)
+
+* SNE convierte **distancias euclídeas** en **similaridades** , que pueden ser interpretadas como probabilidades:
+
+\begin{equation}
+p_{j|i} = \frac{\exp \lbrace -||  x_i - x_j  ||^2/2\sigma_i^2 \rbrace }{ \sum_{k \neq j} \exp \lbrace -||  x_i - x_j  ||^2 / 2\sigma_i^2 \rbrace}
+\end{equation}
+\begin{equation}
+q_{j|i} = \frac{\exp \lbrace -||  y_i - y_j  ||^2 \rbrace }{ \sum_{k \neq j} \exp \lbrace -||  y_i - y_j  ||^2  \rbrace}
+\end{equation}
+
+* Las distribuciones de los vecinos del punto $i$ son $P_i = \lbrace p_{1|i}, \ldots, p_{N|i} \rbrace$ y $Q_i = \lbrace q_{1|i}, \ldots, q_{N|i} \rbrace$
+
+* Optimizamos la divergencia de Kullback-Leiber
+
+\begin{equation}
+C = \sum_i KL(P_i || Q_i) = \sum_i \sum_j p_{j|i} \log \frac{p_{j|i}}{q_{j|i}}
+\end{equation}
+
+
+---
+
+## De SNE a tSNE
+
+* SNE simétrico: optimizamos más eficientemente $C = KL(P||Q)$ definiendo:
+
+\begin{equation}
+p_{ij} = \frac{p_{j|i} + p_{i|j}}{2n}
+\end{equation}
+\begin{equation}
+q_{ij} = \frac{\exp \lbrace -||  y_i - y_j  ||^2 \rbrace }{ \sum_{k \neq j} \exp \lbrace -||  y_i - y_j  ||^2  \rbrace}
+\end{equation}
+
+* tSNE: en lugar de Gaussiana usamos t-Student en el espacio $\mathcal{Y}$:
+
+\begin{equation}
+q_{ij} = \frac{(1 + ||  y_i - y_j  ||^2)^{-1} }{ \sum_{k \neq j} (1 + ||  y_i - y_j  ||^2)^{-1}}
+\end{equation}
+
+(la t-Student tiene colas más pesadas que la Normal, evitando que los puntos se colapsen mucho en el espacio $\mathcal{Y}$)
 
 
 
@@ -912,7 +966,7 @@ donde $\sigma$ es una función no lineal (por ejemplo $\sigma(z) = \max \lbrace 
 
 * Proyección a 2D mediante PCA:
 
-![:scale 100%](./img/COIL_PCA.png)
+![:scale 90%](./img/COIL_PCA.png)
 
 ---
 
