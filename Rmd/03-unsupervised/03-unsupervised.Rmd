@@ -80,7 +80,7 @@ class: middle, center, inverse
 
 ## Retos del Aprendizaje No Supervisado
 
-* $X$ generalmente es de alta dimensión (piensa en imágenes: $128 \times 128 \times 3 = 49152)
+* $X$ generalmente es de alta dimensión (piensa en imágenes: $128 \times 128 \times 3 = 49152)$
 
 * Propiedades de interés que queremos inferir son más complejas que simples parámetros
 
