@@ -128,7 +128,7 @@ class: middle, center, inverse
 
 ## Aplicaciones lineales
 
-* Dado $\boldsymbol{x} \in \mathbb{R}^D$, una **aplicación (función) lineal**  $f : \mathbb{R}^N \rightarrow \mathbb{R}^M$ se expresa como
+* Dado $\boldsymbol{x} \in \mathbb{R}^N$, una **aplicación (función) lineal**  $f : \mathbb{R}^N \rightarrow \mathbb{R}^M$ se expresa como
 $$
 f(\boldsymbol{x}) = W \boldsymbol{x}
 $$
@@ -168,7 +168,7 @@ $$
 $$
 y que
 $$
-\frac{\partial \boldsymbol{A} \boldsymbol{B}}{\partial \boldsymbol{x}} = \frac{\partial \boldsymbol{A}}{\partial \boldsymbol{x}}\boldsymbol{B} + \frac{\partial \boldsymbol{B}}{\partial \boldsymbol{x}}\boldsymbol{A}.
+\frac{\partial \boldsymbol{A} \boldsymbol{B}}{\partial x} = \frac{\partial \boldsymbol{A}}{\partial x}\boldsymbol{B} + \frac{\partial \boldsymbol{B}}{\partial x}\boldsymbol{A}.
 $$
 
 ---
@@ -264,7 +264,7 @@ $$
 * con la restricción:
 
 $$
-\boldsymbol{u}_1^\intercal \boldsymbol{u}_1
+\boldsymbol{u}_1^\intercal \boldsymbol{u}_1 = 1
 $$
 
 * Para resolverlo, utilizamos la formulación Lagrangiana, con lo que lo convertimos al siguiente problema de optimización sin restricciones:
@@ -491,7 +491,7 @@ class: middle, center, inverse
   * MNIST: $D = 28 \times  28$.
   * CIFAR10: $D = 32 \times 32 \times 3$.
   
-* Con PCA: $z = X W^\top$ donde
+* Con PCA: $Z = X W^\top$ donde
 
   1. $W$ es $M \times D$.
   2. $X$ es la matriz de datos $N \times D$.
@@ -500,7 +500,7 @@ class: middle, center, inverse
 
 ## Ejemplo práctico
 
-* Código en *src/tSNE_coil20R.R*.
+* Código en *exercises/03-unsupervised/src/tSNE_coil20R.R*.
 
 * Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
 
@@ -524,7 +524,7 @@ show_object(coil20, object = 4, pose = 0)
 
 ## Ejemplo práctico
 
-* Código en *src/tSNE_coil20R.R*.
+* Código en *exercises/03-unsupervised/src/tSNE_coil20R.R*.
 
 * Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
 
@@ -548,7 +548,7 @@ show_object(coil20, object = 4, pose = 1)
 
 ## Ejemplo práctico
 
-* Código en *src/tSNE_coil20R.R*.
+* Código en *exercises/03-unsupervised/src/tSNE_coil20R.R*.
 
 * Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
 
@@ -572,7 +572,7 @@ show_object(coil20, object = 4, pose = 2)
 
 ## Ejemplo práctico
 
-* Código en *src/tSNE_coil20R.R*.
+* Código en *exercises/03-unsupervised/src/tSNE_coil20R.R*.
 
 * Base de datos COIL20: imágenes de 20 objetos desde 72 ángulos diferentes.
 
@@ -948,7 +948,7 @@ p_{ij} = \frac{p_{j|i} + p_{i|j}}{2n}
 q_{ij} = \frac{\exp \lbrace -||  y_i - y_j  ||^2 \rbrace }{ \sum_{k \neq j} \exp \lbrace -||  y_i - y_j  ||^2  \rbrace}
 \end{equation}
 
-* tSNE: en lugar de Gaussiana usamos t-Student en el espacio $\mathcal{Y}$:
+* tSNE: en lugar de kernel Gaussiano usamos t-Student en el espacio $\mathcal{Y}$:
 
 \begin{equation}
 q_{ij} = \frac{(1 + ||  y_i - y_j  ||^2)^{-1} }{ \sum_{k \neq j} (1 + ||  y_i - y_j  ||^2)^{-1}}
