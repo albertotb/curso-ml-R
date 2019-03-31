@@ -242,7 +242,7 @@ class: middle, center, inverse
 * También nos interesa calcular:
   
   * La media de los datos proyectados
-    $$ \frac{1}{N} \sum_{n=1}^N \boldsymbol{u}_1^\intercal x_n = \boldsymbol{u}_1 \bar{x}  $$
+    $$ \frac{1}{N} \sum_{n=1}^N \boldsymbol{u}_1^\intercal x_n = \boldsymbol{u}_1^\intercal \bar{x}  $$
     
   * La varianza de los datos proyectados
   
