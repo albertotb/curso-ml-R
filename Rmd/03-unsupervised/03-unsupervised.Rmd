@@ -747,7 +747,7 @@ donde $\lambda_i$ son los $D-M$ autovalores de la matriz de covarianza de menor 
 * Cualquier punto $\boldsymbol{x}$, puede ser resumido usando media y covarianza a posteriori.
 
 \begin{eqnarray}
-\mathbb{E}[\boldsymbol{z} \vert \boldsymbol{x}] &=& \boldsymbol{M}^{-1}\boldsymbol{W}_{ML}^\top (\boldsymbol{x} -\boldsymbol{\bar{x}})
+\mathbb{E}[\boldsymbol{z} \vert \boldsymbol{x}] &=& \boldsymbol{M}^{-1}\boldsymbol{W}_{ML}^\top (\boldsymbol{x} -\boldsymbol{\bar{x}}) \\
 \text{cov}[\boldsymbol{z} \vert \boldsymbol{x}] &=& \sigma^2 \boldsymbol{M}^{-1}
 \end{eqnarray}
 
