@@ -13,7 +13,7 @@ output:
       countIncrementalSlides: false
       beforeInit: "macros.js"
     includes:
-      before_body: mathjax.html
+      before_body: mathjax.html  
 ---
 
 # ¿Qué es el Aprendizaje Automático? 
