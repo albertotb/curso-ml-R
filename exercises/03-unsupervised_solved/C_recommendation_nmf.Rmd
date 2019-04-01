@@ -1,0 +1,77 @@
+---
+title: "Clustering de ideologías usando NMF"
+author: "Víctor Gallego y Roi Naveiro"
+date: "01/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+En este ejercicio plantearemos un problema de factorización de una matriz no negativa que representará el número de veces que cierta persona ha votado a cierto partido político en los últimos años.
+
+1. Construcción de la matriz de datos. Estos son los votos de cada persona:
+  * Irene: 1 Podemos, 2 PSOE.
+  * Pepe: 2 Podemos, 1 PSOE, 1 Ciudadanos.
+  * Francisco: 6 Vox.
+  * Luisa: 1 Ciudadanos, 3 PP, 2 Vox.
+  * Cayetano: 4 Ciudadanos, 1 PP.
+  * Eva: 2 Podemos.
+  * Eugenia: 1 Podemos.
+  * Mario: 1 Vox
+
+```{r, echo=F}
+
+# Ps, PSOE, Cs, PP, Vox
+
+irene <- c(1, 2, 0, 0, 0)
+pepe <- c(2, 1, 1, 0, 0)
+fran <- c(0, 0, 0, 0, 6)
+luisa <- c(0, 0, 1, 3, 2)
+cayetano <- c(0, 0, 4, 1, 0)
+eva <- c(2, 0, 0, 0, 0)
+eugenia <- c(1, 0, 0, 0, 0)
+mario <- c(0, 0, 0, 0, 1)
+
+X <- cbind(irene, pepe, fran, luisa, cayetano, eva, eugenia, mario)
+rownames(X) = c("Ps", "PSOE", "Cs", "PP", "Vox")
+
+print("Matriz de datos")
+
+print(X)
+```
+
+2. Factorizar la matrix **X** para distintas dimensiones latentes
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=FALSE}
+library(NMF)
+
+d = 3
+pol_nmf <- nmf(X, d)
+fit(pol_nmf)
+
+# Factores
+print("Matrix de factores")
+W <- basis(pol_nmf)
+print(W)
+#dim(W)
+
+print("Matrix de coeficientes")
+H <- coef(pol_nmf)
+print(H)
+#dim(H)
+
+
+```
+
+3. Interpretar los clusters políticos.
+
+4. Reconstruye la matriz y recomienda partidos a los que votar a las diferentes personas.
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=FALSE}
+
+print("Matrix reconstruida")
+V.hat <- fitted(pol_nmf)
+
+print(V.hat)
+
+```

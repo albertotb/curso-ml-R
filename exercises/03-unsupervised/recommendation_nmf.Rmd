@@ -1,0 +1,40 @@
+---
+title: "Clustering de ideologías usando NMF"
+author: "Víctor Gallego y Roi Naveiro"
+date: "01/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+En este ejercicio plantearemos un problema de factorización de una matriz no negativa que representará el número de veces que cierta persona ha votado a cierto partido político en los últimos años.
+
+1. Construcción de la matriz de datos. Estos son los votos de cada persona:
+  * Irene: 1 Podemos, 2 PSOE.
+  * Pepe: 2 Podemos, 1 PSOE, 1 Ciudadanos.
+  * Francisco: 6 Vox.
+  * Luisa: 1 Ciudadanos, 3 PP, 2 Vox.
+  * Cayetano: 4 Ciudadanos, 1 PP.
+  * Eva: 2 Podemos.
+  * Eugenia: 1 Podemos.
+  * Mario: 1 Vox
+  
+Construye la matriz objetivo en la que las columnas son personas y las filas partidos políticos.
+
+```{r, echo=F}
+# CÓDIGO
+```
+
+2. Factorizar la matrix **X** para distintas dimensiones latentes
+
+```{r, echo=F, message=FALSE, warning=FALSE, comment=FALSE, results=FALSE}
+# CÓDIGO
+```
+
+3. Interpretar los clusters políticos.
+
+4. Reconstruye la matriz y recomienda partidos a los que votar a las diferentes personas.
+
+```{r, echo=F, message=FALSE, warning=FALSE, comment=FALSE, results=FALSE}
+# CÓDIGO
+```

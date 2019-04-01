@@ -1,0 +1,52 @@
+---
+title: "Compresión de rostros usando Análisis de Componentes Principales"
+author: "Víctor Gallego y Roi Naveiro"
+date: "01/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+En este ejercicio se propone aplicar PCA a una base de datos de rostros.
+
+1. Descargar datos de https://drive.google.com/file/d/14f9gJ3SrT2zE8iokixzZBOalvZ4U7YGg/view?usp=sharing
+
+2. Descomprimir y cargarlos mediante (probar con 500 primeras imágenes en caso de disponer de poca RAM)
+
+```{r, echo=T}
+#source("http://bioconductor.org/biocLite.R")
+#biocLite("EBImage")
+library(EBImage)
+
+# Descargar datos desde
+# y descomprimir, luego poner ruta en path:
+faces_files <- list.files(path = "thumbnails128x128", pattern = ".png", 
+                        all.files = TRUE,full.names = TRUE,no.. = TRUE)
+
+faces <- readImage(faces_files)
+```
+
+3. Representar algunas imágenes
+
+```{r, echo=T}
+```
+
+4. Aplicar PCA
+
+```{r, echo=T}
+```
+
+5. Encontrar el número de componentes necesarias para que el error de reconstrucción sea como mucho del 1%.
+
+```{r, echo=T}
+```
+
+```{r, echo=T}
+```
+
+
+
+
+
+
+
