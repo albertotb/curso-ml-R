@@ -14,6 +14,3 @@ for (file in list.files(path = "./Rmd", pattern = ".Rmd", recursive = TRUE)) {
   file.copy(output, "./slides")
   file.remove(output)
 }
-
-
-
