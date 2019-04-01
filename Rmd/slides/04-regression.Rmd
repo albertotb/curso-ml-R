@@ -16,6 +16,36 @@ output:
       before_body: mathjax.html
 ---
 
+## Regresión lineal
+
+La salida $y$ es continua, $y \in \Rbb$
+
+* Regresión lineal (*MSE* o *RSS*) $$\min_w\, ||y - \Xbf w||_2^2 \hphantom{\ + ||w||_2^2}$$
+
+--
+
+* Regresión *ridge* (*MSE* + regularización $l_2$): $$\min_w\, ||y - \Xbf w||_2^2 + ||w||_2^2$$
+
+---
+
+## Regresión logística
+
+La salida $y$ es discreta, $y \in \{ 0, 1 \}$
+
+* Regresión logística (*log-loss*) $$\min_w\, -(y^T \log[\sigma(\Xbf w)] + (1 - y)^T \log[1 - \sigma(\Xbf w)])$$ 
+
+--
+  
+* ¿Regresión logística ridge?
+
+???
+
+La función de pérdida log-loss es un poco distinta a como la vimos antes
+  * Tiene un menos delante, porque queremos minimizar y no maximizar la verosimilitud
+  * Propiedad de la función sigmoidea $\sigma(-x) = 1 - \sigma(x)$
+
+---
+
 ## GLMs
 
 * Generalización de la regresión lineal que permite distribuciones de errores distintas de la distribución normal.
