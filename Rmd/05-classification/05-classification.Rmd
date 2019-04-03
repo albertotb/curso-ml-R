@@ -1,0 +1,63 @@
+---
+title: "Algoritmos de Clasificación"
+subtitle: "Curso de aprendizaje automático para el INE"
+author: "Víctor Gallego y Roi Naveiro"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+      
+---
+
+class: middle, center, inverse
+
+# Regresión Lineal de Matriz de Indicadores
+
+---
+
+## ¿Cómo aplicar regresión lineal a problema de clasificación multiclase?
+
+
+* Consideramos $K$ categorías.
+
+* **One Hot Encoding** de las categorías: para categoría *k*, crear vector $K$ dimensional $t_k$ con tan solo un 1 en posición $k$ (resto ceros).
+
+* $y_i = t_k$ si la categoría del ejemplo i-ésimo es $k$.
+
+* Problema de predicción: reproducir el target de cada observación. Resolver
+
+\begin{equation}
+\min_{\textbf{B}} \sum_{i=1}^N \Vert y_i - [(1,x_i^\top) \textbf{B}]^\top\Vert^2
+\end{equation}
+
+* Para clasificar nueva observación se calcula el vector $\hat{f}(x)$ y se clasifica resolviendo
+
+\begin{equation}
+\arg\min_{k} \Vert \hat{f}(x) - t_k \Vert^2
+\end{equation}
+
+* Es fácil ver que el problema desacopla en $K$ problemas de regresión (uno para cada clase).
+
+---
+
+## Problema - *masking*
+
+* Cuando $K \geq 3$ unas clases pueden enmascarar otras.
+
+---
+# Referencias
+
+   1. Randal J. Barnes [Matrix Differentiation (and some othe stuff)](https://atmos.washington.edu/~dennis/MatrixCalculus.pdf)
+   
+
+   
+
+
+
+
