@@ -50,6 +50,9 @@ class: middle, center, inverse
 
 * Cuando $K \geq 3$ unas clases pueden enmascarar otras.
 
+![:scale 45%](./img/masking1.png) ![:scale 45%](./img/masking2.png)
+
+*Source*: Elements of Statistical Learning
 ---
 # Referencias
 
