@@ -3,9 +3,9 @@
 ## Índice
 
  1. Fundamentos de Aprendizaje Automático
-    * Conceptos generales de aprendizaje bayesiano y Montecarlo (18/03 y 22/03, 6 horas)
-    * Conceptos generales  sobre aprendizaje supervisado: GLMs (22/03 y 25/03, 6 horas)
-    * Conceptos generales sobre aprendizaje no supervisado: PCA (01/04, 4 horas)
+    * Conceptos generales de aprendizaje bayesiano y Montecarlo (18/03 y 22/03, 6 horas) [[slides]](./slides/01-bayes.pdf)
+    * Conceptos generales  sobre aprendizaje supervisado: GLMs (22/03 y 25/03, 6 horas) [[slides]](./Rmd/02-supervised/02-supervised.html)
+    * Conceptos generales sobre aprendizaje no supervisado: PCA (01/04, 4 horas) <a href="./Rmd/03-unsupervised/03-unsupervised.html">[slides]</a>
 
  2. Aplicaciones prácticas de Aprendizaje Automático
     * Algoritmos de regresión: Ridge, Lasso, ElasticNet, PCR, PLS, etc.. (11/04, 4 horas)
