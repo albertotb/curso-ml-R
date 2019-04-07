@@ -225,7 +225,7 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
 
 ---
 
-## Análisis Dsicriminante Regularizado
+## Análisis Discriminante Regularizado
 
 * Compromiso entre LDA y QDA, regularizando la matriz de covarianza.
 
@@ -270,6 +270,105 @@ class: middle, center, inverse
 ## Regresión Logística y Optimización Estocástica
 
 ---
+
+## Regresión logística (repaso)
+
+* Clasificación binaria:
+
+\begin{equation*}
+p(y = 1 | x) = \sigma (w^\intercal x + b)
+\end{equation*}
+
+* Clasificación en $M > 2$ clases: cambiar la función sigmoide $\sigma$ por la **softmax** $s: \mathbb{R}^M \rightarrow \mathbb{R}^M$, definida como
+
+\begin{equation*}
+s(z)_i = \frac{e^{z_i}}{\sum_{j=1}^M e^{z_j}}
+\end{equation*}
+
+donde $z = Wx + B$, con $W \in \mathbb{R}^{M \times D}, B \in \mathbb{R}^{M \times 1}$.
+
+* Aprendizaje mediante mínimos cuadrados no lineales, descenso por el gradiente: los algoritmos vistos requieren acceso a la matriz $X$ entera en cada iteración.
+
+* ¿Qué hacer cuando $X$ no cabe en memoria?
+
+---
+
+
+## Descenso por el gradiente (GD)
+
+* Habitualmente se considera el problema de minimizar una función con la siguiente forma:
+
+\begin{equation*}
+f(w) = \frac{1}{N}\sum_{i=1}^N f_i(w)
+\end{equation*}
+
+(por ejemplo, al minimizar el error/pérdida promedio sobre la muestra de entrenamiento)
+
+--
+
+* Optimizamos iterando:
+
+\begin{equation*}
+w^{t+1} = w^t - \eta \nabla_w f(w^t)
+\end{equation*}
+
+* Problema: complejidad $\mathcal{O}(N)$
+
+
+---
+
+## Descenso por el gradiente estocástico (SGD)
+
+* En cada iteración, barajeamos los datos y escogemos **uno** al azar
+
+\begin{equation*}
+w^{t+1} = w^t - \eta \nabla_w f_i(w^t)
+\end{equation*}
+
+
+* También podemos seleccionar un **minilote** $\mathcal{B} = \lbrace i_1, \ldots, i_B \rbrace \subset \lbrace 1, \ldots N \rbrace$ al azar en cada iteración:
+
+\begin{equation*}
+w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
+\end{equation*}
+
+* La complejidad pasa de $\mathcal{O}(N)$ a $\mathcal{O}(B)$, además, no es necesario tener toda la matriz $X$, sino solo los datos del minilote $\mathcal{B}$.
+
+* Otra ventaja: mayor probabilidad de escapar óptimos locales que con GD: un punto estacionario de la función objetivo en GD no lo será en SGD generalmente.
+
+---
+
+## Ejemplo
+
+Figuras mostrando trayectorias vs tamaño del lote.
+
+---
+
+## Propiedades del SGD
+
+* *Ejercicio: demostrar que el estimador por minilotes es **insesgado**. *
+
+* Citar a Robins & Munro.
+
+* Citar asintótico cuando B = 1.
+
+
+---
+
+## Nuevos desarrollos desde SGD
+
+### Momentum
+
+### AdaGrad
+
+### RMSProp
+
+### Adam
+
+
+---
+
+
 
 
 
@@ -344,7 +443,10 @@ donde $I$ es la función indicatriz.
 
 * Intuititivamente, aumentar $k$ tiende a suavizar la frontera de decisión, es decir, el clasificador es más resistente a outliers. 
 
-![:scale 60%](./img/knn1.png)
+![:scale 50%](./img/knn1.png)
+
+*Fuente*: Elements of Statistical Learning
+
 
 ---
 
@@ -352,7 +454,9 @@ donde $I$ es la función indicatriz.
 
 * Intuititivamente, aumentar $k$ tiende a suavizar la frontera de decisión, es decir, el clasificador es más resistente a outliers. 
 
-![:scale 60%](./img/knn15.png)
+![:scale 50%](./img/knn15.png)
+
+*Fuente*: Elements of Statistical Learning
 
 
 ---
