@@ -38,12 +38,16 @@ Modelos
  * ridge: ridge regression with automatic tunning of the hyper-parameter
  * rpart: arboles de decision
  * randomForest: randomForest
- * e1071: SVM
+ * e1071: SVM, NaiveBayes
  * gbm: gradient boosting
  * xgboost: extreme gradient boosting
  * kernlab: procesos gaussianos, reducción de dimensionalidad
  * Rtsne: fast tSNE using C optimization routines
  * NMF: non-negative matrix factorization for recommendations and clustering
+ 
+Texto
+-----
+ * word2vec: vectorización, word embeddings, etc.
  
 Datasets
 -------
