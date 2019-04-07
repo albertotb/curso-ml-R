@@ -95,7 +95,7 @@ class: middle, center, inverse
 
 ## Teoría de la decisión estadística
 
-* Es suficiente minmizar el coste esperado para cada `\(x\)`
+* Es suficiente minimizar el coste esperado para cada `\(x\)`
 
 `\begin{eqnarray}
 \widehat{Y} (x) = \arg_\min{y} \sum_{i=1}^K L[Y_i, y] P(Y=Y_k \vert X = x)
@@ -265,6 +265,136 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
   \begin{equation}
   \delta_k'(x) = -\frac{1}{2} (x - \mu_k)^\top \boldsymbol{\Sigma}^{-1}(x - \mu_k) + \log \pi_k
   \end{equation}
+
+
+
+---
+
+class: middle, center, inverse
+
+## Regresión Logística y Optimización Estocástica
+
+---
+
+
+
+class: middle, center, inverse
+
+# Interacciones y Máquinas de Factorización (FMs)
+
+---
+
+
+class: middle, center, inverse
+
+# k Vecinos Más Próximos (k-NN)
+
+---
+
+## Fundamentos
+
+* k-NN es un algoritmo robusto y versátil que suele usarse como base antes de modelos más complejos.
+
+* Es de tipo **supervisado**: aprende una función `\(h: \mathcal{X} \rightarrow \mathcal{Y}\)`, donde `\(\mathcal{Y}\)` puede ser discreto (clasificación) o continuo (regresión).
+
+* Es **no paramétrico**: no hace ninguna suposición acerca de la estructura de `\(h\)` (por ejemplo, que sea lineal, `\(h(x) = w^{\intercal} x)\)`. Esto ayuda para prevenir errores de modelización.
+
+* El aprendizaje es **basado en instancias**: en lugar de aprender parámetros, **memoriza** los datos de entrenamiento, que serán usados directamente como *conocimiento* para la fase de inferencia.
+
+* En consecuencia: solo al predecir sobre datos de test el algoritmo usa los datos de entrenamiento.
+
+
+
+---
+
+## Algoritmo
+
+### (Pre)entrenamiento
+
+1. Almacenar el dataset de entrenamiento `\(\mathcal{D}_{tr}\)`.
+
+2. Especificar una función de distancia `\(d : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}_{+}\)`
+
+--
+
+### Predicción 
+
+1. Dado una instancia de test `\(x_0\)`, encontrar los `\(k\)` puntos `\(\lbrace x_{(1)}, \ldots, x_{(k)} \rbrace := \mathcal{A} \subset \mathcal{D}_{tr}\)` más cercanos a `\(x_0\)` según `\(d\)`.
+
+2. La clase predicha será la **mayoritaria** de las clases de los elementos en `\(\mathcal{A}\)`, es decir,
+
+`\begin{equation*}
+P(y = j | x_0 ) = \frac{1}{k} \sum_{i \in \mathcal{A}} I(y_{(i)} = j)
+\end{equation*}`
+
+donde `\(I\)` es la función indicatriz.
+
+---
+
+## Funciones de distancia
+
+* Supongamos `\(x_1, x_2 \in \mathcal{X} = \mathbb{R}^D\)`.
+
+* **Distancia L1**: `\(d_1(x_1, x_2) = \sum_{d=1}^D | x_{1,d} - x_{2,d} |\)`.
+
+* **Distancia L2**: `\(d_2(x_1, x_2) = \sqrt{\sum_{d=1}^D (x_{1,d} - x_{2,d})^2 }\)`.
+
+* **L1 vs L2**: la L2 penaliza mucho más puntos alejados que la L1.
+
+* ¡Es conveniente estandarizar las variables a media 0 y varianza 1 ya que pueden estar en distintas escalas!
+
+---
+
+## El hiperparámetro `\(k\)`
+
+* Intuititivamente, aumentar `\(k\)` tiende a suavizar la frontera de decisión, es decir, el clasificador es más resistente a outliers. 
+
+![:scale 60%](./img/knn1.png)
+
+---
+
+## El hiperparámetro `\(k\)`
+
+* Intuititivamente, aumentar `\(k\)` tiende a suavizar la frontera de decisión, es decir, el clasificador es más resistente a outliers. 
+
+![:scale 60%](./img/knn15.png)
+
+
+---
+
+## Ventajas
+
+* Sencillo y válido para regresión y clasificación multiclase (no solo binaria).
+
+* **No hace suposiciones** sobre la estructura de los datos.
+
+## Inconvenientes
+
+* Predicción **muy costosa en tiempo**: en la mayoría de las aplicaciones, interesa que la predicción sea rápida y el entrenamiento lento.
+
+* Necesario almacenar todo el dataset de entrenamiento.
+
+* En **alta dimensión**, las distancias no son intuitivas.
+
+
+---
+
+## Propiedades asintóticas
+
+## Versiones aproximadas: LSH (TODO)
+
+
+---
+
+## En la práctica: resumen
+
+* Preprocesar los datos: estandarizar.
+
+* Si los datos tienen mucha dimensionalidad, considera utilizar técnicas de reducción de dimensionalidad.
+
+* Validar en el hiperparámetro `\(k\)` y la distancia `\(d\)`.
+
+* Si tiempo es crítico, considerar usar variantes aproximadas: https://github.com/eddelbuettel/rcppannoy
 
 
 ---
