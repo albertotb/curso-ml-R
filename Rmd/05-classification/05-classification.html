@@ -183,6 +183,90 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
 &amp;=&amp; \log \frac{\pi_k(x)}{\pi_j(x)} - \frac{1}{2} (\mu_k + \mu_j)^\top \boldsymbol{\Sigma}^{-1} (\mu_k + \mu_j) + x^\top {\Sigma}^{-1} (\mu_k - \mu_l)
 \end{eqnarray}`
 
+* Frontera de decisión lineal!!
+
+* El hecho de que `\(\boldsymbol{\Sigma}\)` no dependa de la clase causa la linealidad.
+
+---
+
+## LDA
+
+* Vemos que asignar a `\(X=x\)` la clase con más probabilidad a posteriori es equivalente a asignar la clase con *función discriminante lineal* `\(\delta_k (x)\)` más grande
+
+`\begin{equation}
+\delta_k (x) = x^\top \boldsymbol{\Sigma}^{-1} \mu_k - \frac{1}{2} \mu_k^\top \boldsymbol{\Sigma}^{-1}\mu_k + \log \pi_k
+\end{equation}`
+
+--
+
+* Para estimar parámetros desconocidos, usamos datos de entrenamiento (MLE) 
+
+  1. `\(\hat{\pi}_k = N_k/N\)`
+  2. `\(\hat{\mu}_k = \sum_{x_i \vert y_i = Y_k} x_i/N_k\)`
+  3. `\(\boldsymbol{\Sigma} = \sum_{k=1}^K \sum_{x_i \vert y_i = Y_k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top / (N-K)\)`
+
+* `\(\mathcal{O}\)`(Kp)$
+---
+
+## QDA
+
+* Si no asumimos que las matrices de covarianza son independientes de las clases, llegamos al **Análisis Discriminante Cuadrático**.
+
+`\begin{equation}
+\delta_k (x) = -\frac{1}{2} \log \vert \boldsymbol{\Sigma}_k \vert - \frac{1}{2} (x - \mu_k)^\top \boldsymbol{\Sigma}_k^{-1}(x - \mu_k) + \log \pi_k
+\end{equation}`
+
+* La frontera de decisión ahora es cuadrática.
+
+--
+
+* Para estimar parámetros desconocidos, usamos datos de entrenamiento (MLE) 
+
+  1. `\(\hat{\pi}_k = N_k/N\)`
+  2. `\(\hat{\mu}_k = \sum_{x_i \vert y_i = Y_k} x_i/N_k\)`
+  3. `\(\boldsymbol{\Sigma}_k = \sum_{x_i \vert y_i = Y_k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top / (N-K)\)`
+
+* `\(\mathcal{O}\)`(Kp^2)$ parámetros (ojo cuando `\(p\)` es grande!!).
+
+---
+
+## Análisis Dsicriminante Regularizado
+
+* Compromiso entre LDA y QDA, regularizando la matriz de covarianza.
+
+`\begin{equation}
+\hat{\boldsymbol{\Sigma}}_k(\alpha) = \alpha \hat{\boldsymbol{\Sigma}}_k + (1-\alpha)\hat{\boldsymbol{\Sigma}}
+\end{equation}`
+
+* `\(\alpha \in [0,1]\)` permite un contínuo de modelos entre LDA y QDA.
+
+* `\(\alpha\)` suele escogerse usando validación cruzada, validación hold-out,...
+
+* Otra posibilidad
+
+`\begin{equation}
+\hat{\boldsymbol{\Sigma}}_k(\gamma) = \gamma \hat{\boldsymbol{\Sigma}} + (1-\gamma) \sigma^2 \boldsymbol{I}
+\end{equation}`
+
+---
+
+## Computación para LDA
+
+* La computación se simplifica diagonalizando la matriz `\(\hat{\boldsymbol{\Sigma}}\)`.
+
+* Sea `\(\hat{\boldsymbol{\Sigma}} = \boldsymbol{U} \boldsymbol{D} \boldsymbol{U}^\top\)` la descomposición en autovalores de la matriz de covarianza.
+
+* Para clasificar podemos:
+
+  1. *Esferizar* los datos usando `\(X^* = \boldsymbol{D}^{-\frac{1}{2}} \boldsymbol{U}^\top X\)`. Ahora la matriz de covarianza es la identidad.
+  2. Clasificar una nueva instancia a la clase del centroide más cercano en el espacio transformado, modulo el efecto de los priors `\(\pi_k\)`.
+  3. Esto es así pues podemos escribir la función discriminante como
+  
+  \begin{equation}
+  \delta_k'(x) = -\frac{1}{2} (x - \mu_k)^\top \boldsymbol{\Sigma}^{-1}(x - \mu_k) + \log \pi_k
+  \end{equation}
+
+
 ---
 # Referencias
 
