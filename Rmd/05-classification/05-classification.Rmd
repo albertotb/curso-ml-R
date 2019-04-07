@@ -17,7 +17,7 @@ output:
 
 class: middle, center, inverse
 
-# Regresión Lineal de Matriz de Indicadores
+# Regresión Lineal en problemas de clasificación
 
 ---
 
@@ -29,6 +29,8 @@ class: middle, center, inverse
 * **One Hot Encoding** de las categorías: para categoría *k*, crear vector $K$ dimensional $t_k$ con tan solo un 1 en posición $k$ (resto ceros).
 
 * $y_i = t_k$ si la categoría del ejemplo i-ésimo es $k$.
+
+--
 
 * Problema de predicción: reproducir el target de cada observación. Resolver
 
@@ -52,7 +54,134 @@ class: middle, center, inverse
 
 ![:scale 45%](./img/masking1.png) ![:scale 45%](./img/masking2.png)
 
-*Source*: Elements of Statistical Learning
+*Fuente*: Elements of Statistical Learning
+
+---
+
+class: middle, center, inverse
+
+# Introducción
+
+---
+
+## Teoría de la decisión estadística
+
+* Sea $X \in \mathbb{R}^p$, vector de variables predictoras.
+
+* Sea $Y \in  \lbrace Y_1, Y_2, \dots, Y_K\rbrace$, respuesta categórica.
+
+* Distribución de los datos $X, Y \sim p(X,Y)$.
+
+--
+
+* Dado nuevo $X$ necesitamos estimar $\widehat{Y} (X) \in \lbrace \lbrace Y_1, Y_2, \dots, Y_K \rbrace$.
+ 
+* Definimos función de coste $L[Y, \widehat{Y} (X)]$. Una bastante común: coste $0/1$ (0 si acertamos, 1 si nos equivocamos).
+
+--
+
+* Objetivo: Escoger $\widehat{Y} (X)$ que minimice coste esperado
+
+\begin{eqnarray}
+\mathbb{E}_{X,Y} \left[ L(Y, \widehat{Y} (X)) \right] &=& \mathbb{E}_{X} \mathbb{E}_{Y\vert X}\left[ L(Y, \widehat{Y} (X)) \right] \\
+&=& \mathbb{E}_{X} \sum_{i=1}^K L[Y_i, \widehat{Y} (X)] P(Y=Y_k \vert X)
+\end{eqnarray}
+---
+
+## Teoría de la decisión estadística
+
+* Es suficiente minmizar el coste esperado para cada $x$
+
+\begin{eqnarray}
+\widehat{Y} (x) = \arg_\min{y} \sum_{i=1}^K L[Y_i, y] P(Y=Y_k \vert X = x)
+\end{eqnarray}
+
+--
+
+* Con el coste $0/1$ 
+
+\begin{eqnarray}
+\widehat{Y} (x) = \arg_\min{y} \left[ 1 - P(y \vert X = x) \right]
+\end{eqnarray}
+
+* Asignamos la clase con más probabilidad a posteriori.
+
+
+---
+
+## Teoría de la decisión estadística
+
+* Hemos separado el problema de clasificación en dos partes
+
+  1. **Inferencia**: usar datos de entrenamiento para encontrar $P(Y=Y_k \vert X = x)$.
+  2. **Decisión**: usar las distribuciones a posteriori para tomar decisión óptima de clasificación (minimizar coste esperado, maximizar utilidad esperada...)
+  
+* Posibilidad alternativa: aprender directamente funciones que mapeen $X$ en $Y$. 
+
+  
+---
+
+## Tres maneras de enfrentar los problemas de clasificación
+
+1. *Modelos generativos*: tratan de modelizar $P(Y,X)$ (Naive-Bayes).
+
+  + Permiten muestrear.
+  + Detección de outliers (si $P(X)$ es pequeño).
+  - Más dífícil (si $X$ es de dimensión alta...).
+  
+2. *Modelos discriminativos*: tratan de modelizar $P(Y \vert X)$ (Regresión logística).
+
+  + Si solo interesa clasificar: más fácil computacionalmente.
+  
+3. *Funciones discriminantes*: Aprenden funciones que mapean $X$ en $Y$ directamente (Perceptrón).
+  
+  - No tenemos acceso a las probabilidades a posteriori cada vez que queramos tomar nuevas decisiones.
+  - Probabilidades a posteriori **muy útiles**: cambaimos frecuentemente función de coste, queremos tener opción de rechazo, combinar modelos, etc.
+
+---
+
+class: middle, center, inverse
+
+# Análisis Discriminante Lineal
+
+---
+
+## LDA
+
+* Sea $f_k(x)$ la densidad de probabilidad de $x$ condicionada a la clase $Y_k$. 
+* Sea $\pi_k$ el prior de la clase $Y_k$. Se tiene
+
+\begin{equation}
+P(Y=Y_k \vert X=x) = \frac{f_k(x) \pi_k}{\sum_{i=1}^K f_i (x) \pi_{i}}
+\end{equation}
+
+* ¿Es este un modelo generativo, discriminativo o función discriminante?
+
+---
+
+## LDA
+
+* Asumamos modelo Gaussiano para $f_k(x)$
+
+\begin{equation}
+f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \left[ -\frac{1}{2} (x-\mu_k)^\top \boldsymbol{\Sigma_k}^{-1}(x-\mu_k) \right]
+\end{equation}
+
+* LDA: Asume que las clases tienen matriz de covarianza común $\boldsymbol{\Sigma_k} = \boldsymbol{\Sigma}$ $\forall k$.
+
+--
+
+* Comparamos dos clases
+
+\begin{eqnarray}
+\log \frac{P(Y=Y_k \vert x)}{P(Y=Y_j \vert x)} &=& \log \frac{f_k(x)}{f_j(x)} + \log \frac{\pi_k(x)}{\pi_j(x)} \\
+&=& \log \frac{\pi_k(x)}{\pi_j(x)} - \frac{1}{2} (\mu_k + \mu_j)^\top \boldsymbol{\Sigma}^{-1} (\mu_k + \mu_j) + x^\top {\Sigma}^{-1} (\mu_k - \mu_l)
+\end{eqnarray}
+
+* Frontera de decisión lineal!!
+
+* El hecho de que $\boldsymbol{\Sigma}$ no dependa de la clase causa la linealidad.
+
 ---
 # Referencias
 
