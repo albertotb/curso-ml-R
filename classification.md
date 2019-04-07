@@ -17,7 +17,7 @@
 
 # Ejercicios
 
-1. Optimizacin estocstica (A)
+1. Optimización estocástica (A)
 
 2. Clasificadores: LR, LDA(r), NB 
 
