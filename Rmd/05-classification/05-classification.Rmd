@@ -351,6 +351,34 @@ P(X_i = x \vert Y = Y_k) = \frac{\sum_{j=1}^N I(X_i = x)*I(Y = Y_k)}{\sum_{j=1}^
 ---
 class: middle, center, inverse
 
+# Intro a git
+
+---
+
+* Git es un sistema de **control de versiones** utilizado para gestionar archivos de código.
+
+### En la terminal de bash (Linux, MacOS)
+
+* Obtener e instalar el programa **git**: https://git-scm.com/.
+
+* Descarga de un repositorio: **git clone https://github.com/albertotb/curso-ml-R**.
+
+  Esto nos creará un nuevo directorio **curso-ml-R**, descargando todo lo que hubiera en la copia remota (la alojada en Github en este caso).
+
+* Actualización de cambios: **git pull** (ejecutado dentro del directorio del repositorio).
+
+  En caso de que la copia remota tenga cambios respecto a nuestra copia local, actualiza nuestra copia local del repositorio. Esto evita volver a descargar todo como al usar git clone.
+
+---
+
+### En Windows
+
+
+---
+
+
+class: middle, center, inverse
+
 # Regresión Logística y Optimización Estocástica
 
 ---
@@ -452,8 +480,11 @@ Figuras mostrando trayectorias vs tamaño del lote.
 
 ---
 
+![:scale 100%](./img/contours_evaluation_optimizers.gif)
 
 
+
+---
 
 
 class: middle, center, inverse
