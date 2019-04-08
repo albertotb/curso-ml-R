@@ -255,7 +255,7 @@ Mas sesgo pero potencialmente menos varianza, al imponer mas estructura
 
 ---
 
-## Selección de `\(k\)`
+## Selección de k
 
 * Secuencia de modelos indexada por `\(k\)` (igual que *best subset*)
 
@@ -364,7 +364,83 @@ class: middle, center
 
 ---
 
+## Lasso: limitaciones
+
+1. Si `\(d &gt; n\)`, como mucho `\(n\)` coeficientes son `\(\neq 0\)`
+
+    * Limitación desde el punto de vista de selección de variables
+
+2. Variables con correlación alta `\(\Longrightarrow\)` Lasso selecciona una "aleatoriamente"
+
+3. Si `\(n &gt; d\)` y hay variables con correlación alta `\(\Longrightarrow\)` error de Ridge &lt; error de Lasso
+
+---
+
+## Otras penalizaciones
+
+* Podemos generalizar Lasso, Ridge y Best subset como `$$\min_w || y - \Xbf w ||_2^2 + \lambda || w ||_p^p$$`
+donde, `$$|| w ||_p^p = \sum_{i=1}^d{|x_i|^p}$$`
+
+* `\(0 \leq p &lt; 1\)`, no convexas
+
+* `\(p = 1\)`, convexa y no diferenciable
+
+* `\(p &gt; 1\)` convexas y diferenciables
+
+---
+
+## Interpretación Bayesiana
+
+* Regularización = distribución a priori de los parámetros `\(w\)`
+
+* Ridge regressión: distribución Normal
+
+* Lasso: distribución de Laplace, `\(\tau = 1/\lambda\)` `$$f(w) = \frac{1}{2\tau} \exp\bigg(-\frac{|w|}{\tau}\bigg)$$`
+
+* Estimadores: máximo de la distribución a posteriori (MAP)
+  
+  * Ridge: coincide con la media
+  * Lasso y Best subset: moda
+
+---
+
+class: center, middle
+
+![](./img/laplace.svg)
+
+[Wikipedia, "Laplace distribution"](https://en.wikipedia.org/wiki/Laplace_distribution)
+
+---
+
+class: middle, center
+
+![](./img/penalties.png)
+
+---
+
 ## Elastic Net
+
+* Combina regularización Lasso y Ridge: `$$\min_w\, || y - \Xbf w ||_2^2 + \lambda_1 || w ||_1 + \lambda_2 || w ||_2^2$$`
+
+* Otra parametrización con `\(\alpha \in (0, 1)\)`: `$$\min_w\, || y - \Xbf w ||_2^2 + \lambda(\alpha || w ||_1 + (1 - \alpha) || w ||_2^2)$$`
+
+* Equivalentes con 
+
+  * `\(\alpha = \lambda_1/(\lambda_1 + \lambda_2)\)` 
+  
+  * `\(\lambda = \lambda_1 + \lambda_2\)`
+  
+* Selecciona variables y reduce el resto de coeficientes
+
+---
+
+class: center, middle
+
+![:scale 85%](./img/penalties.svg)
+
+???
+
+Ventaja de parametrizacion 2: `\(\lambda\)` te da la distancia al origen, y `\(\alpha\)` la curvatura
 
 ---
 
