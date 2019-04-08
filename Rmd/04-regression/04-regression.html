@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
-    <title>Algoritmos de regresión</title>
+    <title>Modelos lineales: regresión</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alberto Torres Barrán" />
-    <meta name="date" content="2019-04-01" />
+    <meta name="date" content="2019-04-08" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -12,10 +12,10 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Algoritmos de regresión
+# Modelos lineales: regresión
 ## Curso de aprendizaje automático para el INE
 ### Alberto Torres Barrán
-### 2019-04-01
+### 2019-04-08
 
 ---
 
@@ -33,27 +33,30 @@ MathJax.Hub.Config({
 });
 </script>
 
-## Regresión lineal
+## Modelos lineales
 
-La salida `\(y\)` es continua, `\(y \in \Rbb\)`
+Variables provienen de múltiples fuentes:
+* variables quantitativas
+* transformaciones (logaritmo, raiz cuadrada, etc.)
+* expansiones de base, `\(x_2 = x_2^2\)`
+* variables *dummy*
+* interacciones entre variables, `\(x_3 = x_1 \times x_2\)`
 
-* Regresión lineal (*MSE* o *RSS*) `$$\min_w\, ||y - \Xbf w||_2^2 \hphantom{\ + ||w||_2^2}$$`
-
---
-
-* Regresión *ridge* (*MSE* + regularización `\(l_2\)`): `$$\min_w\, ||y - \Xbf w||_2^2 + ||w||_2^2$$`
+Pero siempre: modelo lineal en los parámetros
 
 ---
 
-## Regresión logística
+## Regresión lineal y logística
+
+La salida `\(y\)` es continua, `\(y \in \Rbb\)`
+
+* Regresión lineal (*MSE* o *RSS*) `$$\min_w\, ||y - \Xbf w||_2^2$$`
+
+--
 
 La salida `\(y\)` es discreta, `\(y \in \{ 0, 1 \}\)`
 
-* Regresión logística (*log-loss*) `$$\min_w\, -(y^T \log[\sigma(\Xbf w)] + (1 - y)^T \log[1 - \sigma(\Xbf w)])$$` 
-
---
-  
-* ¿Regresión logística ridge?
+* Regresión logística (*log-loss*) `$$\min_w\, -(y^T \log[\sigma(\Xbf w)] + (1 - y)^T \log[1 - \sigma(\Xbf w)])$$`
 
 ???
 
@@ -63,7 +66,7 @@ La función de pérdida log-loss es un poco distinta a como la vimos antes
 
 ---
 
-## GLMs
+## Generalized linear models (GLM)
 
 * Generalización de la regresión lineal que permite distribuciones de errores distintas de la distribución normal.
 
@@ -116,7 +119,7 @@ La función de pérdida log-loss es un poco distinta a como la vimos antes
 
 * Tiene los mismos argumentos principales que `lm()`, pero además tenemos que especificar la distribución de la variables dependiente con el parámetro `family`
 
-* Por defecto se usa la función de enlace ""canónica", pero esto se puede modificar (ver ayuda)
+* Por defecto se usa la función de enlace "canónica", pero esto se puede modificar (ver ayuda)
 
 * Implementa el algoritmo IRLS (Newton-Raphson), que se puede generalizar para cualquier GLM donde la distribución pertenece a la familia exponencial
 
@@ -124,8 +127,290 @@ Ejemplo: regresión logística
 
 
 ```r
-fit &lt;- glm(Species ~ Petal.Length, data=iris, family=binomial)
+library(MASS)
+fit &lt;- glm(type ~ ., data=Pima.tr, family=binomial)
 ```
+
+---
+
+## Problemas de mínimos cuadrados
+
+1. Calidad de predicción: 
+  
+  * poco sesgo pero potencialmente mucha varianza
+  
+  * podemos mejorar las predicciones reduciendo el valor de algunos coeficientes
+  
+  * aumenta ligeramente el sesgo pero disminuye mucho la varianza
+
+2. Interpretación: 
+
+  * el valor de los coeficientes nos da una idea de las variables mas relevantes
+  
+  * nos gustaria encontrar un subconjunto de los mejores
+
+???
+
+Teorema de Gauss-Markov
+
+El estimador de minimos cuadrados es BLUE
+
+---
+
+## Regularización
+
+* Regresión *ridge* (*MSE* + regularización `\(l_2\)`): `$$\min_w\, ||y - \Xbf w||_2^2 + ||w||_2^2$$`
+
+--
+  
+* ¿Regresión logística ridge?
+
+--
+
+* ¿Otras funciones de regularización?
+
+---
+
+class: middle, center, inverse
+
+# Métodos de seleccion
+
+---
+
+## Regresión *best subset*
+
+* Mantenemos solo un subconjunto de las variables y eliminamos el resto del modelo
+
+* Para `\(k \in \{0, 1, 2, \dots, d\}\)` se resuelve `$$\min_w\, || y - \Xbf w ||_2^2 \quad \mbox{s.t.}\; ||w||_0 \leq k$$`
+donde `\(||w||_0 = \sum_{i=1}^d{\mathbb{I}(w_i \neq 0)}\)`
+
+* `\(\mathbb{I}(\cdot)\)` es la función indicatriz (cuenta el número de elementos distintos de 0)
+
+* La restricción hace que el problema sea NP-completo, `$$C_{d,k}=\binom{d}{k} = \frac{d!}{k!(d-k)!}$$`
+
+* Algoritmos clásicos pueden resolver `\(d \approx 30\)`
+
+* Avances recientes, [(Bertsimas et al., 2015)](https://arxiv.org/pdf/1507.03133.pdf): `\(d \in [100, 1000]\)` 
+
+???
+
+`\(C_{30, 10} \approx 30M\)`
+
+---
+
+class: center, middle
+
+![](./img/best_subset.png)
+
+???
+
+`\(C_{8, 2} = 28\)`
+
+`\(C_{8, 3} = 56\)`
+
+`\(C_{8, 4} = 70\)`
+
+---
+
+## Best subset en R
+
+Paquete `leaps`
+
+---
+
+## Regresión *stepwise*
+
+* *Forward-Stepwise*:
+  
+  1. Añadir al modelo la variable que proporciona mejor ajuste
+  2. Repetir hasta añadir `\(k\)` variables
+
+* *Backward-Stepwise* 
+
+  1. Empezar con las `\(d\)` variables
+  2. Eliminar iterativamente la menos relevante para el ajuste 
+
+* Algoritmos avariciosos
+
+* No buscan entre todas las posibles combinaciones de subconjuntos de tamaño `\(k\)`
+
+* En cada paso solo se ajustan `\(d-k\)` modelos
+
+???
+
+Mas sesgo pero potencialmente menos varianza, al imponer mas estructura
+(no se busca el mejor)
+
+---
+
+## *Stepwise* en R
+
+* Función `step`
+
+* Procedimiento hibrido: se procede como *forward* pero en cada paso está la opción de eliminar alguna variable añadida previamente
+
+* Añade o elimina variables en grupos (por ej. si son variables *dummy*)
+
+* Selecciona automáticamente el valor óptimo de `\(k\)`
+
+---
+
+## Selección de `\(k\)`
+
+* Secuencia de modelos indexada por `\(k\)` (igual que *best subset*)
+
+* Elegir `\(k\)` como el que minimiza el error de validación cruzada 
+
+* Validación cruzada: estimación del error de generalización o error *extra-sample*
+
+* Error de entrenamiento es demasiado optimista (error *in-sample*)
+
+* Alternativa: cuantificar el "optimismo" y minimizarlo (AIC, BIC y derivados)
+
+???
+
+ESL secciones 7.4 en adelante
+
+---
+
+class: inverse, middle, center
+
+# Métodos de reducción
+
+---
+
+## Regresión *rigde*
+
+ESL sección 3.4.1
+
+---
+
+## Lasso: motivación
+
+* Métodos de selección: 
+   
+   * ![:colorText green](modelos interpretables)
+    
+   * ![:colorText red](proceso discreto, las variables están incluidas o no)
+
+
+* Regresión *ridge*: 
+
+  * ![:colorText green](proceso continuo, todos los coeficientes se reducen)
+
+  * ![:colorText red](rara vez son exactanente 0, modelos no interpretables)
+
+
+* Lasso es una técnica intermedia:
+
+  * ![:colorText green](reduce algunos coeficientes)
+  
+  * ![:colorText green](pone el resto a 0)
+
+???
+
+Modelos seleccion: variables entran o salen del modelo
+
+---
+
+## Lasso: formulación
+
+* Problema optimización: `$$\min_w\, || y - \Xbf w ||_2^2\quad \text{s.t. }\; ||w||_1 \leq t$$`
+
+* Equivalente: `$$\min_w\, || y - \Xbf w ||_2^2 + \lambda ||w||_1$$`
+
+* `\(\lambda\)` o `\(t\)` son hiper-parámetros
+
+  * `\(\uparrow \lambda\)` o `\(\downarrow t\)`, se reducen los coeficientes (más regularización)
+
+  * `\(\downarrow \lambda\)` o `\(\uparrow t\)`, aumentan los coeficientes (menos regularización)
+  
+* `\(t\)` suficientemente pequeño (o `\(\lambda\)` suficientemente grande), algunos coeficientes = 0
+
+---
+
+class: middle, center
+
+![:video 600 600](./img/lasso.mp4)
+
+
+---
+
+class: middle, center
+
+![](./img/orthonormal.png)
+
+???
+
+`\(X^T X = I\)`, no ocurre en la practica pero interesante para ver la diferencia entre los estimadores
+
+---
+
+class: middle, center
+
+![](./img/constraint_regions.png)
+
+---
+
+* Comparación Lasso, *best subset* y *forward stepwise* [(Hastie et al., 2017)](https://arxiv.org/pdf/1707.08692.pdf)
+
+* Experimentos en [Github, best-subset](https://github.com/ryantibs/best-subset/)
+
+* [*Relaxed* Lasso](https://stat.ethz.ch/~nicolai/relaxo.pdf)
+
+???
+
+[Relaxed Lasso](https://stats.stackexchange.com/questions/122955/why-is-relaxed-lasso-different-from-standard-lasso)
+
+---
+
+## Elastic Net
+
+---
+
+## Notación
+
+* Lasso (Elastic Net) suelen hacer referencia a: minimizar MSE + norma `\(l_1\)` (+ norma `\(l_2\)`)
+
+* MSE puede reemplazarse por otras funciones de pérdida
+
+* Por ej. cualquier GLM
+
+* En esos casos hablamos de regresión logística, Poisson, Gamma + regularización Ridge/Lasso/Elastic Net
+
+---
+
+## Elastic Net en R
+
+Paquete `glmnet`
+
+---
+
+class: middle, center, inverse
+
+# Métodos de reducción
+
+---
+
+## Principal Component Regression
+
+---
+
+## Partial Least Squares
+
+---
+
+## Algoritmos
+
+ * FISTA
+
+ * Descenso coordinado
+
+---
+ 
+## Variantes del Lasso
+
+Group Lasso, Fused Lasso, Generalized Lasso, Relaxed Lasso
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
