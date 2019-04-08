@@ -267,7 +267,91 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
 
 class: middle, center, inverse
 
-## Regresión Logística y Optimización Estocástica
+# Clasificador Naive-Bayes
+
+---
+## Clasificador NB
+
+* Sea $f_k(x)$ la densidad de probabilidad de $x$ condicionada a la clase $Y_k$. 
+* Sea $\pi_k$ el prior de la clase $Y_k$. Se tiene
+
+\begin{equation}
+P(Y=Y_k \vert X=x) = \frac{f_k(x) \pi_k}{\sum_{i=1}^K f_i (x) \pi_{i}}
+\end{equation}
+
+--
+
+* El modelo NB asume que las variables predictoras son **condicionalmente independientes** dada la clase. O lo que es lo mismo
+
+\begin{equation}
+f_k(X) = \prod_{j=1}^p f_{kj}(X_k)
+\end{equation}
+
+* Esto en general no es cierto...
+
+---
+## Clasificador NB
+
+* ...pero simplificar tremendamente la estimación, cada marginal $f_{kj}$ puede ser estimada por separado.
+
+* Especialemente apropiado cuando la dimensión $p$ es grande (pues la estimación de densidad se vuelve inviable).
+
+* También cuando el vector de variables predictoras contiene variables discretas y continuas (pues cada una se modeliza por separado).
+
+* Aunque la hipótesis es fuerte, el modelo puede funcionar porque la frontera de decisión puede "no sentir" detalles de las densidades condicionadas a la clase.
+
+--
+
+* Podemos ver que es la frontera de decisión la conforma una combinación lineal de funciones de cada variable predictora
+\begin{eqnarray*}
+\log \frac{P(Y=Y_k \vert x)}{P(Y=Y_j \vert x)} &=& \log \frac{f_k(x)}{f_j(x)} + \log \frac{\pi_k(x)}{\pi_j(x)} \\
+&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p \log \frac{f_{ki}(x_i)}{f_{ji}(x_i)} \\
+&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p g_{lji}(x_i)
+\end{eqnarray*}
+
+
+---
+## Clasificador NB en la práctica - estimación de parámetros
+
+* Los parámetros se estima usando máxima verosimilitud con los datos de entrenamiento.
+
+* Para **variables predictoras contínuas** - NB Gaussiano
+
+\begin{equation}
+P(X_i = x_i \vert Y = Y_k) =  \frac{1}{\sqrt{2 \pi \sigma_{ki}^2}} \exp \left[- \frac{(x_i-\mu_{ki})^2}{2 \sigma_{ki}^2}\right]
+\end{equation}
+
+---
+## Clasificador NB en la práctica - estimación de parámetros
+
+* Para **variables predictoras que son cuentas** - Versión suavizada de máxima verosimilitud con modelo multinomial
+
+* Un vector de variables predictoras es un histograma con $x_i$ el número de veces que sucede el evento $i$.  
+
+\begin{equation}
+P(X_i = x \vert Y = Y_k) = \frac{N_{ki} + \alpha}{N_k + \alpha p}
+\end{equation}
+
+* $N_{ki}$ es el número total de cuentas del evento $i$ en la clase $k$ y $N_k$ es el número total de cuentas en la clase $k$.
+
+* $\alpha$ se puede interpretar como prior, evita probabilidades 0. $\alpha = 1$ *Laplace smoothing*. $\alpha < 1$ *Lidstone smoothing*.
+
+---
+## Clasificador NB en la práctica - estimación de parámetros
+
+* Para **variables predictoras categóricas** - MLE con modelo Bernoulli multivariante.
+
+* Cada variable predictora es un booleano, $x_i \in \lbrace 0,1 \rbrace$.
+
+\begin{equation}
+P(X_i = x \vert Y = Y_k) = \frac{\sum_{j=1}^N I(X_i = x)*I(Y = Y_k)}{\sum_{j=1}^N I(Y = Y_k) }
+\end{equation}
+
+
+---
+class: middle, center, inverse
+
+# Regresión Logística y Optimización Estocástica
 
 ---
 
