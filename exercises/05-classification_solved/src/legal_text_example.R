@@ -12,11 +12,16 @@ data <- readxl::read_xlsx('data.xlsx')
 count(data, 'Grupo')
 data$Fallos[1]
 
-# define preprocessing function and tokenization function
-it_train = itoken(data$Fallos, 
+# Creamos split train - test
+ind_train <- sample(1:nrow(data), 0.8*nrow(data))
+data_train <- data[ind_train,]
+data_test <- data[-ind_train,]
+
+# Definimos el preprocesado y tokenizado
+it_train = itoken(data_train$Fallos, 
                   preprocessor = tolower, 
-                  tokenizer = word_tokenizer(), 
-                  ids = data$idSentidosFallos, 
+                  tokenizer = word_tokenizer, 
+                  ids = data_train$idSentidosFallos, 
                   progressbar = TRUE)
 vocab = create_vocabulary(it_train)
 # nos quedams con palabras que al menos aparezcan 10 veces. 
@@ -27,10 +32,24 @@ pruned_vocab = prune_vocabulary(vocab,
 vectorizer = vocab_vectorizer(pruned_vocab)
 
 #dtm: document term matrix
-dtm_data = create_dtm(it_train, vectorizer)
-dim(dtm_data)
+dtm_train = create_dtm(it_train, vectorizer)
+dim(dtm_train)
 
-library(e1071)
-model <- naiveBayes(x = as.matrix(dtm_data), y=data$Grupo)
+## Clasificador
+library(glmnet)
+NFOLDS = 4
+glmnet_classifier = cv.glmnet(x = dtm_train, y = data_train$Grupo, 
+                              family = 'multinomial', 
+                              # L1 penalty
+                              alpha = 1,
+                              type.measure = "class",
+                              # 4-fold cross-validation
+                              nfolds = NFOLDS,
+                              # high value is less accurate, but has faster training
+                              thresh = 1e-3,
+                              # again lower number of iterations for faster training
+                              maxit = 1e3)
+plot(glmnet_classifier)
+
 
 
