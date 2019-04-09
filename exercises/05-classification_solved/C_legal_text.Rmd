@@ -1,0 +1,150 @@
+---
+title: "Clasificación de texto legal"
+author: Victor Gallego y Roi Naveiro
+date: "09/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(text2vec)
+library(tidyverse)
+library(plyr)
+library(caret)
+```
+
+En este ejercicio, entrenaremos varios clasificadores sobre texto legal ... clases?
+
+Primero descargamos y leemos los datos
+
+```{r}
+# Descargamos y leemos los datos
+download.file('https://github.com/vicgalle/neural-classifier/blob/master/data/Quantum1.xlsx?raw=true', 'data.xlsx')
+data <- readxl::read_xlsx('data.xlsx')
+```
+
+
+Explora los datos
+
+```{r}
+# Echamos un vistazo
+count(data, 'Grupo')
+data$Fallos[1]
+```
+
+Divide el conjunto de datos en train y test con proporciones 0.8 y 0.2 respectivamente
+
+```{r}
+# Creamos split train - test
+ind_train <- sample(1:nrow(data), 0.8*nrow(data))
+data_train <- data[ind_train,]
+data_test <- data[-ind_train,]
+```
+
+
+
+## Preprocesado de textos
+
+readatar
+```{r}
+# Creamos split train - test
+ind_train <- sample(1:nrow(data), 0.8*nrow(data))
+data_train <- data[ind_train,]
+data_test <- data[-ind_train,]
+
+# Definimos el preprocesado y tokenizado
+it_train = itoken(data_train$Fallos, 
+                  preprocessor = tolower, 
+                  tokenizer = word_tokenizer, 
+                  ids = data_train$idSentidosFallos, 
+                  progressbar = TRUE)
+vocab = create_vocabulary(it_train)
+# nos quedams con palabras que al menos aparezcan 10 veces. 
+# Cada palabra deberá estar al menos en el 0.1% de documentos
+pruned_vocab = prune_vocabulary(vocab, 
+                                term_count_min = 10, 
+                                doc_proportion_min = 0.001)
+vectorizer = vocab_vectorizer(pruned_vocab)
+
+#dtm: document term matrix
+dtm_train = create_dtm(it_train, vectorizer)
+```
+
+¿Cuál es la dimensión del train tras el preprocesado?
+
+```{r}
+dim(dtm_train)
+```
+
+
+Crea el conjunto de test (OJO, usa el vectorizer generado por el train)
+
+```{r}
+it_test = data_test$Fallos %>% 
+  tolower %>% 
+  word_tokenizer %>% 
+  itoken(ids = data_test$idSentidosFallos, 
+         progressbar = FALSE)
+dtm_test = create_dtm(it_test, vectorizer)
+
+```
+
+## Regresión Logística
+
+```{r}
+library(glmnet)
+NFOLDS = 4
+glmnet_classifier = cv.glmnet(x = dtm_train, y = data_train$Grupo, 
+                              family = 'multinomial', 
+                              # L1 penalty
+                              alpha = 1,
+                              lambda = seq(exp(-6), exp(-2), length.out = 200),
+                              type.measure = "class",
+                              # 4-fold cross-validation
+                              nfolds = NFOLDS,
+                              # high value is less accurate, but has faster training
+                              thresh = 1e-3,
+                              # again lower number of iterations for faster training
+                              maxit = 1e3)
+plot(glmnet_classifier)
+```
+
+Predice sobre el test. ¿Qué precisión obtienes?
+
+```{r}
+preds = predict(glmnet_classifier, dtm_test, type = 'class')
+mean(preds == data_test$Grupo)
+```
+
+## Naive Bayes
+
+```{r}
+train_df = data.frame(as.matrix(dtm_train))
+train_df = lapply(train_df, as.factor)
+#train_df$label = data_train$Grupo
+
+test_df = data.frame(as.matrix(dtm_test))
+test_df = lapply(test_df, as.factor)
+#train_df$label = data_train$Grupo
+```
+
+
+```{r}
+library(e1071)
+nb = naiveBayes(x = train_df, y = factor(data_train$Grupo) )
+```
+
+
+
+Predice sobre el test y mide la precisión
+```{r}
+preds = predict(nb, test_df, type = "class")
+mean(preds == data_test$Grupo)
+```
+
