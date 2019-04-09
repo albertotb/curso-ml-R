@@ -1,0 +1,147 @@
+---
+title: "KNN: Bias-Variance trade-off"
+author: Victor Gallego y Roi Naveiro
+date: "09/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(class)
+```
+
+En este ejercicio, entrenaremos un clasificador KNN para aprender a distinguir imágenes del dígito "8" de otras del dígito "9". Para ello, vamos a usar las proyecciones a 2D que nos daba el análisis de componentes principales.
+
+## Funciones auxiliares
+
+* show_digit: Hace una gráfica del dígito en cuestión.
+* load_image_file: Para cargar las imágenes de los dígitos
+* load_label_file: Para cargar las etiquetas
+
+```{r, message=F}
+show_digit = function(arr784, col = gray(12:1 / 12), ...) {
+  image(matrix(as.matrix(arr784[-785]), nrow = 28)[, 28:1], col = col, ...)
+}
+
+load_image_file = function(filename) {
+  ret = list()
+  f = file(filename, 'rb')
+  readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  n    = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  nrow = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  ncol = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  x = readBin(f, 'integer', n = n * nrow * ncol, size = 1, signed = FALSE)
+  close(f)
+  data.frame(matrix(x, ncol = nrow * ncol, byrow = TRUE))
+}
+
+load_label_file = function(filename) {
+  f = file(filename, 'rb')
+  readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  n = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  y = readBin(f, 'integer', n = n, size = 1, signed = FALSE)
+  close(f)
+  y
+}
+```
+
+## Lectura de Datos
+
+Cargamos el dataset MNIST.
+
+```{r, message=F}
+df = load_image_file("src/t10k-images.idx3-ubyte")
+df$y  = as.factor(load_label_file("src/t10k-labels.idx1-ubyte"))
+```
+
+Esta base de datos consta de 10000 imágenes en escala de gris a 28 x 28, de los dígitos del 0 al 9 (escritos a mano).
+
+```{r, message=F}
+dim(df)
+```
+
+Visualizamos algún ejemplo 
+
+```{r, message=F}
+show_digit(df[1, ])
+```
+Selecciona únicamente las imágens de los dígitos 8  y 9.
+
+```{r}
+df2 = df[df$y == '8' | df$y == '9',]
+```
+
+
+## Creación de conjuntos de train, test y validación.
+
+Divide los datos en train, validación y test, utilizando porcentajes 60, 20, 20, respectivamente.
+
+```{r, message=F}
+size_train = floor(0.6 * nrow(df2))
+size_val = floor(0.2 * nrow(df2))
+size_test = floor(0.2 * nrow(df2))
+##
+ind_train = sample(1:nrow(df2), size=size_train)
+
+train = df2[ind_train,]
+test_val = df2[-ind_train,]
+
+ind_val = sample(1:nrow(test_val), size=size_val)
+
+validation = test_val[ind_val,]
+test = test_val[-ind_val,]
+```
+
+## Proyección a 2D usando PCA
+
+Proyecta los datos de entrenamiento a dos dimensiones usando el paquete prcomp
+```{r, message=F}
+proy_pca <- prcomp(train[, 1:28^2], retx = T) ## Ojo, quitar LABEL, sino son trampas
+# Representamos las dos primeras componentes
+train_proy = data.frame( proy_pca$x[, 1:2] )
+plot(train_proy, type = 'n')
+text(train_proy, labels = train$y, cex = 0.5,
+     col = rainbow(length(levels(train$y)))[train$y])
+```
+
+Proyecta los datos de test y validación a 2D (OJO, usa las matrices de proyección generadas por el PCA del conjunto de train, de otra manera son trampas. Piensa por qué).
+
+```{r, message=F}
+validation_proy = scale(validation[, 1:28^2], proy_pca$center, proy_pca$scale) %*% proy_pca$rotation
+validation_proy = data.frame(validation_proy[, 1:2])
+test_proy = scale(test[, 1:28^2], proy_pca$center, proy_pca$scale) %*% proy_pca$rotation
+test_proy = data.frame(test_proy)
+
+##
+plot(validation_proy, type = 'n')
+text(validation_proy, labels = validation$y, cex = 0.5,
+     col = rainbow(length(levels(validation$y)))[validation$y])
+
+
+train_proy$label = train$y
+validation_proy$label = validation$y
+test_proy$label = test$y
+```
+
+
+
+## Entrenamiento
+
+Entrena un clasificador KNN 
+
+```{r}
+knn( label ~ ., train_proy, test_proy, k = 1)
+```
+
+
+
+
+
+     
+     
