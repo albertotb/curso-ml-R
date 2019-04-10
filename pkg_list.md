@@ -29,6 +29,8 @@ Herramientas de entrenamiento, validación cruzada, búsqueda de parámetros
 Modelos
 -------
  * class: knn
+ * pls: PLS, PCR
+ * leaps: Forward-backward stepwise y best subset
  * glmnet: penalized regression (Lasso, ElasticNet)
  * glmnetUtils: interfaz de formula para glmnet
  * MASS: ridge regression
