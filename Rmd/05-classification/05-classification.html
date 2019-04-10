@@ -4,7 +4,7 @@
     <title>Algoritmos de Clasificación</title>
     <meta charset="utf-8" />
     <meta name="author" content="Víctor Gallego y Roi Naveiro" />
-    <meta name="date" content="2019-04-09" />
+    <meta name="date" content="2019-04-10" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Algoritmos de Clasificación
 ## Curso de aprendizaje automático para el INE
 ### Víctor Gallego y Roi Naveiro
-### 2019-04-09
+### 2019-04-10
 
 ---
 
@@ -453,11 +453,6 @@ w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
 
 * Otra ventaja: mayor probabilidad de escapar óptimos locales que con GD: un punto estacionario de la función objetivo en GD no lo será en SGD generalmente.
 
----
-
-## Ejemplo
-
-Figuras mostrando trayectorias vs tamaño del lote.
 
 ---
 
@@ -476,11 +471,23 @@ Figuras mostrando trayectorias vs tamaño del lote.
 
 ### Momentum
 
+Ayuda a amortiguar las oscilaciones que hacen que SGD sea lento.
+
+`\begin{align*}
+w^{t+1} &amp;= w^t - v^{t+1} \\
+v^{t+1} &amp;= \gamma v^{t} + \eta \nabla_w f_i(w^t)
+\end{align*}`
+
 ### AdaGrad
 
-### RMSProp
+Adapta la tasa de aprendizaje a cada parámetro, disminuyéndola en parámetros con actualizaciones frecuentes (resp. aumentándola en parámetros con actualizaciones infrecuentes). Por esta razón, es adecuado para matrices de datos dispersas.
 
-### Adam
+`\begin{equation*}
+w^{t+1}_j = w^t_j - \frac{\eta}{\sqrt{G^t_{j,j} + \epsilon}} \nabla_w f_i(w^t)_j
+\end{equation*}`
+
+
+#### Adam (lo veremos en Aprendizaje Profundo)
 
 
 ---
