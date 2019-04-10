@@ -619,6 +619,51 @@ donde $I$ es la función indicatriz.
 
 
 ---
+
+class: middle, center, inverse
+
+# Métricas para clasificación
+
+---
+
+## Problema
+
+* La **tasa de acierto** (accuracy) no basta en problemas con clases poco equilibradas.
+
+* Caso real: predicción de CTR (**click-through rate**, click 1, no click 0).
+
+* Alrededor de $10^8$ anuncios (observaciones), de los cuales clicks solo 80.000 clicks.
+
+* Un modelo que clasifique siempre 0, obtiene una tasa de acierto del **99.92 %**...
+
+---
+
+## Calidad modelos clasificación
+
+.pull-left[
+![](./img/confusion_matrix.png)
+]
+
+.pull-right[
+
+Medidas:
+* Tasa de acierto: $\frac{\text{TP} + \text{TN}}{\text{P} + \text{N}}$
+
+* Sensitividad, recall, TPR: $\frac{\text{TP}}{\text{TP} + \text{FN}}$
+
+* Especificidad, TNR: $\frac{\text{TN}}{\text{TN} + \text{FP}}$
+
+* Precisión, PPV: $\frac{\text{TP}}{\text{TP} + \text{FP}}$
+
+* F1-score: $2\times \frac{\text{PPV} \times \text{TPR}}{\text{PPV} + \text{TPR}}$
+]
+
+**Tutorial muy extenso**: http://people.cs.bris.ac.uk/~flach/ICML04tutorial/
+
+(Análisis ROC, generalizaciones a clasificación n-aria,...)
+---
+
+
 # Referencias
 
    1. Randal J. Barnes [Matrix Differentiation (and some othe stuff)](https://atmos.washington.edu/~dennis/MatrixCalculus.pdf)
