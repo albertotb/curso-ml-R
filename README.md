@@ -10,7 +10,7 @@
  2. Aplicaciones prácticas de Aprendizaje Automático
     * Algoritmos de regresión: Ridge, Lasso, ElasticNet, PCR, PLS, etc.. (11/04, 4 horas)
     * Algoritmos de clasificación: KNN, Naive Bayes, ... (12/04, 4 horas)
-    * Arboles de decision, bosques aleatorios y boosting (22/04, 4 horas)
+    * Arboles de decisión, bosques aleatorios y boosting (22/04, 4 horas)
     * Support vector machines (25/04, 4 horas)
     * Análisis de conglomerados: cuantización vectorial (29/04, 4 horas)
     * Modelos gráficos probabilisticos (10/05, 4 horas)
@@ -27,7 +27,7 @@
  * Elements of Statistical Learning ([ESL](https://web.stanford.edu/~hastie/ElemStatLearn/))
  * Introduction to Statistical Learning with R ([ISLR](http://www-bcf.usc.edu/~gareth/ISL/))
  * Pattern Recognition and Machine Learning ([Bishop](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf))
- * Bayesian Data Anaĺysis ([BDA](http://www.stat.columbia.edu/~gelman/book/))
+ * Bayesian Data Analysis ([BDA](http://www.stat.columbia.edu/~gelman/book/))
  * Deep Learning with R ([DLR](https://www.manning.com/books/deep-learning-with-r))
 
 ## Referencias
