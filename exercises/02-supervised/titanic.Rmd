@@ -27,6 +27,7 @@ Con el conjunto de datos anterior:
   4. Eliminar también las variables name y ticket (¿por qué?).
   5. Eliminar las filas que contengan algún NA (función na.omit).
   6. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
-  7. Ajustar un modelo KNN para distintos valores de K y calcular la tasa de acierto (función `knn()` de la librería `class`)
-  8. Ajustar un modelo regresión logística regularizada y comparar con el modelo KNN
-  9. Calcular los *odds ratio* e interpretarlos
+  7. Ajustar un modelo regresión logística regularizada 
+  8. ¿Cuál es el valor de $\lambda$ óptimo?
+  9. ¿Qué variables selecciona el modelo?
+  10. Calcular los *odds ratio* e interpretarlos

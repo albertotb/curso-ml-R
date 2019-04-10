@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
-    <title>Algoritmos de regresión</title>
+    <title>Modelos lineales: regresión</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alberto Torres Barrán" />
-    <meta name="date" content="2019-04-01" />
+    <meta name="date" content="2019-04-10" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -12,10 +12,10 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Algoritmos de regresión
+# Modelos lineales: regresión
 ## Curso de aprendizaje automático para el INE
 ### Alberto Torres Barrán
-### 2019-04-01
+### 2019-04-10
 
 ---
 
@@ -25,6 +25,8 @@ MathJax.Hub.Config({
     Macros: {
       Xcal: "{\\mathcal{X}}",
       Xbf: "{\\mathbf{X}}",
+      Zbf: "{\\mathbf{Z}}",
+      Vbf: "{\\mathbf{V}}",
       Hbf: "{\\mathbf{H}}",
       Rbb: "{\\mathbb{R}}"
     },
@@ -33,27 +35,30 @@ MathJax.Hub.Config({
 });
 </script>
 
-## Regresión lineal
+## Modelos lineales
 
-La salida `\(y\)` es continua, `\(y \in \Rbb\)`
+Variables provienen de múltiples fuentes:
+* variables quantitativas
+* transformaciones (logaritmo, raiz cuadrada, etc.)
+* expansiones de base, `\(x_2 = x_2^2\)`
+* variables *dummy*
+* interacciones entre variables, `\(x_3 = x_1 \times x_2\)`
 
-* Regresión lineal (*MSE* o *RSS*) `$$\min_w\, ||y - \Xbf w||_2^2 \hphantom{\ + ||w||_2^2}$$`
-
---
-
-* Regresión *ridge* (*MSE* + regularización `\(l_2\)`): `$$\min_w\, ||y - \Xbf w||_2^2 + ||w||_2^2$$`
+Pero siempre: modelo lineal en los parámetros
 
 ---
 
-## Regresión logística
+## Regresión lineal y logística
+
+La salida `\(y\)` es continua, `\(y \in \Rbb\)`
+
+* Regresión lineal (*MSE* o *RSS*) `$$\min_w\, ||y - \Xbf w||_2^2$$`
+
+--
 
 La salida `\(y\)` es discreta, `\(y \in \{ 0, 1 \}\)`
 
-* Regresión logística (*log-loss*) `$$\min_w\, -(y^T \log[\sigma(\Xbf w)] + (1 - y)^T \log[1 - \sigma(\Xbf w)])$$` 
-
---
-  
-* ¿Regresión logística ridge?
+* Regresión logística (*log-loss*) `$$\min_w\, -(y^T \log[\sigma(\Xbf w)] + (1 - y)^T \log[1 - \sigma(\Xbf w)])$$`
 
 ???
 
@@ -63,7 +68,7 @@ La función de pérdida log-loss es un poco distinta a como la vimos antes
 
 ---
 
-## GLMs
+## Generalized linear models (GLM)
 
 * Generalización de la regresión lineal que permite distribuciones de errores distintas de la distribución normal.
 
@@ -116,7 +121,7 @@ La función de pérdida log-loss es un poco distinta a como la vimos antes
 
 * Tiene los mismos argumentos principales que `lm()`, pero además tenemos que especificar la distribución de la variables dependiente con el parámetro `family`
 
-* Por defecto se usa la función de enlace ""canónica", pero esto se puede modificar (ver ayuda)
+* Por defecto se usa la función de enlace "canónica", pero esto se puede modificar (ver ayuda)
 
 * Implementa el algoritmo IRLS (Newton-Raphson), que se puede generalizar para cualquier GLM donde la distribución pertenece a la familia exponencial
 
@@ -124,8 +129,685 @@ Ejemplo: regresión logística
 
 
 ```r
-fit &lt;- glm(Species ~ Petal.Length, data=iris, family=binomial)
+library(MASS)
+fit &lt;- glm(type ~ ., data=Pima.tr, family=binomial)
 ```
+
+---
+
+## Problemas de mínimos cuadrados
+
+1. Calidad de predicción: 
+  
+  * poco sesgo pero potencialmente mucha varianza
+  
+  * podemos mejorar las predicciones reduciendo el valor de algunos coeficientes
+  
+  * aumenta ligeramente el sesgo pero disminuye mucho la varianza
+
+2. Interpretación: 
+
+  * el valor de los coeficientes nos da una idea de las variables mas relevantes
+  
+  * nos gustaria encontrar un subconjunto de los mejores
+
+???
+
+Teorema de Gauss-Markov
+
+El estimador de minimos cuadrados es BLUE
+
+---
+
+## Regularización
+
+* Regresión *ridge* (*MSE* + regularización `\(l_2\)`): `$$\min_w\, ||y - \Xbf w||_2^2 + ||w||_2^2$$`
+
+--
+  
+* ¿Regresión logística ridge?
+
+--
+
+* ¿Otras funciones de regularización?
+
+---
+
+class: middle, center, inverse
+
+# Métodos de seleccion
+
+---
+
+## Regresión *best subset*
+
+* Mantenemos solo un subconjunto de las variables y eliminamos el resto del modelo
+
+* Para `\(k \in \{0, 1, 2, \dots, d\}\)` se resuelve `$$\min_w\, || y - \Xbf w ||_2^2 \quad \mbox{s.t.}\; ||w||_0 \leq k$$`
+donde `\(||w||_0 = \sum_{i=1}^d{\mathbb{I}(w_i \neq 0)}\)`
+
+* `\(\mathbb{I}(\cdot)\)` es la función indicatriz (cuenta el número de elementos distintos de 0)
+
+* La restricción hace que el problema sea NP-completo, `$$C_{d,k}=\binom{d}{k} = \frac{d!}{k!(d-k)!}$$`
+
+* Algoritmos clásicos pueden resolver `\(d \approx 30\)`
+
+* Avances recientes, [(Bertsimas et al., 2015)](https://arxiv.org/pdf/1507.03133.pdf): `\(d \in [100, 1000]\)` 
+
+???
+
+`\(C_{30, 10} \approx 30M\)`
+
+---
+
+class: center, middle
+
+![](./img/best_subset.png)
+
+???
+
+`\(C_{8, 2} = 28\)`
+
+`\(C_{8, 3} = 56\)`
+
+`\(C_{8, 4} = 70\)`
+
+---
+
+## Regresión *stepwise*
+
+* *Forward-Stepwise*:
+  
+  1. Añadir al modelo la variable que proporciona mejor ajuste
+  2. Repetir hasta añadir `\(k\)` variables
+
+* *Backward-Stepwise* 
+
+  1. Empezar con las `\(d\)` variables
+  2. Eliminar iterativamente la menos relevante para el ajuste 
+
+* Algoritmos avariciosos
+
+* No buscan entre todas las posibles combinaciones de subconjuntos de tamaño `\(k\)`
+
+* En cada paso solo se ajustan `\(d-k\)` modelos
+
+???
+
+Mas sesgo pero potencialmente menos varianza, al imponer mas estructura
+(no se busca el mejor)
+
+---
+
+## *Best subset* y *stepwise* en R
+
+
+Best subsets:
+
+* Paquete `leaps`, función `regsubsets()`
+
+* También regresión forward y backward stepwise
+
+Stepwise:
+
+* Función `step()`
+
+* Procedimiento hibrido: se procede como *forward* pero en cada paso está la opción de eliminar alguna variable añadida previamente
+
+* Añade o elimina variables en grupos (por ej. si son variables *dummy*)
+
+* Selecciona automáticamente el valor óptimo de `\(k\)`
+
+---
+
+## Selección de k
+
+* Secuencia de modelos indexada por `\(k\)` (igual que *best subset*)
+
+* Elegir `\(k\)` como el que minimiza el error de validación cruzada 
+
+* Validación cruzada: estimación del error de generalización o error *extra-sample*
+
+* Error de entrenamiento es demasiado optimista (error *in-sample*)
+
+* Alternativa: cuantificar el "optimismo" y minimizarlo (AIC, BIC y derivados)
+
+* Más detalles: ESL secciones 7.4 en adelante
+
+???
+
+ESL secciones 7.4 en adelante
+
+---
+
+class: inverse, middle, center
+
+# Métodos de reducción
+
+---
+
+## Lasso: motivación
+
+* Métodos de selección: 
+   
+   * ![:colorText green](modelos interpretables)
+    
+   * ![:colorText red](proceso discreto, las variables están incluidas o no)
+
+
+* Regresión *ridge*: 
+
+  * ![:colorText green](proceso continuo, todos los coeficientes se reducen)
+
+  * ![:colorText red](rara vez son exactanente 0, modelos no interpretables)
+
+
+* Lasso es una técnica intermedia:
+
+  * ![:colorText green](reduce algunos coeficientes)
+  
+  * ![:colorText green](pone el resto a 0)
+
+???
+
+Modelos seleccion: variables entran o salen del modelo
+
+---
+
+## Lasso: formulación
+
+* Problema optimización: `$$\min_w\, || y - \Xbf w ||_2^2\quad \text{s.t. }\; ||w||_1 \leq t$$`
+
+* Equivalente: `$$\min_w\, || y - \Xbf w ||_2^2 + \lambda ||w||_1$$`
+
+* `\(\lambda\)` o `\(t\)` son hiper-parámetros
+
+  * `\(\uparrow \lambda\)` o `\(\downarrow t\)`, se reducen los coeficientes (más regularización)
+
+  * `\(\downarrow \lambda\)` o `\(\uparrow t\)`, aumentan los coeficientes (menos regularización)
+  
+* `\(t\)` suficientemente pequeño (o `\(\lambda\)` suficientemente grande), algunos coeficientes = 0
+
+---
+
+class: middle, center
+
+![:video 600 600](./img/lasso.mp4)
+
+[Pierre Ablin](https://twitter.com/PierreAblin/status/1107625298936451073?s=20), Twitter
+
+---
+
+class: middle, center
+
+![](./img/orthonormal.png)
+
+???
+
+`\(X^T X = I\)`, no ocurre en la practica pero interesante para ver la diferencia entre los estimadores
+
+---
+
+class: middle, center
+
+![](./img/constraint_regions.png)
+
+---
+
+## Lasso, best subset y fordward stepwise
+
+* Comparación Lasso, *best subset* y *forward stepwise* [(Hastie et al., 2017)](https://arxiv.org/pdf/1707.08692.pdf)
+
+* Experimentos en [Github, best-subset](https://github.com/ryantibs/best-subset/)
+
+* [*Relaxed* Lasso](https://stat.ethz.ch/~nicolai/relaxo.pdf): ajustar otro modelo sobre las variables que selecciona el Lasso
+
+???
+
+[Relaxed Lasso](https://stats.stackexchange.com/questions/122955/why-is-relaxed-lasso-different-from-standard-lasso)
+
+---
+
+## Lasso: limitaciones
+
+1. Si `\(d &gt; n\)`, como mucho `\(n\)` coeficientes son `\(\neq 0\)`
+
+    * Limitación desde el punto de vista de selección de variables
+
+2. Variables con correlación alta `\(\Longrightarrow\)` Lasso selecciona una "aleatoriamente"
+
+3. Si `\(n &gt; d\)` y hay variables con correlación alta `\(\Longrightarrow\)` error de Ridge &lt; error de Lasso
+
+---
+
+## Otras penalizaciones
+
+* Podemos generalizar Lasso, Ridge y Best subset como `$$\min_w || y - \Xbf w ||_2^2 + \lambda || w ||_p^p$$`
+donde, `$$|| w ||_p^p = \sum_{i=1}^d{|x_i|^p}$$`
+
+* `\(0 \leq p &lt; 1\)`, no convexas (![:colorText red](NP-completo!))
+
+* `\(p = 1\)`, convexa y no diferenciable 
+
+* `\(p &gt; 1\)`, convexas y diferenciables
+
+---
+
+## Interpretación Bayesiana
+
+* Regularización = distribución a priori de los parámetros `\(w\)`
+
+* Ridge regressión: distribución Normal
+
+* Lasso: distribución de Laplace, `\(\tau = 1/\lambda\)` `$$f(w) = \frac{1}{2\tau} \exp\bigg(-\frac{|w|}{\tau}\bigg)$$`
+
+* Estimadores: máximo de la distribución a posteriori (MAP)
+  
+  * Ridge: coincide con la media
+  * Lasso y Best subset: moda
+
+---
+
+class: center, middle
+
+![](./img/laplace.svg)
+
+[Wikipedia, "Laplace distribution"](https://en.wikipedia.org/wiki/Laplace_distribution)
+
+---
+
+class: middle, center
+
+![](./img/penalties.png)
+
+---
+
+## Elastic Net
+
+* Combina regularización Lasso y Ridge: `$$\min_w\, || y - \Xbf w ||_2^2 + \lambda_1 || w ||_1 + \lambda_2 || w ||_2^2$$`
+
+* Otra parametrización con `\(\alpha \in (0, 1)\)`: `$$\min_w\, || y - \Xbf w ||_2^2 + \lambda(\alpha || w ||_1 + (1 - \alpha) || w ||_2^2)$$`
+
+* Equivalentes con 
+
+  * `\(\alpha = \lambda_1/(\lambda_1 + \lambda_2)\)` 
+  
+  * `\(\lambda = \lambda_1 + \lambda_2\)`
+  
+* Selecciona variables y reduce el resto de coeficientes
+
+---
+
+class: center, middle
+
+![:scale 85%](./img/penalties.svg)
+
+???
+
+Ventaja de parametrizacion 2: `\(\lambda\)` te da la distancia al origen, y `\(\alpha\)` la curvatura
+
+---
+
+## Notación
+
+* Lasso (Elastic Net) suelen hacer referencia a: minimizar MSE + norma `\(l_1\)` (+ norma `\(l_2\)`)
+
+* MSE puede reemplazarse por otras funciones de pérdida
+
+* Por ej. cualquier GLM
+
+* En esos casos hablamos de regresión logística, Poisson, Gamma + regularización Ridge/Lasso/Elastic Net
+
+---
+
+## Elastic Net en R
+
+* Paquete `glmnet`
+
+* Implementa descenso coordenado cíclico (detalles más adelante)
+
+* Resuelve GLMs con regularización `\(l_1\)` (Lasso), `\(l_2\)` (Ridge) o ambas (ElasticNet)
+
+* Sin interfaz de fórmulas
+
+  * Hay que crear la matriz `\(\Xbf\)` "a mano"
+
+* Elige automáticamente el valor óptimo de `\(\lambda\)` (pero no `\(\alpha\)`!)
+
+* Puede ser interesante la extensión `glmnetUtils`
+
+???
+
+En particular codificar las variables categóricas!
+**Ejercicio titanic**
+
+---
+
+class: middle, center, inverse
+
+# Métodos de reducción
+
+---
+
+## Principal Component Regression
+
+* Calcular las `\(m\)` componentes principales, `\(\Vbf \in \Rbb^{d \times m}\)`
+
+* Crear combinaciones lineales de las variables originales: `\(\Zbf = \Xbf \Vbf \in \Rbb^{n \times m}\)`
+
+* Ajustar una regresión lineal, `\(y = \Zbf \theta\)`, `$$\theta^* = (\Zbf^T \Zbf)^{-1} \Zbf^T y$$`
+
+* `\(\Zbf\)` es ortogonal, por lo que los `\(\theta_m\)` son independientes `$$\theta_m = \frac{z_m^T y}{z_m^T z_m}$$`
+
+* Coeficientes sobre los datos originales `\(\Xbf\)`: `$$y = \Zbf \theta = \Xbf \Vbf \theta = \Xbf w\; \Rightarrow\; w = \Vbf \theta$$`
+
+---
+
+## PCR, OLS y Ridge Regression
+
+* Componentes principales dependientes de la escala `\(\Rightarrow\)` estandarizar
+
+* Si `\(m = d\)`, se obtienen el estimador de mínimos cuadrados (OLS)
+
+* Si `\(m &lt; d\)`, se obtiene una versión reducida de la regresión
+
+* Ridge Regression:
+  
+  * reduce los coeficientes de las componentes principales 
+  
+  * reduce más cuanto más grande sea el autovalor
+  
+* PCR descarta las `\(d - m\)` componentes principales con menor autovalor
+
+* `\(m\)` se puede elegir por validación cruzada
+
+???
+
+Z abarca el espacio de columnas de X
+
+---
+
+class: middle, center
+
+![](./img/ridge_vs_pcr.png)
+
+---
+
+## PCR, Lasso y Best subset
+
+* Lasso y Best subset obtienen modelos interpretables
+
+* PCR reduce las variables, pero son combinaciones lineales de las originales
+
+* Computacionalmente:
+
+    * Best subset es factible para `\(d \approx 100\)`
+    
+    * Lasso y PCR tienen aprox. el mismo coste
+
+* PCR puede ser útil para situaciones con muchas variables altamente correladas
+
+---
+
+## Partial Least Squares
+
+* Igual que con PCR, es importante estandarizar las `\(x_j\)`
+
+* Algoritmo (simplificado):
+
+  1. Calcular `\(\phi_m = x_j^T y\)` para cada `\(j=1, \dots d\)`
+
+  2. Calcular `\(z_m = \sum_j \phi_m x_j\)`
+  
+  3. Resolver regresión lineal `\(y = z_m \theta_m\)`
+  
+  4. Actualizar salida, `\(y^{(m)} = y^{(m-1)} + \theta_m^* z_m\)`
+
+  5. Ortogonalizar `\(x_j\)` con respecto a `\(z_m\)`
+  
+  6. Repetir hasta un `\(m &lt; d\)`
+
+
+???
+
+1. Calcular correlacion
+
+2. Combinar linealmente las variables usando correlacion con y como peso -&gt; genera nueva dirección
+
+3. Ajustar regresión sobre esa dirección
+
+4. Añadir a la salida
+
+5. Ortogonalizar
+
+---
+
+## PLS vs PCR
+
+* PCR:
+
+  * no supervisado (solo usa `\(\Xbf\)` para calcular las componentes principales)
+
+  * elige direcciones `\(z_m\)` que maximizan la varianza
+
+* PLS: 
+
+  * crea combinaciones lineales de las variables originales, pero de manera supervisada (usando el valor de `\(y\)`)
+
+  * si `\(m = d\)` obtenemos el estimador de mínimos cuadrados
+
+  * produce una series de direcciones ortogonales `\(z_1, z_2, \dots, z_m\)`
+  
+  * elige direcciones que maximizan la varianza **y** tienen mucha correlación con la salida `\(y\)`
+
+---
+
+## PLS y PCR en R
+
+* Paquete `pls`
+
+* Funciones `pcr()` y `plsr()`
+
+* Ambas eligen el valor óptimo de `\(k\)` usando validación cruzada
+
+???
+
+**Ejercicio prostate**
+
+[PLS y PCR](http://www.science.smith.edu/~jcrouser/SDS293/labs/lab11-r.html)
+
+Comparación de Least Squares, Best subset, Ridge, Lasso, PLS, PCR (Forward stepwise, Elastic Net?) ESL, tabla 3.3
+
+---
+
+class: middle, center, inverse
+
+# Descenso coordinado
+
+---
+
+## Motivación
+
+* Lasso es un problema
+
+  1. cuadrático
+  
+  2. convexo
+  
+  3. sin restricciones
+  
+* Pero
+
+  1. No diferenciable en 0
+  
+  2. No es fuertemente convexo `\(\Longrightarrow\)` peor tasa de convergencia algoritmos estándar
+  
+---
+
+## Descenso coordinado
+
+* Resuelve el de forma eficiente el problema de optimización de los GLM con:
+
+  * regularización `\(l_1\)`
+  
+  * regularización `\(l_1 + l_2\)`
+
+* Esquema básico:
+
+  1. Seleccionar una coordenada `\(j \in \{1,\dots, d\}\)`
+  
+  2. Fijar el valor del resto
+
+  3. Optimizar con respecto respecto a la coordenada `\(j\)`
+
+      * solución analítica!
+  
+  4. Repetir para el resto de las coordenadas varias veces
+  
+---
+
+## Descenso coordinado: Lasso
+
+ * Función que minimiza Lasso, `\(f(w) = || y - \Xbf w ||_2^2 + \lambda || w ||_1\)`
+ 
+ * Fijamos `\(w_k = \tilde{w}_k\)` para `\(k \neq j\)`
+  
+ * Aislamos `\(w_j\)`, `$$f(\tilde{w}, w_j) = \frac{1}{2} \sum_{i=1}^n{\big(y_i - \sum_{k \neq j}{x_{ik}\tilde{w}_k} - x_{ij}w_j\big)^2} + \lambda \sum_{k \neq j}{|\tilde{w}_k|} + \lambda |w_j|$$`
+ 
+ * Derivada, si `\(w_j \neq 0\)`:
+
+`\begin{align}
+\frac{\partial f}{w_j} &amp;= -\sum_{i=1}^n{x_{ij}\big(y_i - \sum_{k \neq j}x_{ik}w_{k} - x_{ij}w_j\big)} + \lambda\, \text{sign}(w_j) = \\
+&amp;= -\underbrace{\sum_{i=1}^n{x_{ij}\big(y_i - \sum_{k \neq j}x_{ik}\tilde{w}_{k}\big)}}_{a_j} + \underbrace{\sum_{i=1}^n{x_{ij}^2}}_{b_j} w_j + \lambda\, \text{sign}(w_j)
+\end{align}`
+
+* Si estandarizamos las variables, `\(b_j = 1\)`
+
+???
+
+Problema Lasso univariante donde la salida son los residuos parciales `\(y_i - y_i^{(j)}\)` (sin influencia de `\(j\)`)
+
+---
+
+class: middle, center
+
+![:video 800 600](./img/subdiff.mp4)
+
+[Mathurin Massias](https://twitter.com/mathusmassias/status/1109304558356824064?s=20), Twitter
+
+---
+
+## Solución: operador *soft-thresholding*
+
+1. Si `\(w_j &lt; 0, \quad -a_j + w_j + \lambda = 0 \quad \Rightarrow \quad w_j = a_j + \lambda \quad \text{para} \quad a_j &lt; \lambda\)`
+  
+2. Si `\(w_j &gt; 0, \quad -a_j + w_j - \lambda = 0 \quad \Rightarrow \quad w_j = a_j - \lambda \quad \text{para} \quad a_j &gt; \lambda\)`
+  
+3. Si `\(w_j = 0, \quad 0 \in [ -a_j - \lambda,\, -a_j + \lambda ] \quad \Rightarrow \quad -\lambda \leq a_j \leq \lambda\)`
+  
+![:vspace 6]
+  
+* Operador *soft-thresholding*, `$$S_\gamma(z) = \text{sign}(z)\max(|z| - \gamma,\, 0)$$`
+
+* Actualización: `$$\tilde{w}_j = S_\lambda(a_j) = \bigg(\sum_{i=1}^n{x_{ij}\big(y_i - \sum_{k \neq j}x_{ik}\tilde{w}_{k}}\big)\bigg)$$`
+
+???
+
+Residuos parciales (sin influencia de j)
+
+Coeficiente de minimos cuadrados de los residuos
+
+---
+
+class: middle, center
+
+![:video 800 600](./img/prox.mp4)
+
+[Pierre Ablin](https://twitter.com/PierreAblin/status/1109114419127218176?s=20), Twitter
+
+---
+
+## Descenso coordinado: implementación
+
+* *Regularization path*: resolver el problema para valores decrecientes de `\(\lambda\)`
+  
+  1. Empezamos por el valor más pequeño de `\(\lambda\)` para el cual `\(w^* = 0\)`, `\(\lambda_\text{max}\)`
+
+  2. Terminamos con `\(\lambda_\text{min}\)` tal que `\(\lambda_\text{min}/\lambda_\text{max} = \epsilon\)`
+  
+  3. Creamos una rejilla de `\(M\)` valores en escala logarítmica
+  
+* *Warm-starts*: valor inicial de los pesos `\(w\)` es el valor anterior de `\(w^*(\lambda)\)` 
+
+* Reducir el coste computacional:
+  
+  1. Calcular y almacenar `\(x_j^T y\)` (cache)
+  
+  2. Aprovechar dispersión: multiplicar solo elementos distintos de 0
+
+  3. Descartar coeficientes `\(0\)` antes de tiempo
+
+---
+
+class: middle, center, inverse
+
+# Variantes del Lasso
+
+---
+
+## Variantes del Lasso
+
+Múltiples variantes:
+  
+  * Group Lasso
+  
+  * Fused Lasso
+  
+  * Generalized Lasso
+  
+  * Relaxed Lasso
+  
+  * ...
+
+Ejemplo: Group Lasso 
+
+  * Variables tienen `\(J\)` grupos predefinidos
+  
+  * Regularización: norma `\(l_{2, 1}\)`, `\(||w||_{2, 1} = \sum_{j = 1}^J \sqrt{|| w_j ||_2}\)`
+  
+  * Coeficientes de grupo `\(j\)` son o bien todos `\(0\)` o todos `\(\neq 0\)`
+
+---
+
+## FISTA
+
+* Descenso por gradiente proyectado:
+
+  1. Paso de descenso por gradiente
+  
+  2. Proyectamos a la región de las restricciones usando operador proximal
+  
+* En general, el operador proximal es otro problema de optimización: `$$\text{prox}_g(v) = \arg\min_{z} \bigg(g(z) + \frac{1}{2}|| z - v ||_2^2\bigg)$$`
+  
+* En ocasiones tiene solución analítica:
+
+  * Lasso: `\(\text{prox}_{\lambda ||\cdot||_1}(v) = S_\lambda(v)\)`
+  
+* Existen "trucos" para acelerar la convergencia (Nesterov)
+
+---
+
+## Referencias
+
+1. Tibshirani (1996). [Regression Shrinkage and Selection via the Lasso](https://www.jstor.org/stable/2346178?seq=1#page_scan_tab_contents)
+
+2. Zou, Hastie (2004). [Regularization and variable selection via the
+elastic net](https://web.stanford.edu/~hastie/Papers/B67.2%20%282005%29%20301-320%20Zou%20&amp;%20Hastie.pdf)
+
+3. Beck, Teboulle (2008). [A Fast Iterative Shrinkage-Thresholding Algorithm
+for Linear Inverse Problems](https://epubs.siam.org/doi/abs/10.1137/080716542)
+
+4. Friedman, Hastie, Tibshirani (2009). [https://web.stanford.edu/~hastie/Papers/glmnet.pdf](https://web.stanford.edu/~hastie/Papers/glmnet.pdf)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
