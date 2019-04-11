@@ -357,7 +357,7 @@ f(w) = \frac{1}{N}\sum_{i=1}^N f_i(w)
 * Optimizamos iterando:
 
 `\begin{equation*}
-w^{t+1} = w^t - \eta \nabla_w f(w^t)
+w^{t+1} = w^t - \eta_t \nabla_w f(w^t)
 \end{equation*}`
 
 * Problema: complejidad `\(\mathcal{O}(N)\)`
@@ -370,14 +370,14 @@ w^{t+1} = w^t - \eta \nabla_w f(w^t)
 * En cada iteración, barajeamos los datos y escogemos **uno** al azar
 
 `\begin{equation*}
-w^{t+1} = w^t - \eta \nabla_w f_i(w^t)
+w^{t+1} = w^t - \eta_t \nabla_w f_i(w^t)
 \end{equation*}`
 
 
 * También podemos seleccionar un **minilote** `\(\mathcal{B} = \lbrace i_1, \ldots, i_B \rbrace \subset \lbrace 1, \ldots N \rbrace\)` al azar en cada iteración:
 
 `\begin{equation*}
-w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
+w^{t+1} = w^t - \eta_t \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
 \end{equation*}`
 
 * La complejidad pasa de `\(\mathcal{O}(N)\)` a `\(\mathcal{O}(B)\)`, además, no es necesario tener toda la matriz `\(X\)`, sino solo los datos del minilote `\(\mathcal{B}\)`.
@@ -391,6 +391,21 @@ w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
 
 * *Ejercicio: demostrar que el estimador por minilotes es **insesgado**. *
 
+--
+
+* Usando resultados de aproximación estocástica de Robbins &amp; Monro (1954), se puede demostrar que si las tasas de aprendizaje cumplen estas condiciones:
+
+`\begin{align*}
+\sum_{t=0}^\infty \eta_t &amp;= \infty \\
+\sum_{t=0}^\infty \eta^2_t &amp;&lt; \infty
+\end{align*}`
+
+entonces 
+
+`\begin{equation*}
+| f(w^t) - f^* | = \mathcal{O}(1/t)
+\end{equation*}`
+
 
 
 
@@ -398,16 +413,16 @@ w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
 
 ## Nuevos desarrollos desde SGD
 
-### Momentum
+### Momento (1986)
 
 Ayuda a amortiguar las oscilaciones que hacen que SGD sea lento.
 
 `\begin{align*}
 w^{t+1} &amp;= w^t - v^{t+1} \\
-v^{t+1} &amp;= \gamma v^{t} + \eta \nabla_w f_i(w^t)
+v^{t+1} &amp;= \gamma v^{t} + \eta_t \nabla_w f_i(w^t)
 \end{align*}`
 
-### AdaGrad
+### AdaGrad (2011)
 
 Adapta la tasa de aprendizaje a cada parámetro, disminuyéndola en parámetros con actualizaciones frecuentes (resp. aumentándola en parámetros con actualizaciones infrecuentes). Por esta razón, es adecuado para matrices de datos dispersas.
 
@@ -415,14 +430,23 @@ Adapta la tasa de aprendizaje a cada parámetro, disminuyéndola en parámetros 
 w^{t+1}_j = w^t_j - \frac{\eta}{\sqrt{G^t_{j,j} + \epsilon}} \nabla_w f_i(w^t)_j
 \end{equation*}`
 
+donde `\(G^t_{j,j} = \sum_{t'=0}^t (\nabla_w f_i(w^t)_j)^2\)` (la suma de los gradientes al cuadrado para esa coordenada hasta `\(t\)`)
 
-#### Adam (lo veremos en Aprendizaje Profundo)
+
 
 
 ---
 
-![:scale 100%](./img/contours_evaluation_optimizers.gif)
+## Efecto de la estocasticidad
 
+![:scale 100%](./img/sgd.png)
+
+---
+
+## Con o sin momento
+
+![:scale 100%](./img/momentum.png)
+* Símil físico con la **inercia** de una partícula.
 
 ---
 
@@ -568,14 +592,7 @@ f_k(X) = \prod_{j=1}^p f_{kj}(X_k)
 
 * Aunque la hipótesis es fuerte, el modelo puede funcionar porque la frontera de decisión puede "no sentir" detalles de las densidades condicionadas a la clase.
 
---
 
-* Podemos ver que es la frontera de decisión la conforma una combinación lineal de funciones de cada variable predictora
-`\begin{eqnarray*}
-\log \frac{P(Y=Y_k \vert x)}{P(Y=Y_j \vert x)} &amp;=&amp; \log \frac{f_k(x)}{f_j(x)} + \log \frac{\pi_k(x)}{\pi_j(x)} \\
-&amp;=&amp; \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p \log \frac{f_{ki}(x_i)}{f_{ji}(x_i)} \\
-&amp;=&amp; \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p g_{lji}(x_i)
-\end{eqnarray*}`
 
 
 ---
@@ -721,7 +738,13 @@ donde `\(I\)` es la función indicatriz.
 
 ## Propiedades asintóticas
 
-* **Ejercicio**: probar que a medida que el número de observaciones de entrenamiento `\(N \rightarrow \infty\)`, 1-NN tiene una tasa de error que no será peor que el doble la tasa de error de Bayes.
+* **Ejercicio**: probar que a medida que el número de observaciones de entrenamiento `\(N \rightarrow \infty\)`, 1-NN tiene una tasa de error acotada por el doble la tasa de error de Bayes.
+
+--
+
+* Error de Bayes = `\(1 - p_{k^*}(x)\)`.
+* Error de 1-NN = `\(\sum_{k=1}^K p_k(x) (1 - p_k(x)) \geq 1 - p_{k^*}(x)\)`.
+* Si `\(K = 2\)`: Error de 1-NN = `\(2 p_{k^*}(x) (1 - p_{k^*}(x)) \leq 2 (1 - p_{k^*}(x))\)`
 
 
 
