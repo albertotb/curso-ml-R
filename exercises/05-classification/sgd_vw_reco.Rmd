@@ -1,0 +1,62 @@
+---
+title: "Modelos lineales con SGD"
+author: Victor Gallego y Roi Naveiro
+date: "09/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(rvw)
+library(dplyr)
+```
+
+En este ejercicio, utilizaremos la librería Vowpal Wabbit para entrenar variantes de un modelo lineal.
+
+Primero descargamos y leemos los datos desde http://www.grouplens.org/system/files/ml-100k.zip.
+Nos interesan ua.base (training set) y ua.test (test set).
+Los datos constan de 4 columnas: usuario, item, rating (de 1 a 5) y timestamp del evento (descartable)
+
+```{r}
+
+```
+
+Utilizando la función object_size del paquete pryr, calcula lo que ocupa en memoria el training set, 
+antes y después de convertir a variables dummies.
+
+```{r}
+
+```
+
+Ajustar un modelo lineal llamando a vw().
+Como hiperparámetros escoge:
+* épocas de SGD: 3
+* bits de hashing: 18
+* learning rate: 0.005
+* regularización L1: 0.0001
+
+Calcular el RMSE.
+```{r}
+
+```
+
+Ahora ajusta un modelo con interacciones cuadráticas y calcula el nuevo RMSE. Compara el tiempo de train con el anterior
+Utiliza el argumento extra de vw.
+
+```{r}
+
+```
+
+Ahora ajustamos una FM con dimensión latente = 10.
+
+```{r}
+
+```
+
+

@@ -1,0 +1,122 @@
+---
+title: "Clasificación de texto legal"
+author: Victor Gallego y Roi Naveiro
+date: "09/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=F}
+library(text2vec)
+library(tidyverse)
+library(plyr)
+library(e1071)
+library(glmnet)
+```
+
+## Introducción
+
+En este ejercicio, entrenaremos varios clasificadores sobre texto legal. Cada documento se corresponde con un párrafo que puede pertenecer a una de cinco porsibles clases: ...
+
+El objetivo es, dado un nuevo texto nunca visto, predecir la clase a la que pertenece.
+
+Primero descargamos y leemos los datos
+
+```{r message=F}
+# Descargamos y leemos los datos
+download.file('https://github.com/vicgalle/neural-classifier/blob/master/data/Quantum1.xlsx?raw=true', 'data.xlsx')
+data <- readxl::read_xlsx('data.xlsx')
+```
+
+Explora los datos
+
+```{r message=F}
+## Código
+```
+
+Divide el conjunto de datos en train y test con proporciones 0.8 y 0.2 respectivamente
+
+```{r message=F}
+# Creamos split train - test
+## Código
+```
+
+
+
+## Preprocesado de textos
+
+Aplica a cada texto del train el siguiente preprocesado:
+
+1. Reducir a minúsculas.
+2. Separar por palabras
+3. Recortar el vocabulario para solo seleccionar las palabras que al menos aparecen diez veces en algún documento y que además aparecen en al menos en el 0.1 % de los documentos.
+4. Vectorizar estas palabras, usando representación bag of words.
+```{r message=F}
+
+# Definimos el preprocesado y tokenizado
+
+## Código
+
+# nos quedams con palabras que al menos aparezcan 10 veces. 
+# Cada palabra deberá estar al menos en el 0.1% de documentos
+
+## Código
+
+#Crear la dtm: document term matrix
+
+## Código
+```
+
+¿Cuál es la dimensión del train tras el preprocesado? ¿Cuántas palabras tiene el vocabulario?
+
+```{r message=F}
+## Código
+```
+
+
+Crea el conjunto de test (OJO, usa el vectorizer generado por el train, sino es trampa... ¿por qué?).
+
+```{r message=F}
+## Código
+```
+
+
+## Regresión Logística
+
+Entrena un modelo de regresión logística con regularización L1 usando la librería glmnet. Haz validación cruzada con 4 folds, del coeficiente de regularización $\lambda$. Pinta la curva de error de clasificación frente a $\lambda$. ¿Cuál es el valor óptimo de este hiperparámetro?
+
+```{r message=F}
+## Código
+```
+
+Predice sobre el test. ¿Qué precisión obtienes?
+
+```{r message=F}
+preds = predict(glmnet_classifier, dtm_test, type = 'class')
+mean(preds == data_test$Grupo)
+```
+
+## Naive Bayes
+
+Entrena un modelo NB sobre el texto legal. Para ello primero tendrás que crear dataframes de train y test. No olvides convertir cada variable predictora a un factor!! ¿Qué pasaría si no lo haces?
+```{r message=F}
+## Código
+```
+
+Entrena el modelo sin hacer validación.
+
+```{r message=F}
+## Código
+```
+
+Predice sobre el test. ¿Qué precisión obtienes?
+```{r message=F}
+## Código
+```
+

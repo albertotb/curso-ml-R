@@ -1,0 +1,221 @@
+---
+title: "KNN: Bias-Variance trade-off"
+author: Victor Gallego y Roi Naveiro
+date: "09/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(class)
+library(caret)
+library(pROC)
+```
+
+En este ejercicio, entrenaremos un clasificador KNN para aprender a distinguir imágenes del dígito "8" de otras del dígito "9". Para ello, vamos a usar las proyecciones a 2D que nos daba el análisis de componentes principales.
+
+## Funciones auxiliares
+
+* show_digit: Hace una gráfica del dígito en cuestión.
+* load_image_file: Para cargar las imágenes de los dígitos
+* load_label_file: Para cargar las etiquetas
+
+```{r, message=F}
+show_digit = function(arr784, col = gray(12:1 / 12), ...) {
+  image(matrix(as.matrix(arr784[-785]), nrow = 28)[, 28:1], col = col, ...)
+}
+
+load_image_file = function(filename) {
+  ret = list()
+  f = file(filename, 'rb')
+  readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  n    = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  nrow = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  ncol = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  x = readBin(f, 'integer', n = n * nrow * ncol, size = 1, signed = FALSE)
+  close(f)
+  data.frame(matrix(x, ncol = nrow * ncol, byrow = TRUE))
+}
+
+load_label_file = function(filename) {
+  f = file(filename, 'rb')
+  readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  n = readBin(f, 'integer', n = 1, size = 4, endian = 'big')
+  y = readBin(f, 'integer', n = n, size = 1, signed = FALSE)
+  close(f)
+  y
+}
+```
+
+## Lectura de Datos
+
+Cargamos el dataset MNIST.
+
+```{r, message=F}
+df = load_image_file("src/t10k-images.idx3-ubyte")
+df$y  = as.factor(load_label_file("src/t10k-labels.idx1-ubyte"))
+```
+
+Esta base de datos consta de 10000 imágenes en escala de gris a 28 x 28, de los dígitos del 0 al 9 (escritos a mano).
+
+```{r, message=F}
+dim(df)
+```
+
+Visualizamos algún ejemplo 
+
+```{r, message=F}
+show_digit(df[1, ])
+```
+Selecciona únicamente las imágens de los dígitos 8  y 9.
+
+```{r}
+df2 = df[df$y == '8' | df$y == '9',]
+```
+
+
+## Creación de conjuntos de train, test y validación.
+
+Divide los datos en train y test, utilizando porcentajes 70, 30; respectivamente.
+
+```{r, message=F}
+size_train = floor(0.7 * nrow(df2))
+#size_test = floor(0.3 * nrow(df2))
+#size_val = floor(0.2 * nrow(df2))
+##
+ind_train = sample(1:nrow(df2), size=size_train)
+
+train = df2[ind_train,]
+test = df2[-ind_train,]
+
+#ind_val = sample(1:nrow(test_val), size=size_val)
+#validation = test_val[ind_val,]
+#test = test_val[-ind_val,]
+```
+
+## Proyección a 2D usando PCA
+
+Proyecta los datos de entrenamiento a dos dimensiones usando el paquete prcomp
+```{r, message=F}
+proy_pca <- prcomp(train[, 1:28^2], retx = T) ## Ojo, quitar LABEL, sino son trampas
+
+train_proy = data.frame(proy_pca$x[, 1:2])
+train_proy$label = train$y
+train_proy$label = factor(train_proy$label)
+levels(train_proy$label) = c("n8", "n9")
+```
+
+
+```{r}
+p = ggplot(train_proy, aes(x = PC1, y=PC2, colour=label) ) + geom_point()
+p
+```
+
+Proyecta los datos de test y validación a 2D (OJO, usa las matrices de proyección generadas por el PCA del conjunto de train, de otra manera son trampas. Piensa por qué).
+
+```{r, message=F}
+test_proy = scale(test[, 1:28^2], proy_pca$center, proy_pca$scale) %*% proy_pca$rotation
+test_proy = data.frame(test_proy[, 1:2])
+#test_proy = scale(test[, 1:28^2], proy_pca$center, proy_pca$scale) %*% proy_pca$rotation
+#test_proy = data.frame(test_proy)
+
+test_proy$label = test$y
+test_proy$label = factor(test_proy$label)
+levels(test_proy$label) = c("n8", "n9")
+p = ggplot(test_proy, aes(x = PC1, y=PC2, colour=label) ) + geom_point()
+p
+
+```
+
+## Entrenamiento
+
+Entrena un clasificador KNN usando el paquete caret. Usar validación cruzada con 5 folds y 3 repeticuines para estimar el número optimo de vecinos. Primero definir los controles del training.
+
+```{r}
+# Setting up train controls
+repeats = 3
+numbers = 5
+tunel = 100
+
+x = trainControl(method = "repeatedcv",
+                 number = numbers,
+                 repeats = repeats,
+                 classProbs = TRUE,
+                 summaryFunction = twoClassSummary)
+```
+
+
+Una vez definidos, entrenar el algoritmo
+
+```{r}
+model1 <- train(label ~ ., data = train_proy, method = "knn",
+               trControl = x,
+               preProcess = c("center", "scale"),
+               metric = "ROC",
+               tuneLength = tunel)
+
+# Summary of model
+model1
+plot(model1)
+```
+
+
+Representar el número de vecinos frente al valor de AUC. ¿Cuál es el número óptimo de vecinos?
+
+```{r}
+model1$bestTune
+```
+
+## AUC en el conjunto de test
+
+Estima el valor de la AUC en el conjunto de test y pinta la curva ROC
+
+```{r}
+preds = predict(model1, newdata = test_proy, type = "prob")
+roc_obj = roc(test_proy$label, preds[,1])
+auc(roc_obj)
+
+roc_full_resolution <- roc(test_proy$label, preds[,1])
+plot(roc_full_resolution, print.auc=TRUE)
+```
+
+## Overfitting
+
+Juega con el valor del número de vecinos para entender el comportamiento observado en el gráfico anterior.
+
+```{r}
+
+plot_decision_boundary = function(train_proy, k){
+  title = paste0(k, "-nearest neighbour")
+  x <- train_proy[, c("PC1", "PC2")]
+  g <- train_proy$label
+  px1 <- seq(min(train_proy$PC1), max(train_proy$PC1), length.out = 20)
+  px2 <- seq(min(train_proy$PC2), max(train_proy$PC2), length.out = 20)
+  xnew <- expand.grid(px1, px2)
+  mod15 <- knn(x, xnew, g, k=k, prob=TRUE)
+  prob <- attr(mod15, "prob")
+  prob <- ifelse(mod15=="n8", prob, 1-prob)
+  
+  prob15 <- matrix(prob, length(px1), length(px2))
+  par(mar=rep(2,4))
+  contour(px1, px2, prob15, levels=0.7, labels="", xlab="", ylab="", main=
+          title, axes=FALSE)
+  points(x, col=ifelse(g=="n8", "coral", "cornflowerblue"))
+  gd <- expand.grid(x=px1, y=px2)
+  points(gd, pch=".", cex=3.0, col=ifelse(prob15>0.5, "coral", "cornflowerblue"))
+  box()
+}
+```
+
+     
+```{r}
+k = 1
+plot_decision_boundary(train_proy, k)
+```
+     
