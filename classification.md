@@ -22,20 +22,3 @@
 2. Clasificadores: LR, LDA(r), NB
 
 3. kNN y overfitting. (B)
-
-
-# TODO
-
-1. Métricas (binario no balanceado)
-
---R--
-
-2. FMs
-
-3. Redactar ejercicio legal
-
-3'. Lista paquetes
-
-4. Caret
-
-5. Preparar ejercicios vacíos
