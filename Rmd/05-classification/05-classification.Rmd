@@ -85,7 +85,7 @@ class: middle, center, inverse
 * Para clasificar nueva observación se calcula el vector $\hat{f}(x)$ y se clasifica resolviendo
 
 \begin{equation}
-\arg\min_{k} \Vert \hat{f}(x) - t_k \Vert^2
+\arg \min_{k} \Vert \hat{f}(x) - t_k \Vert^2
 \end{equation}
 
 * Es fácil ver que el problema desacopla en $K$ problemas de regresión (uno para cada clase).
@@ -137,7 +137,7 @@ class: middle, center, inverse
 * Es suficiente minimizar el coste esperado para cada $x$
 
 \begin{eqnarray}
-\widehat{Y} (x) = \arg_\min{y} \sum_{i=1}^K L[Y_i, y] P(Y=Y_k \vert X = x)
+\widehat{Y} (x) = \arg \min_{y} \sum_{i=1}^K L[Y_i, y] P(Y=Y_k \vert X = x)
 \end{eqnarray}
 
 --
