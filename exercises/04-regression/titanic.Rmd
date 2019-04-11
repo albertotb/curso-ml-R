@@ -25,9 +25,10 @@ Con el conjunto de datos anterior:
   2. Ver cuantos valores missing tiene cada variable con summary.
   3. Eliminar la variable cabin (¿por qué?).
   4. Eliminar también las variables name y ticket (¿por qué?).
-  5. Eliminar las filas que contengan algún NA (función na.omit).
-  6. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
-  7. Ajustar un modelo regresión logística regularizada 
-  8. ¿Cuál es el valor de $\lambda$ óptimo?
-  9. ¿Qué variables selecciona el modelo?
-  10. Calcular los *odds ratio* e interpretarlos
+  5. Imputar los valores de `age` con la mediana
+  6. Eliminar las filas que contengan algún NA (función na.omit).
+  7. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
+  8. Ajustar un modelo regresión logística con y sin regularizar 
+  9. ¿Cuál es el valor de $\lambda$ óptimo?
+  10. ¿Qué variables selecciona el modelo?
+  11. Calcular los *odds ratio* e interpretarlos
