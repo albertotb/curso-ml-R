@@ -15,6 +15,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(rvw)
 library(dplyr)
+setwd("C:/Program Files/VowpalWabbit")  # Nos ubicamos donde se haya instalado vw.exe
+# Alternativa: también se puede hacer como admin en el shell de Win:
+# SetX Path "%Path%;%programfiles%\VowpalWabbit"
 ```
 
 En este ejercicio, utilizaremos la librería Vowpal Wabbit para entrenar variantes de un modelo lineal.
@@ -22,6 +25,10 @@ En este ejercicio, utilizaremos la librería Vowpal Wabbit para entrenar variant
 Primero descargamos y leemos los datos desde http://www.grouplens.org/system/files/ml-100k.zip.
 Nos interesan ua.base (training set) y ua.test (test set).
 Los datos constan de 4 columnas: usuario, item, rating (de 1 a 5) y timestamp del evento (descartable)
+
+Nos interesa predecir el rating a partir del usuario e item. Como rating está ordenado, realmente es un problema de regresión. 
+
+(Para practicar también se puede convertir rating a una variable 0/1 y cambiar la función objetivo)
 
 ```{r}
 
@@ -47,13 +54,14 @@ Calcular el RMSE.
 ```
 
 Ahora ajusta un modelo con interacciones cuadráticas y calcula el nuevo RMSE. Compara el tiempo de train con el anterior
-Utiliza el argumento extra de vw.
+Utiliza el argumento 'extra' de vw() para pasarle el string '-q ::', donde -q indica que obtenga interacciones de orden 2 (cuadráticas).
 
 ```{r}
 
 ```
 
 Ahora ajustamos una FM con dimensión latente = 10.
+Utiliza el argumento 'extra' de vw para pasarle el string '--lrq ::10', donde --lrq indica que obtenga interacciones cuadráticas aproximadas (low rank quadratic).
 
 ```{r}
 
