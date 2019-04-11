@@ -1,0 +1,34 @@
+---
+title: "Titanic"
+author: "Alberto Torres Barrán"
+date: "21/3/2019"
+output: pdf_document
+---
+
+Vamos a intentar predecir la supervivencia de las víctimas del Titanic a partir de las siguientes variables:
+
+  * survival: Supervivencia (0 = No; 1 = Si)
+  * pclass: Clase de pasajero (1, 2, 3)
+  * name: Nombre
+  * sex: Sexo
+  * age: Edad
+  * sibsp: Número de hermanos/esposos/as a bordo.
+  * parch: Número de padres/hijos a bordo
+  * ticket: Número de ticket
+  * fare: Coste del billete
+  * cabin: Cabina
+  * embarked: Puerto de embarque
+
+Con el conjunto de datos anterior:
+
+  1. Cargar el fichero `titanic.csv` en R.
+  2. Ver cuantos valores missing tiene cada variable con summary.
+  3. Eliminar la variable cabin (¿por qué?).
+  4. Eliminar también las variables name y ticket (¿por qué?).
+  5. Imputar los valores de `age` con la mediana
+  6. Eliminar las filas que contengan algún NA (función na.omit).
+  7. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
+  8. Ajustar un modelo regresión logística con y sin regularizar 
+  9. ¿Cuál es el valor de $\lambda$ óptimo?
+  10. ¿Qué variables selecciona el modelo?
+  11. Calcular los *odds ratio* e interpretarlos
