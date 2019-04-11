@@ -1,0 +1,137 @@
+------
+title: "Titanic"
+author: "Alberto Torres Barrán"
+date: "21/3/2019"
+output: pdf_document
+---
+
+Vamos a intentar predecir la supervivencia de las víctimas del Titanic a partir de las siguientes veariables:
+
+  * survival: Supervivencia (0 = No; 1 = Si)
+  * pclass: Clase de pasajero (1, 2, 3)
+  * name: Nombre
+  * sex: Sexo
+  * age: Edad
+  * sibsp: Número de hermanos/esposos/as a bordo.
+  * parch: Número de padres/hijos a bordo
+  * ticket: Número de ticket
+  * fare: Coste del billete
+  * cabin: Cabina
+  * embarked: Puerto de embarque
+
+Con el conjunto de datos anterior:
+
+1. Cargar el fichero `titanic.csv` en R.
+  
+```{r}
+data <- read.csv2('../../data/titanic.csv', na.strings = "")
+```
+  
+2. Ver cuantos valores missing tiene cada variable con summary.
+  
+```{r}
+colSums(is.na(data))
+```
+
+3. Eliminar la variable cabin (¿por qué?).
+  
+```{r}
+data$cabin <- NULL
+```
+  
+4. Eliminar también las variables name y ticket (¿por qué?).
+  
+```{r warning=FALSE}
+library(dplyr)
+data <- select(data, -name, -ticket)
+```
+
+5. Imputar los valores de `age` con la mediana
+  
+```{r}
+data$age[is.na(data$age)] <- median(data$age, na.rm = TRUE)
+```
+
+
+6. Eliminar las filas que contengan algún NA (función na.omit).
+  
+```{r}
+data <- na.omit(data)
+```
+
+7. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
+
+```{r}
+set.seed(1234)
+idx <- sample(nrow(data), replace = FALSE, size = floor(nrow(data)*0.8))
+train <- data[ idx, ]
+test  <- data[-idx, ]
+```
+
+8. Ajustar regresión logística
+
+```{r}
+logreg <- glm(survived ~ ., data = train, family = "binomial")
+```
+
+9. Calcular *odds-ratio*
+
+```{r}
+exp(coef(logreg))
+```
+
+10. Calcular error de test (tasa de acierto)
+
+```{r}
+y_pred <- predict(logreg, newdata = test, type = "response")
+mean(test$survived == (y_pred > 0.5)) * 100
+```
+
+11. Ajustar un modelo regresión logística regularizada 
+
+```{r warning=FALSE}
+library(fastDummies)
+
+data_num <- 
+  data %>%
+    fastDummies::dummy_columns(remove_first_dummy = TRUE) %>%
+    select_if(is.numeric)
+```  
+  
+  
+```{r warning=FALSE}
+library(glmnet)
+
+X_train <- as.matrix(data_num[idx, colnames(train) != "survived"]) 
+y_train <- data_num[idx, "survived"]
+  
+X_test <- as.matrix(data_num[-idx, colnames(test) != "survived"])
+y_test <- data_num[-idx, "survived"]
+
+enet <- cv.glmnet(X_train, y_train, family = "binomial")
+```
+
+  
+12. ¿Cuál es el valor de $\lambda$ óptimo?
+  
+```{r}
+enet$lambda.min
+```
+
+```{r}
+plot(enet)
+```
+
+13. ¿Qué variables selecciona el modelo?
+  
+```{r}
+coef(enet)
+```
+
+14. Calcular el nuevo error de test
+
+```{r}
+y_pred <- predict(enet, newx = X_test)
+mean(y_test == (y_pred > 0.5)) * 100
+```
+
