@@ -249,7 +249,6 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
   2. `\(\hat{\mu}_k = \sum_{x_i \vert y_i = Y_k} x_i/N_k\)`
   3. `\(\boldsymbol{\Sigma} = \sum_{k=1}^K \sum_{x_i \vert y_i = Y_k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top / (N-K)\)`
 
-* `\(\mathcal{O}(Kp)\)`
 ---
 
 ## QDA
@@ -270,7 +269,6 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
   2. `\(\hat{\mu}_k = \sum_{x_i \vert y_i = Y_k} x_i/N_k\)`
   3. `\(\boldsymbol{\Sigma}_k = \sum_{x_i \vert y_i = Y_k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top / (N-K)\)`
 
-* `\(\mathcal{O}(Kp^2)\)` parámetros (ojo cuando `\(p\)` es grande!!).
 
 ---
 
@@ -499,7 +497,7 @@ class: middle, center, inverse
 * Donde los parámetros a estimar son
 
 `\begin{eqnarray}
-\omega_0 \in \mathbb{R}, &amp; \boldsymbol{\omega} \in \mathbb{R}^p, &amp; \boldsymbol{V} \in \mathbb{R}^{p \times k}
+\omega_0 \in \mathbb{R}, ~ &amp; \boldsymbol{\omega} \in \mathbb{R}^p, ~ &amp; \boldsymbol{V} \in \mathbb{R}^{p \times k}
 \end{eqnarray}`
 
 --

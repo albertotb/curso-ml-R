@@ -492,7 +492,7 @@ class: middle, center, inverse
 * Donde los parámetros a estimar son
 
 \begin{eqnarray}
-\omega_0 \in \mathbb{R}, & \boldsymbol{\omega} \in \mathbb{R}^p, & \boldsymbol{V} \in \mathbb{R}^{p \times k}
+\omega_0 \in \mathbb{R}, ~ & \boldsymbol{\omega} \in \mathbb{R}^p, ~ & \boldsymbol{V} \in \mathbb{R}^{p \times k}
 \end{eqnarray}
 
 --
