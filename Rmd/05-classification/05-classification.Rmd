@@ -515,6 +515,62 @@ class: middle, center, inverse
 # Interacciones y Máquinas de Factorización (FMs)
 
 ---
+## Fm's - Problema
+
+* ¿Cómo modelizar interacciones cuando nos enfrentamos a variables categóricas con número alto de categorías?
+
+* **Una** variable con $K+1$ categorías $\rightarrow$ $K \choose 2$ interacciones a pares. Explota rápido...
+
+* Número medio de valores distintos de cero en los vectores de variables predictoras mucho menor que su dimensión.
+
+* Datos muy dispersos (sparse)! No hay datos suficientes para estimar interacciones complejas de manera independiente...
+
+---
+## FM's - Idea
+
+* El modelo de una FM de grado 2 (solo interacciones a pares)
+
+\begin{equation}
+\widehat{y}(x) := \sigma \left[ \omega_0 + \sum_{i=1}^p \omega_{i} x_i \sum_{i=1}^p \sum_{j=i+1}^p \langle v_i, v_j\rangle x_i x_j \right]
+\end{equation}
+
+* Donde los parámetros a estimar son
+
+\begin{eqnarray}
+\omega_0 \in \mathbb{R}, & \boldsymbol{\omega} \in \mathbb{R}^p, & \boldsymbol{V} \in \mathbb{R}^{p \times k}
+\end{eqnarray}
+
+--
+
+* $k$ es la dimensión latente! $\langle v_i, v_j\rangle$ es un producto escalar
+
+\begin{equation}
+\langle v_i, v_j\rangle = \sum_{f=1}^k v_{i,f} v_{j,f}
+\end{equation}
+
+--
+
+* Reducimos número de parámetros de $1 + p + p^2 $ a $1 + p + pk$.
+
+
+
+---
+## FM's - Intuición y computación
+
+* Con datos sparse, no hay datos suficientes para estimar todas las interacciones de manera independiente.
+
+* Las FMs pueden estimar interacciones incluso en este contexto porque rompen la independencia entre los parámetros de las interacciones, factorizandolos.
+
+* Los datos de una interacción ayudan a estimar los parámetros de otras interacciones relacionadas.
+
+* La complejidad de computar el modelo de FMs es $\mathcal{O} (kp^2)$, pues hay que computar todas las interacciones!
+
+* Se puede reducir esta complejidad a $\mathcal{O} (kp)$ (tiempo lineal) !! 
+
+* Fácil de probar:
+S. Rendle [Factorization Machines](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)
+
+---
 
 
 class: middle, center, inverse

@@ -73,10 +73,11 @@ Visualizamos algún ejemplo
 ```{r, message=F}
 show_digit(df[1, ])
 ```
+
 Selecciona únicamente las imágens de los dígitos 8  y 9.
 
 ```{r}
-df2 = df[df$y == '8' | df$y == '9',]
+## Código
 ```
 
 
@@ -85,84 +86,42 @@ df2 = df[df$y == '8' | df$y == '9',]
 Divide los datos en train y test, utilizando porcentajes 70, 30; respectivamente.
 
 ```{r, message=F}
-size_train = floor(0.7 * nrow(df2))
-#size_test = floor(0.3 * nrow(df2))
-#size_val = floor(0.2 * nrow(df2))
-##
-ind_train = sample(1:nrow(df2), size=size_train)
-
-train = df2[ind_train,]
-test = df2[-ind_train,]
-
-#ind_val = sample(1:nrow(test_val), size=size_val)
-#validation = test_val[ind_val,]
-#test = test_val[-ind_val,]
+## Código
 ```
 
 ## Proyección a 2D usando PCA
 
-Proyecta los datos de entrenamiento a dos dimensiones usando el paquete prcomp
+Proyecta los datos de entrenamiento a dos dimensiones usando el paquete prcomp. Crea un dataframe para el conjunto de entrenamiento y llámalo train_proy. Convierte la etiqueta a variable de tipo factor y cambia el nombre de los niveles a "n8" y "n9".
 ```{r, message=F}
-proy_pca <- prcomp(train[, 1:28^2], retx = T) ## Ojo, quitar LABEL, sino son trampas
-
-train_proy = data.frame(proy_pca$x[, 1:2])
-train_proy$label = train$y
-train_proy$label = factor(train_proy$label)
-levels(train_proy$label) = c("n8", "n9")
+## Código
 ```
 
 
+Puedes visualizar el conjunto de entrenamiento
 ```{r}
 p = ggplot(train_proy, aes(x = PC1, y=PC2, colour=label) ) + geom_point()
 p
 ```
 
-Proyecta los datos de test y validación a 2D (OJO, usa las matrices de proyección generadas por el PCA del conjunto de train, de otra manera son trampas. Piensa por qué).
+Proyecta los datos de test y validación a 2D (OJO, usa las matrices de proyección generadas por el PCA del conjunto de train, de otra manera son trampas. Piensa por qué). Crea el conjunto de test, recuerda renombrar los niveles de la etiqueta.
 
 ```{r, message=F}
-test_proy = scale(test[, 1:28^2], proy_pca$center, proy_pca$scale) %*% proy_pca$rotation
-test_proy = data.frame(test_proy[, 1:2])
-#test_proy = scale(test[, 1:28^2], proy_pca$center, proy_pca$scale) %*% proy_pca$rotation
-#test_proy = data.frame(test_proy)
-
-test_proy$label = test$y
-test_proy$label = factor(test_proy$label)
-levels(test_proy$label) = c("n8", "n9")
-p = ggplot(test_proy, aes(x = PC1, y=PC2, colour=label) ) + geom_point()
-p
-
+## Código
 ```
 
 ## Entrenamiento
 
-Entrena un clasificador KNN usando el paquete caret. Usar validación cruzada con 5 folds y 3 repeticuines para estimar el número optimo de vecinos. Primero definir los controles del training.
+Entrena un clasificador KNN usando el paquete caret. Usar validación cruzada con 5 folds y 3 repeticiones para estimar el número optimo de vecinos. Primero definir los controles del training.
 
 ```{r}
-# Setting up train controls
-repeats = 3
-numbers = 5
-tunel = 100
-
-x = trainControl(method = "repeatedcv",
-                 number = numbers,
-                 repeats = repeats,
-                 classProbs = TRUE,
-                 summaryFunction = twoClassSummary)
+## Código
 ```
 
 
 Una vez definidos, entrenar el algoritmo
 
 ```{r}
-model1 <- train(label ~ ., data = train_proy, method = "knn",
-               trControl = x,
-               preProcess = c("center", "scale"),
-               metric = "ROC",
-               tuneLength = tunel)
-
-# Summary of model
-model1
-plot(model1)
+## Código
 ```
 
 
@@ -177,17 +136,12 @@ model1$bestTune
 Estima el valor de la AUC en el conjunto de test y pinta la curva ROC
 
 ```{r}
-preds = predict(model1, newdata = test_proy, type = "prob")
-roc_obj = roc(test_proy$label, preds[,1])
-auc(roc_obj)
-
-roc_full_resolution <- roc(test_proy$label, preds[,1])
-plot(roc_full_resolution, print.auc=TRUE)
+## Código
 ```
 
 ## Overfitting
 
-Juega con el valor del número de vecinos para entender el comportamiento observado en el gráfico anterior.
+Juega con el valor del número de vecinos para entender el comportamiento observado en el gráfico anterior. Utiliza esta función para pintar la frontera de decisión.
 
 ```{r}
 
@@ -211,11 +165,13 @@ plot_decision_boundary = function(train_proy, k){
   points(gd, pch=".", cex=3.0, col=ifelse(prob15>0.5, "coral", "cornflowerblue"))
   box()
 }
+
+
+```
+
+```{r}
+## Código
 ```
 
      
-```{r}
-k = 1
-plot_decision_boundary(train_proy, k)
-```
      

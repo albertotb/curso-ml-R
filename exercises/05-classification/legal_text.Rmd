@@ -16,7 +16,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(text2vec)
 library(tidyverse)
 library(plyr)
-library(caret)
+library(e1071)
+library(glmnet)
 ```
 
 ## Introducción
@@ -36,18 +37,14 @@ data <- readxl::read_xlsx('data.xlsx')
 Explora los datos
 
 ```{r message=F}
-# Echamos un vistazo
-count(data, 'Grupo')
-data$Fallos[1]
+## Código
 ```
 
 Divide el conjunto de datos en train y test con proporciones 0.8 y 0.2 respectivamente
 
 ```{r message=F}
 # Creamos split train - test
-ind_train <- sample(1:nrow(data), 0.8*nrow(data))
-data_train <- data[ind_train,]
-data_test <- data[-ind_train,]
+## Código
 ```
 
 
@@ -63,40 +60,30 @@ Aplica a cada texto del train el siguiente preprocesado:
 ```{r message=F}
 
 # Definimos el preprocesado y tokenizado
-it_train = itoken(data_train$Fallos, 
-                  preprocessor = tolower, 
-                  tokenizer = word_tokenizer, 
-                  ids = data_train$idSentidosFallos, 
-                  progressbar = TRUE)
-vocab = create_vocabulary(it_train)
+
+## Código
+
 # nos quedams con palabras que al menos aparezcan 10 veces. 
 # Cada palabra deberá estar al menos en el 0.1% de documentos
-pruned_vocab = prune_vocabulary(vocab, 
-                                term_count_min = 10, 
-                                doc_proportion_min = 0.001)
-vectorizer = vocab_vectorizer(pruned_vocab)
 
-#dtm: document term matrix
-dtm_train = create_dtm(it_train, vectorizer)
+## Código
+
+#Crear la dtm: document term matrix
+
+## Código
 ```
 
 ¿Cuál es la dimensión del train tras el preprocesado? ¿Cuántas palabras tiene el vocabulario?
 
 ```{r message=F}
-dim(dtm_train)
+## Código
 ```
 
 
 Crea el conjunto de test (OJO, usa el vectorizer generado por el train, sino es trampa... ¿por qué?).
 
 ```{r message=F}
-it_test = data_test$Fallos %>% 
-  tolower %>% 
-  word_tokenizer %>% 
-  itoken(ids = data_test$idSentidosFallos, 
-         progressbar = FALSE)
-dtm_test = create_dtm(it_test, vectorizer)
-
+## Código
 ```
 
 
@@ -105,21 +92,7 @@ dtm_test = create_dtm(it_test, vectorizer)
 Entrena un modelo de regresión logística con regularización L1 usando la librería glmnet. Haz validación cruzada con 4 folds, del coeficiente de regularización $\lambda$. Pinta la curva de error de clasificación frente a $\lambda$. ¿Cuál es el valor óptimo de este hiperparámetro?
 
 ```{r message=F}
-library(glmnet)
-NFOLDS = 4
-glmnet_classifier = cv.glmnet(x = dtm_train, y = data_train$Grupo, 
-                              family = 'multinomial', 
-                              # L1 penalty
-                              alpha = 1,
-                              lambda = seq(exp(-6), exp(-2), length.out = 200),
-                              type.measure = "class",
-                              # 4-fold cross-validation
-                              nfolds = NFOLDS,
-                              # high value is less accurate, but has faster training
-                              thresh = 1e-3,
-                              # again lower number of iterations for faster training
-                              maxit = 1e3)
-plot(glmnet_classifier)
+## Código
 ```
 
 Predice sobre el test. ¿Qué precisión obtienes?
@@ -133,25 +106,17 @@ mean(preds == data_test$Grupo)
 
 Entrena un modelo NB sobre el texto legal. Para ello primero tendrás que crear dataframes de train y test. No olvides convertir cada variable predictora a un factor!! ¿Qué pasaría si no lo haces?
 ```{r message=F}
-train_df = data.frame(as.matrix(dtm_train))
-train_df = lapply(train_df, as.factor)
-#train_df$label = data_train$Grupo
-
-test_df = data.frame(as.matrix(dtm_test))
-test_df = lapply(test_df, as.factor)
-#train_df$label = data_train$Grupo
+## Código
 ```
 
 Entrena el modelo sin hacer validación.
 
 ```{r message=F}
-library(e1071)
-nb = naiveBayes(x = train_df, y = factor(data_train$Grupo) )
+## Código
 ```
 
 Predice sobre el test. ¿Qué precisión obtienes?
 ```{r message=F}
-preds = predict(nb, test_df, type = "class")
-mean(preds == data_test$Grupo)
+## Código
 ```
 
