@@ -244,7 +244,7 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
   2. $\hat{\mu}_k = \sum_{x_i \vert y_i = Y_k} x_i/N_k$
   3. $\boldsymbol{\Sigma} = \sum_{k=1}^K \sum_{x_i \vert y_i = Y_k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top / (N-K)$
 
-* $\mathcal{O}$(Kp)$
+* $\mathcal{O}(Kp)$
 ---
 
 ## QDA
@@ -304,92 +304,6 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
   \begin{equation}
   \delta_k'(x) = -\frac{1}{2} (x - \mu_k)^\top \boldsymbol{\Sigma}^{-1}(x - \mu_k) + \log \pi_k
   \end{equation}
-
-
-
----
-
-class: middle, center, inverse
-
-# Clasificador Naive-Bayes
-
----
-## Clasificador NB
-
-* Sea $f_k(x)$ la densidad de probabilidad de $x$ condicionada a la clase $Y_k$. 
-* Sea $\pi_k$ el prior de la clase $Y_k$. Se tiene
-
-\begin{equation}
-P(Y=Y_k \vert X=x) = \frac{f_k(x) \pi_k}{\sum_{i=1}^K f_i (x) \pi_{i}}
-\end{equation}
-
---
-
-* El modelo NB asume que las variables predictoras son **condicionalmente independientes** dada la clase. O lo que es lo mismo
-
-\begin{equation}
-f_k(X) = \prod_{j=1}^p f_{kj}(X_k)
-\end{equation}
-
-* Esto en general no es cierto...
-
----
-## Clasificador NB
-
-* ...pero simplificar tremendamente la estimación, cada marginal $f_{kj}$ puede ser estimada por separado.
-
-* Especialemente apropiado cuando la dimensión $p$ es grande (pues la estimación de densidad se vuelve inviable).
-
-* También cuando el vector de variables predictoras contiene variables discretas y continuas (pues cada una se modeliza por separado).
-
-* Aunque la hipótesis es fuerte, el modelo puede funcionar porque la frontera de decisión puede "no sentir" detalles de las densidades condicionadas a la clase.
-
---
-
-* Podemos ver que es la frontera de decisión la conforma una combinación lineal de funciones de cada variable predictora
-\begin{eqnarray*}
-\log \frac{P(Y=Y_k \vert x)}{P(Y=Y_j \vert x)} &=& \log \frac{f_k(x)}{f_j(x)} + \log \frac{\pi_k(x)}{\pi_j(x)} \\
-&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p \log \frac{f_{ki}(x_i)}{f_{ji}(x_i)} \\
-&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p g_{lji}(x_i)
-\end{eqnarray*}
-
-
----
-## Clasificador NB en la práctica - estimación de parámetros
-
-* Los parámetros se estima usando máxima verosimilitud con los datos de entrenamiento.
-
-* Para **variables predictoras contínuas** - NB Gaussiano
-
-\begin{equation}
-P(X_i = x_i \vert Y = Y_k) =  \frac{1}{\sqrt{2 \pi \sigma_{ki}^2}} \exp \left[- \frac{(x_i-\mu_{ki})^2}{2 \sigma_{ki}^2}\right]
-\end{equation}
-
----
-## Clasificador NB en la práctica - estimación de parámetros
-
-* Para **variables predictoras que son cuentas** - Versión suavizada de máxima verosimilitud con modelo multinomial
-
-* Un vector de variables predictoras es un histograma con $x_i$ el número de veces que sucede el evento $i$.  
-
-\begin{equation}
-P(X_i = x \vert Y = Y_k) = \frac{N_{ki} + \alpha}{N_k + \alpha p}
-\end{equation}
-
-* $N_{ki}$ es el número total de cuentas del evento $i$ en la clase $k$ y $N_k$ es el número total de cuentas en la clase $k$.
-
-* $\alpha$ se puede interpretar como prior, evita probabilidades 0. $\alpha = 1$ *Laplace smoothing*. $\alpha < 1$ *Lidstone smoothing*.
-
----
-## Clasificador NB en la práctica - estimación de parámetros
-
-* Para **variables predictoras categóricas** - MLE con modelo Bernoulli multivariante.
-
-* Cada variable predictora es un booleano, $x_i \in \lbrace 0,1 \rbrace$.
-
-\begin{equation}
-P(X_i = x \vert Y = Y_k) = \frac{\sum_{j=1}^N I(X_i = x)*I(Y = Y_k)}{\sum_{j=1}^N I(Y = Y_k) }
-\end{equation}
 
 
 
@@ -474,9 +388,7 @@ w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
 
 * *Ejercicio: demostrar que el estimador por minilotes es **insesgado**. *
 
-* Citar a Robins & Munro.
 
-* Citar asintótico cuando B = 1.
 
 
 ---
@@ -508,6 +420,48 @@ w^{t+1}_j = w^t_j - \frac{\eta}{\sqrt{G^t_{j,j} + \epsilon}} \nabla_w f_i(w^t)_j
 
 ![:scale 100%](./img/contours_evaluation_optimizers.gif)
 
+
+---
+
+## SGD con datos dispersos
+
+* Caso real: recomendación de películas a usuarios. Las observaciones son del tipo *(id_usuario, id_pelicula, rating)*
+
+* Los identificadores son variables categóricas (factor). Por ejemplo, asumiendo 50.000 usuarios:
+
+\begin{equation*}
+\mbox{id_usuario = 24678} \rightarrow \left( 0, 0, 0, \ldots, 0, 1, 0, \ldots \right) \in \mathbb{R}^{50000}
+\end{equation*}
+
+* Esto produce una explosión en el número de variables dummy necesarias: riesgo de que **no quepa en memoria** la matriz de datos dummies.
+
+* Solución: trabajar directamente sin dummificar, usando librerías especializadas como Vowpal Wabbit (Microsoft): https://github.com/VowpalWabbit/vowpal_wabbit
+
+* SGD (o variantes) solo actualizarán el peso correspondiente, ignorando los que tendrían el dummy a 0.
+
+---
+
+## Feature hashing trick
+
+* En muchas ocasiones, las variables categóricas están representadas como **cadenas alfanuméricas**.
+
+* Ejemplo en datos de ad-server: un identificador de un cookie es **76c24efd-ec42-492a-92df-c62cfd4540a3**.
+
+* ¿Cómo lo convertimos a un índice entero de forma eficiente?
+
+--
+
+* Solución: usar una **función de hash** sobre la representación en binario de la cadena
+
+\begin{equation*}
+\mathcal{H} : \lbrace 0, 1 \rbrace^{D} \rightarrow \lbrace 0, 1 \rbrace^{d}
+\end{equation*}
+
+* donde $d < D$. Típicamente $d$ se toma entre 15 y 30.
+
+* Por ejemplo, $\mathcal{H}(\mbox{76c24efd-ec42-492a-92df-c62cfd4540a3}) = 65538$
+
+* El algoritmo de optimización solo hace la computación para actualizar el peso $w_{65538}$
 
 
 ---
@@ -553,7 +507,7 @@ class: middle, center, inverse
 
 --
 
-* Reducimos número de parámetros de $1 + p + p^2 $ a $1 + p + pk$.
+* Reducimos número de parámetros de $1 + p + p^2$ a $1 + p + pk$.
 
 
 
@@ -572,6 +526,93 @@ class: middle, center, inverse
 
 * Fácil de probar:
 S. Rendle [Factorization Machines](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)
+
+---
+
+class: middle, center, inverse
+
+# Clasificador Naive-Bayes
+
+---
+## Clasificador NB
+
+* Sea $f_k(x)$ la densidad de probabilidad de $x$ condicionada a la clase $Y_k$. 
+* Sea $\pi_k$ el prior de la clase $Y_k$. Se tiene
+
+\begin{equation}
+P(Y=Y_k \vert X=x) = \frac{f_k(x) \pi_k}{\sum_{i=1}^K f_i (x) \pi_{i}}
+\end{equation}
+
+--
+
+* El modelo NB asume que las variables predictoras son **condicionalmente independientes** dada la clase. O lo que es lo mismo
+
+\begin{equation}
+f_k(X) = \prod_{j=1}^p f_{kj}(X_k)
+\end{equation}
+
+* Esto en general no es cierto...
+
+---
+
+## Clasificador NB
+
+* ...pero simplificar tremendamente la estimación, cada marginal $f_{kj}$ puede ser estimada por separado.
+
+* Especialemente apropiado cuando la dimensión $p$ es grande (pues la estimación de densidad se vuelve inviable).
+
+* También cuando el vector de variables predictoras contiene variables discretas y continuas (pues cada una se modeliza por separado).
+
+* Aunque la hipótesis es fuerte, el modelo puede funcionar porque la frontera de decisión puede "no sentir" detalles de las densidades condicionadas a la clase.
+
+--
+
+* Podemos ver que es la frontera de decisión la conforma una combinación lineal de funciones de cada variable predictora
+\begin{eqnarray*}
+\log \frac{P(Y=Y_k \vert x)}{P(Y=Y_j \vert x)} &=& \log \frac{f_k(x)}{f_j(x)} + \log \frac{\pi_k(x)}{\pi_j(x)} \\
+&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p \log \frac{f_{ki}(x_i)}{f_{ji}(x_i)} \\
+&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p g_{lji}(x_i)
+\end{eqnarray*}
+
+
+---
+## Clasificador NB en la práctica - estimación de parámetros
+
+* Los parámetros se estima usando máxima verosimilitud con los datos de entrenamiento.
+
+* Para **variables predictoras contínuas** - NB Gaussiano
+
+\begin{equation}
+P(X_i = x_i \vert Y = Y_k) =  \frac{1}{\sqrt{2 \pi \sigma_{ki}^2}} \exp \left[- \frac{(x_i-\mu_{ki})^2}{2 \sigma_{ki}^2}\right]
+\end{equation}
+
+---
+## Clasificador NB en la práctica - estimación de parámetros
+
+* Para **variables predictoras que son cuentas** - Versión suavizada de máxima verosimilitud con modelo multinomial
+
+* Un vector de variables predictoras es un histograma con $x_i$ el número de veces que sucede el evento $i$.  
+
+\begin{equation}
+P(X_i = x \vert Y = Y_k) = \frac{N_{ki} + \alpha}{N_k + \alpha p}
+\end{equation}
+
+* $N_{ki}$ es el número total de cuentas del evento $i$ en la clase $k$ y $N_k$ es el número total de cuentas en la clase $k$.
+
+* $\alpha$ se puede interpretar como prior, evita probabilidades 0. $\alpha = 1$ *Laplace smoothing*. $\alpha < 1$ *Lidstone smoothing*.
+
+---
+## Clasificador NB en la práctica - estimación de parámetros
+
+* Para **variables predictoras categóricas** - MLE con modelo Bernoulli multivariante.
+
+* Cada variable predictora es un booleano, $x_i \in \lbrace 0,1 \rbrace$.
+
+\begin{equation}
+P(X_i = x \vert Y = Y_k) = \frac{\sum_{j=1}^N I(X_i = x)*I(Y = Y_k)}{\sum_{j=1}^N I(Y = Y_k) }
+\end{equation}
+
+
 
 ---
 
@@ -677,7 +718,8 @@ donde $I$ es la función indicatriz.
 
 ## Propiedades asintóticas
 
-## Versiones aproximadas: LSH (TODO)
+* **Ejercicio**: probar que a medida que el número de observaciones de entrenamiento $N \rightarrow \infty$, 1-NN tiene una tasa de error que no será peor que el doble la tasa de error de Bayes.
+
 
 
 ---

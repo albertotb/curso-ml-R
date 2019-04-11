@@ -249,7 +249,7 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
   2. `\(\hat{\mu}_k = \sum_{x_i \vert y_i = Y_k} x_i/N_k\)`
   3. `\(\boldsymbol{\Sigma} = \sum_{k=1}^K \sum_{x_i \vert y_i = Y_k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top / (N-K)\)`
 
-* `\(\mathcal{O}\)`(Kp)$
+* `\(\mathcal{O}(Kp)\)`
 ---
 
 ## QDA
@@ -311,6 +311,226 @@ f_k(x) = \frac{1}{(2 \pi)^{p/2} \vert \boldsymbol{\Sigma_k}\vert^{1/2}} \exp \le
   \end{equation}
 
 
+
+---
+
+
+class: middle, center, inverse
+
+# Regresión Logística y Optimización Estocástica
+
+---
+
+## Regresión logística (repaso)
+
+* Clasificación binaria:
+
+`\begin{equation*}
+p(y = 1 | x) = \sigma (w^\intercal x + b)
+\end{equation*}`
+
+* Clasificación en `\(M &gt; 2\)` clases: cambiar la función sigmoide `\(\sigma\)` por la **softmax** `\(s: \mathbb{R}^M \rightarrow \mathbb{R}^M\)`, definida como
+
+`\begin{equation*}
+s(z)_i = \frac{e^{z_i}}{\sum_{j=1}^M e^{z_j}}
+\end{equation*}`
+
+donde `\(z = Wx + B\)`, con `\(W \in \mathbb{R}^{M \times D}, B \in \mathbb{R}^{M \times 1}\)`.
+
+* Aprendizaje mediante mínimos cuadrados no lineales, descenso por el gradiente: los algoritmos vistos requieren acceso a la matriz `\(X\)` entera en cada iteración.
+
+* ¿Qué hacer cuando `\(X\)` no cabe en memoria?
+
+---
+
+
+## Descenso por el gradiente (GD)
+
+* Habitualmente se considera el problema de minimizar una función con la siguiente forma:
+
+`\begin{equation*}
+f(w) = \frac{1}{N}\sum_{i=1}^N f_i(w)
+\end{equation*}`
+
+(por ejemplo, al minimizar el error/pérdida promedio sobre la muestra de entrenamiento)
+
+--
+
+* Optimizamos iterando:
+
+`\begin{equation*}
+w^{t+1} = w^t - \eta \nabla_w f(w^t)
+\end{equation*}`
+
+* Problema: complejidad `\(\mathcal{O}(N)\)`
+
+
+---
+
+## Descenso por el gradiente estocástico (SGD)
+
+* En cada iteración, barajeamos los datos y escogemos **uno** al azar
+
+`\begin{equation*}
+w^{t+1} = w^t - \eta \nabla_w f_i(w^t)
+\end{equation*}`
+
+
+* También podemos seleccionar un **minilote** `\(\mathcal{B} = \lbrace i_1, \ldots, i_B \rbrace \subset \lbrace 1, \ldots N \rbrace\)` al azar en cada iteración:
+
+`\begin{equation*}
+w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
+\end{equation*}`
+
+* La complejidad pasa de `\(\mathcal{O}(N)\)` a `\(\mathcal{O}(B)\)`, además, no es necesario tener toda la matriz `\(X\)`, sino solo los datos del minilote `\(\mathcal{B}\)`.
+
+* Otra ventaja: mayor probabilidad de escapar óptimos locales que con GD: un punto estacionario de la función objetivo en GD no lo será en SGD generalmente.
+
+
+---
+
+## Propiedades del SGD
+
+* *Ejercicio: demostrar que el estimador por minilotes es **insesgado**. *
+
+
+
+
+---
+
+## Nuevos desarrollos desde SGD
+
+### Momentum
+
+Ayuda a amortiguar las oscilaciones que hacen que SGD sea lento.
+
+`\begin{align*}
+w^{t+1} &amp;= w^t - v^{t+1} \\
+v^{t+1} &amp;= \gamma v^{t} + \eta \nabla_w f_i(w^t)
+\end{align*}`
+
+### AdaGrad
+
+Adapta la tasa de aprendizaje a cada parámetro, disminuyéndola en parámetros con actualizaciones frecuentes (resp. aumentándola en parámetros con actualizaciones infrecuentes). Por esta razón, es adecuado para matrices de datos dispersas.
+
+`\begin{equation*}
+w^{t+1}_j = w^t_j - \frac{\eta}{\sqrt{G^t_{j,j} + \epsilon}} \nabla_w f_i(w^t)_j
+\end{equation*}`
+
+
+#### Adam (lo veremos en Aprendizaje Profundo)
+
+
+---
+
+![:scale 100%](./img/contours_evaluation_optimizers.gif)
+
+
+---
+
+## SGD con datos dispersos
+
+* Caso real: recomendación de películas a usuarios. Las observaciones son del tipo *(id_usuario, id_pelicula, rating)*
+
+* Los identificadores son variables categóricas (factor). Por ejemplo, asumiendo 50.000 usuarios:
+
+`\begin{equation*}
+\mbox{id_usuario = 24678} \rightarrow \left( 0, 0, 0, \ldots, 0, 1, 0, \ldots \right) \in \mathbb{R}^{50000}
+\end{equation*}`
+
+* Esto produce una explosión en el número de variables dummy necesarias: riesgo de que **no quepa en memoria** la matriz de datos dummies.
+
+* Solución: trabajar directamente sin dummificar, usando librerías especializadas como Vowpal Wabbit (Microsoft): https://github.com/VowpalWabbit/vowpal_wabbit
+
+* SGD (o variantes) solo actualizarán el peso correspondiente, ignorando los que tendrían el dummy a 0.
+
+---
+
+## Feature hashing trick
+
+* En muchas ocasiones, las variables categóricas están representadas como **cadenas alfanuméricas**.
+
+* Ejemplo en datos de ad-server: un identificador de un cookie es **76c24efd-ec42-492a-92df-c62cfd4540a3**.
+
+* ¿Cómo lo convertimos a un índice entero de forma eficiente?
+
+--
+
+* Solución: usar una **función de hash** sobre la representación en binario de la cadena
+
+`\begin{equation*}
+\mathcal{H} : \lbrace 0, 1 \rbrace^{D} \rightarrow \lbrace 0, 1 \rbrace^{d}
+\end{equation*}`
+
+* donde `\(d &lt; D\)`. Típicamente `\(d\)` se toma entre 15 y 30.
+
+* Por ejemplo, `\(\mathcal{H}(\mbox{76c24efd-ec42-492a-92df-c62cfd4540a3}) = 65538\)`
+
+* El algoritmo de optimización solo hace la computación para actualizar el peso `\(w_{65538}\)`
+
+
+---
+
+
+class: middle, center, inverse
+
+# Interacciones y Máquinas de Factorización (FMs)
+
+---
+## Fm's - Problema
+
+* ¿Cómo modelizar interacciones cuando nos enfrentamos a variables categóricas con número alto de categorías?
+
+* **Una** variable con `\(K+1\)` categorías `\(\rightarrow\)` `\(K \choose 2\)` interacciones a pares. Explota rápido...
+
+* Número medio de valores distintos de cero en los vectores de variables predictoras mucho menor que su dimensión.
+
+* Datos muy dispersos (sparse)! No hay datos suficientes para estimar interacciones complejas de manera independiente...
+
+---
+## FM's - Idea
+
+* El modelo de una FM de grado 2 (solo interacciones a pares)
+
+`\begin{equation}
+\widehat{y}(x) := \sigma \left[ \omega_0 + \sum_{i=1}^p \omega_{i} x_i \sum_{i=1}^p \sum_{j=i+1}^p \langle v_i, v_j\rangle x_i x_j \right]
+\end{equation}`
+
+* Donde los parámetros a estimar son
+
+`\begin{eqnarray}
+\omega_0 \in \mathbb{R}, &amp; \boldsymbol{\omega} \in \mathbb{R}^p, &amp; \boldsymbol{V} \in \mathbb{R}^{p \times k}
+\end{eqnarray}`
+
+--
+
+* `\(k\)` es la dimensión latente! `\(\langle v_i, v_j\rangle\)` es un producto escalar
+
+`\begin{equation}
+\langle v_i, v_j\rangle = \sum_{f=1}^k v_{i,f} v_{j,f}
+\end{equation}`
+
+--
+
+* Reducimos número de parámetros de `\(1 + p + p^2\)` a `\(1 + p + pk\)`.
+
+
+
+---
+## FM's - Intuición y computación
+
+* Con datos sparse, no hay datos suficientes para estimar todas las interacciones de manera independiente.
+
+* Las FMs pueden estimar interacciones incluso en este contexto porque rompen la independencia entre los parámetros de las interacciones, factorizandolos.
+
+* Los datos de una interacción ayudan a estimar los parámetros de otras interacciones relacionadas.
+
+* La complejidad de computar el modelo de FMs es `\(\mathcal{O} (kp^2)\)`, pues hay que computar todas las interacciones!
+
+* Se puede reducir esta complejidad a `\(\mathcal{O} (kp)\)` (tiempo lineal) !! 
+
+* Fácil de probar:
+S. Rendle [Factorization Machines](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)
 
 ---
 
@@ -397,186 +617,6 @@ P(X_i = x \vert Y = Y_k) = \frac{\sum_{j=1}^N I(X_i = x)*I(Y = Y_k)}{\sum_{j=1}^
 \end{equation}`
 
 
-
----
-
-
-class: middle, center, inverse
-
-# Regresión Logística y Optimización Estocástica
-
----
-
-## Regresión logística (repaso)
-
-* Clasificación binaria:
-
-`\begin{equation*}
-p(y = 1 | x) = \sigma (w^\intercal x + b)
-\end{equation*}`
-
-* Clasificación en `\(M &gt; 2\)` clases: cambiar la función sigmoide `\(\sigma\)` por la **softmax** `\(s: \mathbb{R}^M \rightarrow \mathbb{R}^M\)`, definida como
-
-`\begin{equation*}
-s(z)_i = \frac{e^{z_i}}{\sum_{j=1}^M e^{z_j}}
-\end{equation*}`
-
-donde `\(z = Wx + B\)`, con `\(W \in \mathbb{R}^{M \times D}, B \in \mathbb{R}^{M \times 1}\)`.
-
-* Aprendizaje mediante mínimos cuadrados no lineales, descenso por el gradiente: los algoritmos vistos requieren acceso a la matriz `\(X\)` entera en cada iteración.
-
-* ¿Qué hacer cuando `\(X\)` no cabe en memoria?
-
----
-
-
-## Descenso por el gradiente (GD)
-
-* Habitualmente se considera el problema de minimizar una función con la siguiente forma:
-
-`\begin{equation*}
-f(w) = \frac{1}{N}\sum_{i=1}^N f_i(w)
-\end{equation*}`
-
-(por ejemplo, al minimizar el error/pérdida promedio sobre la muestra de entrenamiento)
-
---
-
-* Optimizamos iterando:
-
-`\begin{equation*}
-w^{t+1} = w^t - \eta \nabla_w f(w^t)
-\end{equation*}`
-
-* Problema: complejidad `\(\mathcal{O}(N)\)`
-
-
----
-
-## Descenso por el gradiente estocástico (SGD)
-
-* En cada iteración, barajeamos los datos y escogemos **uno** al azar
-
-`\begin{equation*}
-w^{t+1} = w^t - \eta \nabla_w f_i(w^t)
-\end{equation*}`
-
-
-* También podemos seleccionar un **minilote** `\(\mathcal{B} = \lbrace i_1, \ldots, i_B \rbrace \subset \lbrace 1, \ldots N \rbrace\)` al azar en cada iteración:
-
-`\begin{equation*}
-w^{t+1} = w^t - \eta \nabla_w \frac{1}{B} \sum_{i \in \mathcal{B}} f_i(w^t)
-\end{equation*}`
-
-* La complejidad pasa de `\(\mathcal{O}(N)\)` a `\(\mathcal{O}(B)\)`, además, no es necesario tener toda la matriz `\(X\)`, sino solo los datos del minilote `\(\mathcal{B}\)`.
-
-* Otra ventaja: mayor probabilidad de escapar óptimos locales que con GD: un punto estacionario de la función objetivo en GD no lo será en SGD generalmente.
-
-
----
-
-## Propiedades del SGD
-
-* *Ejercicio: demostrar que el estimador por minilotes es **insesgado**. *
-
-* Citar a Robins &amp; Munro.
-
-* Citar asintótico cuando B = 1.
-
-
----
-
-## Nuevos desarrollos desde SGD
-
-### Momentum
-
-Ayuda a amortiguar las oscilaciones que hacen que SGD sea lento.
-
-`\begin{align*}
-w^{t+1} &amp;= w^t - v^{t+1} \\
-v^{t+1} &amp;= \gamma v^{t} + \eta \nabla_w f_i(w^t)
-\end{align*}`
-
-### AdaGrad
-
-Adapta la tasa de aprendizaje a cada parámetro, disminuyéndola en parámetros con actualizaciones frecuentes (resp. aumentándola en parámetros con actualizaciones infrecuentes). Por esta razón, es adecuado para matrices de datos dispersas.
-
-`\begin{equation*}
-w^{t+1}_j = w^t_j - \frac{\eta}{\sqrt{G^t_{j,j} + \epsilon}} \nabla_w f_i(w^t)_j
-\end{equation*}`
-
-
-#### Adam (lo veremos en Aprendizaje Profundo)
-
-
----
-
-![:scale 100%](./img/contours_evaluation_optimizers.gif)
-
-
-
----
-
-
-class: middle, center, inverse
-
-# Interacciones y Máquinas de Factorización (FMs)
-
----
-## Fm's - Problema
-
-* ¿Cómo modelizar interacciones cuando nos enfrentamos a variables categóricas con número alto de categorías?
-
-* **Una** variable con `\(K+1\)` categorías `\(\rightarrow\)` `\(K \choose 2\)` interacciones a pares. Explota rápido...
-
-* Número medio de valores distintos de cero en los vectores de variables predictoras mucho menor que su dimensión.
-
-* Datos muy dispersos (sparse)! No hay datos suficientes para estimar interacciones complejas de manera independiente...
-
----
-## FM's - Idea
-
-* El modelo de una FM de grado 2 (solo interacciones a pares)
-
-`\begin{equation}
-\widehat{y}(x) := \sigma \left[ \omega_0 + \sum_{i=1}^p \omega_{i} x_i \sum_{i=1}^p \sum_{j=i+1}^p \langle v_i, v_j\rangle x_i x_j \right]
-\end{equation}`
-
-* Donde los parámetros a estimar son
-
-`\begin{eqnarray}
-\omega_0 \in \mathbb{R}, &amp; \boldsymbol{\omega} \in \mathbb{R}^p, &amp; \boldsymbol{V} \in \mathbb{R}^{p \times k}
-\end{eqnarray}`
-
---
-
-* `\(k\)` es la dimensión latente! `\(\langle v_i, v_j\rangle\)` es un producto escalar
-
-`\begin{equation}
-\langle v_i, v_j\rangle = \sum_{f=1}^k v_{i,f} v_{j,f}
-\end{equation}`
-
---
-
-* Reducimos número de parámetros de $1 + p + p^2 $ a `\(1 + p + pk\)`.
-
-
-
----
-## FM's - Intuición y computación
-
-* Con datos sparse, no hay datos suficientes para estimar todas las interacciones de manera independiente.
-
-* Las FMs pueden estimar interacciones incluso en este contexto porque rompen la independencia entre los parámetros de las interacciones, factorizandolos.
-
-* Los datos de una interacción ayudan a estimar los parámetros de otras interacciones relacionadas.
-
-* La complejidad de computar el modelo de FMs es `\(\mathcal{O} (kp^2)\)`, pues hay que computar todas las interacciones!
-
-* Se puede reducir esta complejidad a `\(\mathcal{O} (kp)\)` (tiempo lineal) !! 
-
-* Fácil de probar:
-S. Rendle [Factorization Machines](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)
 
 ---
 
@@ -682,7 +722,8 @@ donde `\(I\)` es la función indicatriz.
 
 ## Propiedades asintóticas
 
-## Versiones aproximadas: LSH (TODO)
+* **Ejercicio**: probar que a medida que el número de observaciones de entrenamiento `\(N \rightarrow \infty\)`, 1-NN tiene una tasa de error que no será peor que el doble la tasa de error de Bayes.
+
 
 
 ---
