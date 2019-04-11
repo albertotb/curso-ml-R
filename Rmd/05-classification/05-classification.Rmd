@@ -12,7 +12,51 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       beforeInit: "macros.js"
-      
+    
+---
+class: middle, center, inverse
+
+# Intro a git
+
+---
+
+* Git es un sistema de **control de versiones** utilizado para gestionar archivos de código.
+
+### En la terminal de bash (Linux, MacOS)
+
+* Obtener e instalar el programa **git**: https://git-scm.com/.
+
+* Descarga de un repositorio: **git clone https://github.com/albertotb/curso-ml-R**.
+
+  Esto nos creará un nuevo directorio **curso-ml-R**, descargando todo lo que hubiera en la copia remota (la alojada en Github en este caso).
+
+* Actualización de cambios: **git pull** (ejecutado dentro del directorio del repositorio).
+
+  En caso de que la copia remota tenga cambios respecto a nuestra copia local, actualiza nuestra copia local del repositorio. Esto evita volver a descargar todo como al usar git clone.
+
+---
+
+### En Windows
+
+* Podemos utilizar la interfaz gráfica oficial desde https://desktop.github.com. Tras instalarlo, en el menú principal escogemos **Clone a new repository**:
+
+![:scale 90%](./img/clone.PNG)
+
+
+---
+
+* Ésta es la pantalla por defecto del repositorio. Podemos abrir los archivos en el explorador, o ver los cambios recientes en el lateral.
+
+![:scale 90%](./img/no_changes.PNG)
+
+---
+
+* Para **sincronizar** nuestra copia local con el remoto, pulsamos en **Fetch** arriba, y en caso de haber cambios, pulsamos en **Pull origin** para confirmar.
+
+![:scale 90%](./img/fetch.PNG)
+
+
+
 ---
 
 class: middle, center, inverse
@@ -348,47 +392,6 @@ P(X_i = x \vert Y = Y_k) = \frac{\sum_{j=1}^N I(X_i = x)*I(Y = Y_k)}{\sum_{j=1}^
 \end{equation}
 
 
----
-class: middle, center, inverse
-
-# Intro a git
-
----
-
-* Git es un sistema de **control de versiones** utilizado para gestionar archivos de código.
-
-### En la terminal de bash (Linux, MacOS)
-
-* Obtener e instalar el programa **git**: https://git-scm.com/.
-
-* Descarga de un repositorio: **git clone https://github.com/albertotb/curso-ml-R**.
-
-  Esto nos creará un nuevo directorio **curso-ml-R**, descargando todo lo que hubiera en la copia remota (la alojada en Github en este caso).
-
-* Actualización de cambios: **git pull** (ejecutado dentro del directorio del repositorio).
-
-  En caso de que la copia remota tenga cambios respecto a nuestra copia local, actualiza nuestra copia local del repositorio. Esto evita volver a descargar todo como al usar git clone.
-
----
-
-### En Windows
-
-* Podemos utilizar la interfaz gráfica oficial desde https://desktop.github.com. Tras instalarlo, en el menú principal escogemos **Clone a new repository**:
-
-![:scale 90%](./img/clone.PNG)
-
-
----
-
-* Ésta es la pantalla por defecto del repositorio. Podemos abrir los archivos en el explorador, o ver los cambios recientes en el lateral.
-
-![:scale 90%](./img/no_changes.PNG)
-
----
-
-* Para **sincronizar** nuestra copia local con el remoto, pulsamos en **Fetch** arriba, y en caso de haber cambios, pulsamos en **Pull origin** para confirmar.
-
-![:scale 90%](./img/fetch.PNG)
 
 ---
 
@@ -733,13 +736,6 @@ Medidas:
 **Tutorial muy extenso**: http://people.cs.bris.ac.uk/~flach/ICML04tutorial/
 
 (Análisis ROC, generalizaciones a clasificación n-aria,...)
----
-
-
-# Referencias
-
-   1. Randal J. Barnes [Matrix Differentiation (and some othe stuff)](https://atmos.washington.edu/~dennis/MatrixCalculus.pdf)
-   
 
    
 
