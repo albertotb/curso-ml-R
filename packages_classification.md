@@ -29,7 +29,10 @@ install.packages('pryr')
 install.packages("fastDummies")
 
 ## VOWPAL WABIT WRAPPER
-install.packages("rvw")
+devtools::install_github('rvw-org/rvw-legacy').
+Previamente hay que instalar la aplicación de VW:
+* Windows: instalador en https://github.com/eisber/vowpal_wabbit/releases/download/v8.4.0.3/VowpalWabbit-8.4.0.3.msi
+* Linux: apt install vowpal-wabbit
 
 ## GRÁFICOS
 install.packages("ggplot2")
