@@ -68,7 +68,7 @@ class: middle, center, inverse
 ## ¿Cómo aplicar regresión lineal a problema de clasificación multiclase?
 
 
-* Consideramos $K$ categorías.
+* Consideramos $K$ clases.
 
 * **One Hot Encoding** de las categorías: para categoría *k*, crear vector $K$ dimensional $t_k$ con tan solo un 1 en posición $k$ (resto ceros).
 
@@ -145,7 +145,7 @@ class: middle, center, inverse
 * Con el coste $0/1$ 
 
 \begin{eqnarray}
-\widehat{Y} (x) = \arg_\min{y} \left[ 1 - P(y \vert X = x) \right]
+\widehat{Y} (x) = \arg \min_{y} \left[ 1 - P(y \vert X = x) \right]
 \end{eqnarray}
 
 * Asignamos la clase con más probabilidad a posteriori.
