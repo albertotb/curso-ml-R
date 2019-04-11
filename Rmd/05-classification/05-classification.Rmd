@@ -563,14 +563,7 @@ f_k(X) = \prod_{j=1}^p f_{kj}(X_k)
 
 * Aunque la hipótesis es fuerte, el modelo puede funcionar porque la frontera de decisión puede "no sentir" detalles de las densidades condicionadas a la clase.
 
---
 
-* Podemos ver que es la frontera de decisión la conforma una combinación lineal de funciones de cada variable predictora
-\begin{eqnarray*}
-\log \frac{P(Y=Y_k \vert x)}{P(Y=Y_j \vert x)} &=& \log \frac{f_k(x)}{f_j(x)} + \log \frac{\pi_k(x)}{\pi_j(x)} \\
-&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p \log \frac{f_{ki}(x_i)}{f_{ji}(x_i)} \\
-&=& \log \frac{\pi_k(x)}{\pi_j(x)} + \sum_{i=1}^p g_{lji}(x_i)
-\end{eqnarray*}
 
 
 ---
