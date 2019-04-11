@@ -9,7 +9,7 @@
 
  2. Aplicaciones prácticas de Aprendizaje Automático
     * Algoritmos de regresión: Ridge, Lasso, ElasticNet, PCR, PLS, etc.. (11/04, 4 horas) [[slides]](./Rmd/04-regression/04-regression.html)
-    * Algoritmos de clasificación: KNN, Naive Bayes, ... (12/04, 4 horas)
+    * Algoritmos de clasificación: KNN, Naive Bayes, ... (12/04, 4 horas) [[slides]](./Rmd/05-classification/05-classification.html)
     * Arboles de decisión, bosques aleatorios y boosting (22/04, 4 horas)
     * Support vector machines (25/04, 4 horas)
     * Análisis de conglomerados: cuantización vectorial (29/04, 4 horas)
