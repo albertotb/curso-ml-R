@@ -1,11 +1,11 @@
----
+------
 title: "Titanic"
 author: "Alberto Torres Barrán"
 date: "21/3/2019"
 output: pdf_document
 ---
 
-Vamos a intentar predecir la supervivencia de las víctimas del Titanic a partir de las siguientes variables:
+Vamos a intentar predecir la supervivencia de las víctimas del Titanic a partir de las siguientes veariables:
 
   * survival: Supervivencia (0 = No; 1 = Si)
   * pclass: Clase de pasajero (1, 2, 3)
@@ -21,14 +21,18 @@ Vamos a intentar predecir la supervivencia de las víctimas del Titanic a partir
 
 Con el conjunto de datos anterior:
 
-  1. Cargar el fichero `titanic.csv` en R.
-  2. Ver cuantos valores missing tiene cada variable con summary.
-  3. Eliminar la variable cabin (¿por qué?).
-  4. Eliminar también las variables name y ticket (¿por qué?).
-  5. Imputar los valores de `age` con la mediana
-  6. Eliminar las filas que contengan algún NA (función na.omit).
-  7. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
-  8. Ajustar un modelo regresión logística con y sin regularizar 
-  9. ¿Cuál es el valor de $\lambda$ óptimo?
-  10. ¿Qué variables selecciona el modelo?
-  11. Calcular los *odds ratio* e interpretarlos
+1. Cargar el fichero `titanic.csv` en R.
+2. Ver cuantos valores missing tiene cada variable con summary.
+3. Eliminar la variable cabin (¿por qué?).
+4. Eliminar también las variables name y ticket (¿por qué?).
+5. Imputar los valores de `age` con la mediana
+6. Eliminar las filas que contengan algún NA (función na.omit).
+7. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
+8. Ajustar regresión logística
+9. Calcular *odds-ratio*
+10. Calcular error de test (tasa de acierto)
+11. Ajustar un modelo regresión logística regularizada 
+12. ¿Cuál es el valor de $\lambda$ óptimo?
+13. ¿Qué variables selecciona el modelo?
+14. Calcular el nuevo error de test
+
