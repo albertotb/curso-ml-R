@@ -505,7 +505,7 @@ class: middle, center, inverse
 
 --
 
-* Reducimos número de parámetros de $\mathcal{O}(p^2)$ a $\mathcal{O}(kp)$.
+* Reducimos número de parámetros de $1 + p + \frac{p(p-1)}{2}$ a $1 + p + kp$.
 
 
 
