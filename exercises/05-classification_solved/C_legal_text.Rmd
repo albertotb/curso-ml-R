@@ -21,7 +21,9 @@ library(caret)
 
 ## Introducción
 
-En este ejercicio, entrenaremos varios clasificadores sobre texto legal. Cada documento se corresponde con un párrafo que puede pertenecer a una de cinco porsibles clases: ...
+En este ejercicio, entrenaremos varios clasificadores sobre texto legal. Cada documento se corresponde con un párrafo que puede pertenecer a una de cinco porsibles clases: 
+inadmitido, estimado, estimado parcialmente, desestimado, otro
+(las clases están representadas en el excel por las letras A, B, C, D, y E, respectivamente
 
 El objetivo es, dado un nuevo texto nunca visto, predecir la clase a la que pertenece.
 
