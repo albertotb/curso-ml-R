@@ -1,0 +1,21 @@
+---
+title: "Support Vector Machines"
+subtitle: "Curso de aprendizaje automático para el INE"
+author: "Alberto Torres Barrán"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+    includes:
+      before_body: mathjax.html
+  keep_md: true
+---
+
+## Introducción
+
