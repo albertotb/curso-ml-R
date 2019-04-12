@@ -7,18 +7,19 @@ output: pdf_document
 
 Con los datos `prostate.data`:
 
-  1. Cargar fichero en R
-  2. Separar en train/test de acuerdo con los valores de la columna `train`
-  3. Ajustar modelos de regresión sobre `lpsa`:
+1. Cargar fichero en R
+2. Separar en train/test de acuerdo con los valores de la columna `train`
+3. Escalar las variables para que tengan media 0 y varianza 1 (menos `lpsa`)
+4. Ajustar modelos de regresión sobre `lpsa`:
     
-    * Best subset
-    * Fordward stepwise
-    * Lasso
-    * Ridge regressión
-    * Elastic Net
-    * PCR
-    * PLS
-    
-  4. Comparar los valores de los coeficientes de cada modelo
-  5. Comparar las variables que selecciona cada modelo
-  6. Comparar los errores sobre el conjunto de test
+  * Regresión lineal
+  * Best subset
+  * Ridge regression
+  * Lasso
+  * Elastic Net
+  * PLS
+  
+5. Comparar los valores de los coeficientes de cada modelo
+6. Comparar las variables que selecciona cada modelo
+7. Comparar los errores sobre el conjunto de test
+

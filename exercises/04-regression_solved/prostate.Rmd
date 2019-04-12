@@ -1,0 +1,158 @@
+---
+title: "Prostate"
+author: "Alberto Torres Barrán"
+date: "21/3/2019"
+output: pdf_document
+---
+
+Con los datos `prostate.data`:
+
+1. Cargar fichero en R
+
+```{r}
+data <- read.csv('../../data/prostate.data', header = TRUE, row.names = 1)
+```
+
+2. Separar en train/test de acuerdo con los valores de la columna `train`
+
+```{r}
+train_col <- which(colnames(data) == "train")
+target_col <- which(colnames(data) == "lpsa")
+
+train_set <- data[ data$train, -train_col]
+test_set  <- data[!data$train, -train_col]
+```
+
+3. Escalar las variables para que tengan media 0 y varianza 1 (menos `lpsa`)
+
+```{r}
+Xtrain <- scale(train_set[, -target_col])
+center <- attr(Xtrain, "scaled:center")
+scale  <- attr(Xtrain, "scaled:scale")
+
+Xtest <- scale(test_set[, -target_col], center = center, scale = scale)
+```
+
+```{r}
+train <- data.frame(Xtrain, lpsa=train_set[, target_col])
+test <- data.frame(Xtest, lpsa=test_set[, target_col])
+```
+
+4. Ajustar modelos de regresión sobre `lpsa`:
+    
+  * Regresión lineal
+  
+```{r message=FALSE, warning=FALSE}
+library(ModelMetrics)
+lm_fit <- lm(lpsa ~ ., data = train)
+lm_pred <- predict(lm_fit, newdata = test)
+lm_mse <- mse(test[, target_col], lm_pred)
+lm_coef <- coef(lm_fit)
+
+lm_mse
+```
+
+  * Best subset
+  
+```{r message=FALSE, warning=FALSE}
+library(leaps)
+
+bs <- regsubsets(lpsa ~ ., data = train)
+bs_summ <- summary(bs)
+kopt <- which.min(bs_summ$bic)
+best_vars <- bs_summ$which[kopt, -1]
+
+bs_fit <- lm(lpsa ~ ., data = train[,c(best_vars, lpsa=TRUE)])
+bs_pred <- predict(bs_fit, newdata = test)
+bs_mse <- mse(test[, target_col], bs_pred)
+
+bs_coef <- numeric(length(lm_coef))
+names(bs_coef) <- names(lm_coef)
+bs_coef[names(coef(bs_fit))] <- coef(bs_fit)
+
+bs_mse
+```
+
+  * Ridge regression
+  
+```{r message=FALSE, warning=FALSE}
+library(ridge)
+
+rr_fit <- linearRidge(lpsa ~ ., data = train)
+rr_pred <- predict(rr_fit, newdata = test)
+rr_mse <- mse(test[, target_col], rr_pred)
+rr_coef <- coef(rr_fit)
+
+rr_mse
+```
+  
+  * Lasso
+  
+```{r message=FALSE, warning=FALSE}
+library(glmnet)
+library(glmnetUtils)
+
+la_fit <- cv.glmnet(lpsa ~ ., data = train, alpha = 1)
+la_pred <- predict(la_fit, newdata = test, s = "lambda.min")
+la_mse <- mse(test[, target_col], la_pred)
+la_coef <- coef(la_fit)[,1]
+la_mse
+```
+
+  * Elastic Net
+  
+```{r message=FALSE, warning=FALSE}
+library(glmnet)
+library(glmnetUtils)
+
+en_fit <- cv.glmnet(lpsa ~ ., data = train, alpha = 0.5)
+en_pred <- predict(en_fit, newdata = test, s = "lambda.min")
+en_mse <- mse(test[, target_col], en_pred)
+en_coef <- coef(en_fit)[,1]
+en_mse
+```
+
+  * PLS
+  
+```{r message=FALSE, warning=FALSE}
+library(pls)
+
+pls_fit <- plsr(formula = lpsa ~ ., data = train, validation = "CV")
+ncomp_opt <- pls_fit$ncomp
+pls_pred <- predict(pls_fit, newdata = test)
+pls_mse <- mse(test[, target_col], pls_pred)
+intercept <- pls_fit$Ymeans - pls_fit$Xmeans %*% coef(pls_fit)
+pls_coef <- c(Intercept = intercept, coef(pls_fit))
+pls_mse
+```
+  
+5. Comparar los valores de los coeficientes de cada modelo
+6. Comparar las variables que selecciona cada modelo
+
+```{r}
+coef_df <- data.frame(
+  LS = round(lm_coef, 3),
+  Best_Subset = round(bs_coef, 3),
+  Ridge = round(rr_coef, 3),
+  Lasso = round(la_coef, 3),
+  ENet = round(en_coef, 3),
+  PLS = round(pls_coef, 3)
+)
+
+coef_df
+```
+
+
+7. Comparar los errores sobre el conjunto de test
+
+```{r}
+mse_list = c(LS = lm_mse, 
+             Best_Subset = bs_mse,
+             Ridge = rr_mse,
+             Lasso = la_mse,
+             ENet = en_mse,
+             PLS = pls_mse)
+
+mse_list
+```
+
