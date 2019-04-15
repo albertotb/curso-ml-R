@@ -26,8 +26,30 @@ class: middle, center, inverse
 
 ---
 
-## AdaBoost.M1
+## Aprendiendo de los errores
 
+* Dado un dataset de entrenamiento $\lbrace (x_i, y_i) \rbrace_{i=1}^N$, ajustamos un modelo $G(x)$ y calculamos la tasa de error sobre el conjunto de entrenamiento
+\begin{equation*}
+err = \frac{1}{N} \sum_{i=1}^N I(y_i \neq G(x_i))
+\end{equation*}
+
+* Partiendo de que $G(x)$ es un clasificador débil, ¿cómo podemos hacer que además vaya corrigiendo sus errores?
+
+--
+
+* **Boosting**: iremos aplicando el algoritmo a versiones modificadas de los datos de entrenamiento, obteniendo una secuencia de clasificadores
+
+\begin{equation*}
+G_m(x),\quad m=1,\ldots,M
+\end{equation*}
+
+---
+
+## AdaBoost.M1 (1997)
+
+* Remuestrear los datos de entrenamiento, dando mayor pesado a las instancias mal clasificadas.
+
+* Algoritmo
 
 * Terminar con que AdaBoost es un modelo aditivo con una funcion de coste exponencial.
 
