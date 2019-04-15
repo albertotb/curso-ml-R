@@ -1,0 +1,47 @@
+---
+title: "Algoritmos de Árboles y Colectividades"
+subtitle: "Curso de aprendizaje automático para el INE"
+author: "Víctor Gallego y Roi Naveiro"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+    
+---
+class: middle, center, inverse
+
+# Intro a métodos basados en árboles
+
+
+---
+class: middle, center, inverse
+
+# Boosting
+
+---
+
+class: middle, center, inverse
+
+# Random Forest
+
+---
+
+class: middle, center, inverse
+
+# Colectividades
+
+---
+
+
+
+   
+
+
+
+
