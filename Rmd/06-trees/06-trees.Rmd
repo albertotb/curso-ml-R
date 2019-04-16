@@ -61,7 +61,50 @@ G_m(x),\quad m=1,\ldots,M
 
 ---
 
-## Hiperparámetros y regularización
+## Hiperparámetros
+
+* $J_m$, tamaño de cada árbol: se tiende a escoger $J = J_m$ para simplificar complejidad.
+
+  * $J = 2$: no interacciones (solo hay una decisión/subdivisión).
+  
+  * $J = 3$: interacciones entre dos variables (subdivisiones sucesivas).
+  
+  * Con $J$ se permiten hasta $J-1$ interacciones.
+  
+  * Según ESL, típicamente escoger $4 \leq J \leq 8$.
+  
+--
+  
+* $M$, número de iteraciones/árboles.
+
+  * El error de entrenamiento se podría reducir arbitrariamente con $M \rightarrow \infty$.
+  
+  * Ajustarlo mediante un conjunto de validación, y dejar de iterar cuando el error de validación no mejore tras unas pocas iteraciones (**early stopping**).
+  
+---
+
+## Regularización
+
+* $\eta \in \left[ 0, 1\right]$, tasa de muestreo/subsampling:
+
+  * En lugar de estimar el gradiente sobre todo el conjunto de entrenamiento, $\mathcal{O}(N)$,
+  
+  * lo hacemos con una muestra aleatoria uniforme, $\mathcal{O}(\eta N)$ (como en SGD).
+  
+  * Típicamente $\eta \leq 1/2$.
+  
+--
+
+* $\nu \in \left[ 0, 1\right]$, parámetro de encogimiento/shrinkage:
+
+  * Se sustituye $f_m(x) = f_{m-1}(x) + \sum_{j=1}^{J_m} \gamma_{jm} I (x \in R_{jm})$
+  
+  * por $f_m(x) = f_{m-1}(x) + \nu \sum_{j=1}^{J_m} \gamma_{jm} I (x \in R_{jm})$.
+  
+  * Controla la tasa de aprendizaje del boosting.
+  
+  * Empíricamente $\nu$ bajo favorece generalización (bajo error en test), aunque hace que aumente el número de iteraciones $M$.
+  
 
 ---
 
