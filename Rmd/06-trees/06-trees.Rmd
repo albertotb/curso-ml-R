@@ -55,9 +55,34 @@ G_m(x),\quad m=1,\ldots,M
 
 ---
 
+## Generalizando AdaBoost.M1
+
+
+---
+
+## Mínimos cuadrados por etapas (stagewise LS)
+
+
+---
+
+## La función de coste exponencial
+
+
+---
+
+## Implementación con árboles
+
+---
+
 ## Gradient Boosting
 
-* Los árboles son ideales para combinarlos con boosting.
+* Intuición
+
+---
+
+## Gradient Boosting
+
+* Algoritmo
 
 ---
 
