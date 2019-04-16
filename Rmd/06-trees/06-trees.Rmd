@@ -67,6 +67,81 @@ G_m(x),\quad m=1,\ldots,M
 
 ## Interpretabilidad
 
+### Importancia de variables
+
+* Para un solo árbol, Breiman propuso como medida de **importancia de una variable** $X_l$
+
+\begin{equation*}
+\mathcal{I}_l^2 (T) = \sum_{t=1}^{J-1} \hat{i}_t^2 I(v(t) = l),
+\end{equation*}
+
+(En cada nodo $t$, una de las variables $X_{v(t)}$ es la escogida para hacer el corte en dos subregiones. Tal variable escogida es la que maximiza la mejora estimada en el riesgo cuadrático $\hat{i}_t^2$)
+
+
+* Para un conjunto de $M$ árboles, podemos promediarla
+
+\begin{equation*}
+\mathcal{I}_l^2  = \frac{1}{M} \sum_{m=1}^{M} \mathcal{I}_l^2 (T).
+\end{equation*}
+
+---
+
+## Interpretabilidad
+
+### Gráficos de dependencia parcial
+
+* Dividimos las variables predictoras $X = (X_1, X_2, \ldots, X_p)$ en dos grupos disjuntos:
+
+\begin{equation*}
+X = (X_{\mathcal{S}}, X_{\mathcal{C}})\mbox{ tal que } \mathcal{S} \cup \mathcal{C} = \lbrace 1, 2, \ldots, p \rbrace. 
+\end{equation*}
+
+* En lugar de inspeccionar la respuesta (por ej, probabilidad de +) $f(X)$, representamos una aproximación definida sobre $X_{\mathcal{S}}$:
+
+\begin{equation*}
+f_{\mathcal{S}} (X_{\mathcal{S}}) = \mathbb{E}_{X_{\mathcal{C}}} \left[ f(X_{\mathcal{S}}, X_{\mathcal{C}})\right] \approx \frac{1}{N} \sum_{i=1}^N f(X_{\mathcal{S}}, x_{i\mathcal{C}})
+\end{equation*}
+
+* $|\mathcal{S}|$ bajo para poder visualizarlo.
+
+* Ejemplo en los ejercicios de hoy.
+
+---
+
+## Interpretabilidad
+
+* Gráfico de dependencia parcial para detección de spam: aumento del uso del símbolo ! aumenta probabilidad de spam, mientras que con la marca HP sucede a la inversa.
+
+![:scale 90%](./img/pd_spam.png)
+
+
+
+---
+
+## Librerías para R
+
+* **gbm**: la implementación original. Soporta gráficos de dependencia parcial para interpretabilidad.
+
+  * https://cran.r-project.org/web/packages/gbm/index.html
+
+
+* **xgboost**: usada por varios ganadores de la plataforma Kaggle. ~10 veces más rápida que gbm, soporta matrices dispersas. También soporta boosting de modelos lineales.
+
+  * https://cran.r-project.org/web/packages/xgboost/index.html
+  
+---
+
+## Resumen
+
+* Boosting como proceso de **optimización por etapas y suave**. Por ejemplo, **gradient boosting** aproxima los gradientes en cada iteración por un árbol ajustado a ellos.
+
+* Boosting como alternativa al bagging. Mientras que boosting es un proceso que busca la **reducción del sesgo**, el bagging se emplea como **reducción de la varianza**.
+
+* Fácil de hacer overfiting: usar conjunto de validación como **terminación temprana**.
+
+* **Interpretabilidad decente**: importancia de variables y gráficos de dependencia parcial.
+
+
 ---
 
 
