@@ -14,12 +14,14 @@ output:
       beforeInit: "macros.js"
     
 ---
+
 class: middle, center, inverse
 
-# Intro a métodos basados en árboles
+# Introducción a métodos basados en árboles
 
 
 ---
+
 class: middle, center, inverse
 
 # Boosting
@@ -212,10 +214,192 @@ f_{\mathcal{S}} (X_{\mathcal{S}}) = \mathbb{E}_{X_{\mathcal{C}}} \left[ f(X_{\ma
 
 ---
 
-
 class: middle, center, inverse
 
 # Random Forest
+
+---
+
+## Introducción - Bootstrap
+
+* Técnica para medir precisión de estimadores. 
+
+* Permite estimar la distribución de casi cualquier estadístico (y por tanto cualquier propiedad de interés, como la varianza).
+
+--
+
+* Idea
+
+  1. Muestrear al azar los datos de entrenamiento **con reemplazo**.
+  2. Generar $B$ *muestras bootstrap*, del mismo tamaño que el train.
+  3. En cada muestra, calcular el estadístico de interés: **bootstrap estimates**.
+  4. La distribución empírica de las **bootstrap estimates** es una estimación de la distribución del estimador.
+  
+---
+
+## Introducción - Bagging
+
+* Además de servir para cuantificar la predicción de una estimación, el bootstrap puede usarse para mejorar la predicción!
+
+* Ajustamos **modelo de regresión** a datos de entrenamiento $T = \lbrace (x_1,y_1), \dots, (x_N, y_N)\rbrace$ 
+
+* $\hat{f}(x)$ es la predicción del modelo en el punto $x$.
+
+--
+
+* **Bagging** (bootstrap aggregation) promedia esta predicción sobre una colección de muestras bootstrap del conjunto de entrenamiento,
+
+* Para cada muestra bootstrap $T^{i}$, $i = 1,2, \dots, B$ ajustamos el modelo obteniendo $f^{i}(x).$ La estimación de bagging es
+
+\begin{equation}
+\hat{f}_{bag} = \frac{1}{B} \sum_{i=1}^B f^{i}(x)
+\end{equation}
+
+* Interesante para árboles pues cada árbol bootstrap *se fijará* en variables diferentes.
+
+---
+
+## Introducción - Bagging
+
+
+* En **clasificación** cada muestra bagging predice una clase. La predicción final será la clase más votada.
+
+* Para estimar probabilidades no usar proporciones de votos. Promediar la estimaciones de probabilidad de cada muestra (por ejemplo en árboles de decisión la proporción de las clases en nodos terminales).
+
+--
+
+* Bagging es una técnica para reducir la varianza de una función predictiva.
+
+* De forma empírica: funciona bien para procedimientos con poco sesgo y mucha varianza (árboles de decisión).
+
+
+---
+
+## Introducción - Random Forests
+
+* Random Forests es una modificación de bagging de árboles de decisión, que produce un comité de árboles **decorrelados**.
+
+* Resultados similares a boosting pero más sencillos de entrenar y tunear.
+
+![:scale 75%](./img/visualRF.png)
+---
+
+## RF - Bagging
+
+* La idea subyacente es promediar muchos modelos ruidosos pero aproximadamente insegados y así reducir la varianza.
+
+* Los árboles son candidatos ideales: si son profundos son aproximadamente insesgados.
+
+* Como cada árbol generado con bagging está idénticamente distribuido, la media de $B$ árboles de bagging es la misma.
+
+* El sesgo de los predicción del bagging de árboles es el mismo que el de cada árbol individual. Podemos mejora reduciendo varianza..,
+
+---
+
+## RF - Bagging 
+
+* Intuición en regresión: si el training set $(x_i, y_i)$ con $i=1,2, \dots, N$ es iid de la distribución $P$, el estimador agregado ideal es $f_{ag}(x) = \mathbb{E}_P(\hat{f}^*(x))$ (aquí las muestras bootstrap son muestras de tamaño $N$ de P).
+
+\begin{eqnarray}
+\mathbb{E}_P [Y- \hat{f}^*(x)]^2 &=& \mathbb{E}_P [Y - f_{ag}(x) + f_{ag}(x) - \hat{f}^*(x)]^2 \\
+&=& \mathbb{E}_P[Y - f_{ag}(x)]^2 + \mathbb{E}_P[f_{ag}(x) - \hat{f}^*(x)]^2 \\
+&\geq& \mathbb{E}_P[Y - f_{ag}(x)]^2
+\end{eqnarray}
+
+--
+
+* La agregación usando la población real **nunca** incrementa el error cuadrático medio.
+
+* Esto sugiere que usando baggin con los datos de train quizás disminuiremos el error cuadrático medio...
+
+---
+## RF - Decorrelación
+
+* La media de $B$ variables aleatorias independientes e idénticamente distribuidas tiene varianza $\frac{1}{B} \sigma^2$.
+
+* (Ejercicio) Si las variables son simplemente idénticamente distribuidas (pero no independientes) con correlación positiva $\rho$ entonces la varianza de la media es
+
+\begin{equation}
+\rho \sigma^2 + \frac{1-\rho}{B}\sigma^2
+\end{equation}
+
+--
+
+* Al aumentar $B$ el segundo término se anula.
+
+* Podemos mejorar la reducción de la varianza si reducimos $\rho$ (sin pasarse para no aumentar mucho $\sigma^2$).
+
+* En RF se consigue así: Antes de cada separación en cada árbol, seleccionar al azar $m$ variables predictoras y buscar el corte óptimo usando solo esas.
+
+* Menor $m$ $\Rightarrow$ Menor $\rho$.
+
+
+---
+
+## Ejercicio 
+
+Si las variables son simplemente idénticamente distribuidas (pero no independientes) con correlación positiva $\rho$ entonces la varianza de la media es
+
+\begin{equation}
+\rho \sigma^2 + \frac{1-\rho}{B}\sigma^2
+\end{equation}
+
+Tenemos que
+
+\begin{eqnarray}
+\text{Var} \left( \frac{1}{B} \sum X_i  \right) =  \frac{1}{B^2} \text{Var} \left( \sum X_i  \right) = \frac{1}{B^2} \left[ \mathbb{E} \left[\left(\sum X_i \right)^2 \right] - \mathbb{E} \left[\sum X_i\right]^2   \right]
+\end{eqnarray}
+
+El segundo término vale
+
+\begin{eqnarray}
+\mathbb{E} \left[\sum X_i\right]^2  = B^2 \mu^2
+\end{eqnarray}
+
+El primero
+
+\begin{eqnarray}
+ \mathbb{E} \left[\left(\sum X_i \right)^2 \right] =  \mathbb{E} \left[ \left(\sum_{i=1}^B X_i^2 \right) + 2 \left(\sum_{i=1}^B \sum_{j<i} X_i X_j \right) \right] = B(\sigma^2 + \mu^2) + B(B-1)(\rho \sigma^2 + \mu^2)
+\end{eqnarray}
+
+Sustituyendo llegamos a la expresión de partida.
+
+
+---
+
+## RF - Detalles Técnicos
+
+* En **regresión**: hacer la media de predicción de cada árbol.
+
+* En **clasificación**: voto mayoritario.
+
+--
+
+* En **regresión** se recomienda: $m = p/3$ y tamaño mínimo de nodos para permitir división 5. 
+
+* En **clasificaión** se recomienda: $m = \sqrt{p}$ y tamaño mínimo de nodos 1. 
+
+* Mejor tunear estos hiperparámetros (son los más importantes).
+
+--
+
+* RF es muy fácil de tunear y suele dar buenos resultados: recomendable usarlo como primera opción.
+
+* Además es trivial de paralelizar!!
+
+
+---
+
+## Muestras *Out of bag*
+
+---
+
+## Medidas de importancia de las variables
+
+---
+
+## Gráficos de proximidad
+
 
 ---
 
