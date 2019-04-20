@@ -22,15 +22,172 @@ class: center, middle, inverse, title-slide
 
 class: middle, center, inverse
 
-# Introducción a métodos basados en árboles
-
+# Árboles de Clasificación y Regresión (CART)
 
 ---
 
+## Introducción
+
+* Idea de los árboles: particionar el espacio de variables predictores en rectángulos.
+
+* Ajustar modelo muy sencillo a cada partición.
+
+* Tarea: encontrar usando el train las estructura del árbol (variables del corte y umbral) y el modelo en cada partición.
+
+--
+
+* Punto fuerte: interpretabilidad
+
+* Importante en ciencias médicas: imita la forma de pensar de los doctores.
+
+![:scale 90%](./img/tree.png)
+---
+
+## Árboles de regresión (1)
+
+* Sean datos de entrenamiento `\(\lbrace (x_i, y_i) \rbrace_{i=1}^N\)`, donde cada `\(x_i\)` es un vector de `\(p\)` variables predictoras. 
+
+* Supongamos que particionamos el espacio de variables predictoras en `\(M\)` regiones `\(R_1, \dots, R_M\)` y para cada una ajustamos una constante `\(c_m\)`. La respuestas es
+
+`\begin{equation}
+f(x) = \sum_{m=1}^M c_m I()x \in R_m
+\end{equation}`
+
+* Si nuestro criterio es minimizar `\(\sum (y_i - f(x_i))^2\)`, entonces dada la región `\(R_m\)` la mejor `\(c_m\)` es la media de los `\(y_i\)` de los `\(x_i \in R_m\)`.
+
+---
+
+## Árboles de regresión (2)
+
+* Buscar la mejor partición `\(R_1,\dots, R_M\)` en términos minimizar la suma de cuadrados es **computacionalmente inviable**.
+
+* Alternativa greedy: buscar mejores particiones binarias de forma secuencial.
+
+* Empezando con todos los datos, sea `\(j\)` la variable de partición y `\(s\)` el umbral. Esto define dos regiones del espacio `\(R_1\)` `\((X_j \leq s)\)` y `\(R_2\)` `\((X_j &gt; s)\)`.
+
+* Hay que resolver
+
+`\begin{equation}
+\min_{j,s} \left[ \min_{c_1} \sum_{x_i \in R_1(j,s)} (y_i - c_1)^2 +  \min_{c_2} \sum_{x_i \in R_2(j,s)} (y_i - c_2)^2\right]
+\end{equation}`
+
+--
+
+* Para cada `\(j,s\)` el problema interno se resuelve inmediatamente: `\(c_1\)` es la media de los `\(y_i\)` de los `\(x_i \in R_1\)` (igual para `\(c_2\)`).
+
+* Para cada variable `\(j\)` encontrar el punto de partición `\(s\)` es rápido.
+
+* Se puede inspeccionar todas las variables de partición y encontrar el mejor par `\((j,s)\)`.
+
+* Iterar el proceso en las regiones resultantes.
+
+---
+
+## Árboles de regresión (3)
+
+* ¿Cuándo parar?
+
+* Árbol profundo hace overfitting, árbol pequeño tiene mucho sesgo.
+
+* Tamaño del árbol es un hiperparámetro.
+
+--
+
+* Estrategia óptima: construír un árbol muy profundo `\((T_0)\)` y **podarlo**.
+
+* Sea `\(T\)` cualquier subárbol de `\(T_0\)` obtenido colapsando algún nodo interno.
+
+* Sea `\(|T|\)` el número de nodos terminales en `\(T\)` y `\(N_m\)` el número de instancias en el nodo terminal `\(m\)`-ésimo. Entonces
+
+`\begin{equation}
+Q_m(T) = \frac{1}{N_m} \sum_{x_i \in R_m} (y_i - \hat{c}_m)^2
+\end{equation}`
+
+--
+
+* El criterio a optimizar en la poda es
+
+`\begin{equation}
+\sum_{m=1}^{|T|} N_m Q_m(T) + \alpha |T|
+\end{equation}`
+
+---
+
+## Árboles de regresión (4)
+
+* El criterio a optimizar en la poda es
+
+`\begin{equation}
+C_\alpha (T) = \sum_{m=1}^{|T|} N_m Q_m(T) + \alpha |T|
+\end{equation}`
+
+* `\(\alpha\)` es un hiperparámetro que penaliza el tamaño de los árboles.
+
+* Para cada `\(\alpha\)` existe un subarbol `\(T_\alpha\)` tal que `\(C_\alpha (T_\alpha)\)` es mínimo. 
+
+--
+
+* Estrategia de búsqueda de `\(T_\alpha\)`: colapsar el nodo que produce el menos incremento en `\(\sum_{m=1}^{|T|} N_m Q_m(T)\)`, hasta quedarnos con un solo nodo.
+
+* Esta secuencia de subárboles contiene el óptimo!
+
+---
+
+## Árboles de clasificación
+
+* Debemos cambiar el criterio para particionar y para podar.
+
+* Sea un nodo `\(m\)` que representa la región `\(R_m\)` con `\(N_m\)` observaciones. Definimos `\(\hat{p}_{mk}\)` como la proporción de instancias de clase `\(k\)` en el nodo `\(m\)`.
+
+* Denominamos `\(k(m)\)` a la clase mayoritaria en el nodo `\(m\)` (aquella para la cual `\(\hat{p}_{mk}\)` es máximo)
+
+--
+
+* **Medidas de impuridad**
+
+  1. Error de clasificación:  `\(1 - \hat{p}_{mk(m)}\)`
+  2. Índice de Gini:  `\(\sum_{k=1}^K \hat{p}_{mk} (1- \hat{p}_{mk})\)`
+  3. Entropía cruzada: `\(- \sum_{k=1}^K \hat{p}_{mk} \log \hat{p}_{mk}\)`
+
+
+* Gini y entropía cruzada **son diferenciables**.
+
+* OJO: pesar con número de ejemplos en cada partición resultante!! Es decir, minimizar 
+
+`\begin{equation}
+n_L Q_L + n_R Q_R
+\end{equation}`
+
+---
+
+## Detalle técnico (1)
+
+* **Ejercicio**: ¿Cuántas particiones posibles de una variable categórica con `\(q\)` categorías en dos grupos existen?
+
+--
+
+* Fácil ver que `\(2^{q-1} - 1\)`. **Escalado catastrófico**.
+
+* Si la respuestas es binaria (0-1) hay solución. Sea `\(x\)` variable categórica con categorías `\(x^1, \dots, x^q\)`.
+
+* Ordenamos las categorías en orden creciente de `\(P(Y=1|x=x_i)\)`.
+
+* El corte óptimo es alguno de los que respeta este orden, si la impureza es Gini o entropía cruzada.
+
+--
+
+* También se cumple para output cuantitativo ordenando en valor creciente de la media de la respuesta.
+
+---
+
+## Detalle técnico (2)
+
+![:scale 100%](./img/cat_vars.png)
+
+---
 class: middle, center, inverse
 
 # Boosting
-
 ---
 
 ## Aprendiendo de los errores
