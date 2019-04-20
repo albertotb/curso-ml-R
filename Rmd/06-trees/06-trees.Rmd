@@ -621,13 +621,213 @@ Sustituyendo llegamos a la expresión de partida.
 
 class: middle, center, inverse
 
-# Colectividades
+# Métodos basados en Colectividades
 
 ---
 
+* **Ensembling methods**, también denominados **comités** de modelos.
+
+* Supongamos que tenemos 3 clasificadores $G_i(x)$, que para cierta instancia $x_0$ pronostican:
+
+\begin{align*}
+G_1(x_0) &= 1 \\
+G_2(x_0) &= 0 \\
+G_3(x_0) &= 1 \\
+\end{align*}
+
+* ¿Qué clase deberíamos asignar a $x_0$?
+
+--
+
+* Varias opciones:
+
+  * **Voto uniforme**: cada modelo cuenta lo mismo
+  
+  * **Voto ponderado**: asignamos mayor peso a los modelos con más confianza.
+  
+  * **Regresión**: tomamos la media o la mediana.
 
 
-   
+---
+
+## Ejemplo con dataset Iris
+
+* Árbol de clasificación (tasa de acierto: 92%)
+
+<center>
+![:scale 50%](./img/iris_tree.png)
+</center>
+
+
+---
+
+## Ejemplo con dataset Iris
+
+* kNN con $k=1$ (tasa de acierto: 90.7%)
+
+<center>
+![:scale 50%](./img/iris_1nn.png)
+</center>
+
+---
+
+## Ejemplo con dataset Iris
+
+* SVM (tasa de acierto: 92.7%)
+
+<center>
+![:scale 50%](./img/iris_svm.png)
+</center>
+
+
+---
+
+## Ejemplo con dataset Iris
+
+* Comité de los tres modelos anteriores, votación uniforme (tasa de acierto: **94%**)
+
+<center>
+![:scale 50%](./img/iris_com.png)
+</center>
+
+---
+
+## ¿Por qué funciona esto?
+
+* Por ejemplo, asumimos que tenemos 10 observaciones a clasificar (0 ó 1), cuyas etiquetas reales son 
+
+\begin{align*}
+1111111111
+\end{align*}
+
+--
+
+* Tenemos tres modelos incorrelados entre sí, cada uno con un 70% de precisión. Por tanto, tres ejemplos de predicciones de cada modelo podrían ser
+
+\begin{align*}
+0110101111 \\
+1010111110 \\
+1101110011 \\
+\end{align*}
+
+--
+
+* Al tomar la clase mayoritaria en cada observación, nos quedaría:
+
+\begin{align*}
+1110111111 
+\end{align*}
+
+(90% de precisión)
+
+---
+
+## Ejercicio (1)
+
+* Para el caso de regresión, demostrar que si los errores de $M$ modelos son incorrelados y de media $0$, entonces el error del comité es menor que los errores de cada modelo promediados
+
+--
+
+* La predicción del comité viene dada por
+
+\begin{equation*}
+y_{COM}(x) = \frac{1}{M} \sum_{m=1}^M y_m(x)
+\end{equation*}
+
+* Supongamos que la verdadera función de regresión es $h(x)$, por lo que cada modelo es de la forma
+
+\begin{equation*}
+y_m(x) = h(x) + \epsilon_m(x)
+\end{equation*}
+
+* El error (cuadrático) promedio es:
+
+\begin{equation*}
+\mathbb{E}_x \left[ (y_m(x) - h(x))^2\right] = \mathbb{E}_x \left[  \epsilon_m(x)^2 \right]
+\end{equation*}
+
+* El error, además promediado sobre $M$, es:
+
+\begin{equation*}
+E_{PR} =  \frac{1}{M} \sum_{m=1}^M \mathbb{E}_x \left[  \epsilon_m(x)^2 \right]
+\end{equation*}
+
+
+---
+
+## Ejercicio (2)
+
+* El error promedio para el comité es
+
+\begin{equation*}
+E_{COM} = \mathbb{E}_x \left[ ( \frac{1}{M} \sum_{m=1}^M y_m(x) - h(x)  )^2 \right]  = 
+\mathbb{E}_x \left[  (\frac{1}{M}\sum_{m=1}^M \epsilon_m(x))^2 \right]
+\end{equation*}
+
+* Con la hipótesis del enunciado:
+
+\begin{align*}
+\mathbb{E}_x \left[  \epsilon_m(x) \right] &= 0 \\
+\mathbb{E}_x \left[  \epsilon_m(x) \epsilon_n(x)  \right] &= 0 \qquad n \neq m
+\end{align*}
+
+
+* Obtenemos que 
+
+\begin{align*}
+E_{COM} = \mathbb{E}_x \left[  \frac{1}{M} \frac{1}{M} \sum_{m=1}^M \epsilon_m(x)^2 \right] = \frac{1}{M} E_{PR}
+\end{align*}
+
+* En general, los (errores de los) modelos **no serán totalmente incorrelados**.
+
+
+
+---
+
+## Promediado Bayesiano de modelos (BMA)
+
+* Los comités tiene una interpretación bastante natural en Estadística Bayesiana.
+
+* Asumimos que tenemos $k = 1, \ldots, K$ modelos distintos
+
+* $p(k)$ es la importancia de cada modelo.
+
+* $p(y|x,k)$ es la probabilidad de que el modelo $k$ clasifique $x$ como de clase $y$.
+
+* Por la Ley de Probabilidad Total:
+
+\begin{align*}
+p(y|x) = \sum_{k=1}^K p(y|x,k)p(k)
+\end{align*}
+
+* La suma sobre $k$ representa nuestra incertidumbre sobre cual de los $k$ modelos es el que más se aproxima a la realidad.
+
+---
+
+## Generalizando
+
+* Previamente teníamos un comité de la forma
+
+\begin{align*}
+p(y|x) = \sum_{k=1}^K p(y|x,k)\mathbf{p(k)}
+\end{align*}
+
+* ¿Por qué $p(k)$ debería ser homogénea (igual en todo el dominio $\mathcal{X}$)?
+
+--
+
+* Llegamos a las **mixturas de expertos**
+
+\begin{align*}
+p(y|x) = \sum_{k=1}^K p(y|x,k)\mathbf{p(k|x)}
+\end{align*}
+
+* Diferentes componentes se especializan en modelar distintas regiones del espacio $\mathcal{X}$.
+
+* La visión probabilista/Bayesiana del aprendizaje automático permite este tipo de construcciones, y da algoritmos generales para ajustarlos (como el algoritmo EM).
+
+* Más en las sesiones de modelos Bayesianos / Aprendizaje profundo.
+
 
 
 
