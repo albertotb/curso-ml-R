@@ -27,8 +27,8 @@ Descomprimer los datos!
 Carga el el train y test de la carpeta data.
 
 ```{r, message=F}
-train = read.csv("../06-trees/data/train_fraud.csv")
-test = read.csv("../06-trees/data/test_fraud.csv")
+train = read.csv("../06-trees/data/fraud/train_fraud.csv")
+test = read.csv("../06-trees/data/fraud/test_fraud.csv")
 ```
 
 Explora los datos. ¿Cuál es la prevalencia de fraude en cada conjunto?
@@ -80,7 +80,7 @@ precision = function(df, depth){
 
 recall = function(df, depth){
   tot = dim(df)[1]
-  totF = sum(totF = df[,2])
+  totF = sum(df[,2] == 1)
   inspect = floor(depth*tot)
   return(sum(df[1:inspect,2] == 1)/totF)
 }
