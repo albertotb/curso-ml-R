@@ -204,27 +204,104 @@ G_m(x),\quad m=1,\ldots,M
 
 ---
 
-## AdaBoost.M1 (1997)
+## AdaBoost.M1 (1997) (1)
 
-* Remuestrear los datos de entrenamiento, dando mayor pesado a las instancias mal clasificadas.
+* **Idea**: remuestrear los datos de entrenamiento, dando mayor peso a las instancias mal clasificadas.
 
-* Algoritmo
+* Algoritmo: input: $(x_i, y_i),\qquad y_i \in \lbrace -1, +1 \rbrace,\qquad 1 \leq i \leq N$.
 
-* Terminar con que AdaBoost es un modelo aditivo con una funcion de coste exponencial.
+  1. Inicialmente pesos uniformes: $w_i = \frac{1}{N}$
+  
+  2. Desde $m=1$ hasta $M$:
+    + Ajustar $G_m(x)$ a los datos de entrenamiento
+    + Calculamos el error sobre la muestra de entrenamiento
+    + Aumentamos $w_i$ en los ejemplos mal clasificados
+      
+
 
 ---
 
-## Generalizando AdaBoost.M1
+## AdaBoost.M1 (1997) (2)
+
+* Algoritmo: input: $(x_i, y_i),\qquad y_i \in \lbrace -1, +1 \rbrace,\qquad 1 \leq i \leq N$.
+
+  1. Inicialmente pesos uniformes: $w_i = \frac{1}{N}$
+  
+  2. Desde $m=1$ hasta $M$:
+    + Ajustar $G_m(x)$ a los datos de entrenamiento
+    + Cálculo del error ponderado:
+\begin{equation*}
+err_{m} = \frac{\sum_{i=1}^N w_i I(y_i \neq G_m(x_i))}{\sum_{i=1}^N w_i}
+\end{equation*}
+    + Calcular 
+\begin{equation*}
+\alpha_m = \log(\frac{1-err_m}{err_m})
+\end{equation*}
+    + Actualizar los pesos
+\begin{equation*}
+w_i \leftarrow w_i \exp \lbrace \alpha_m I(y_i \neq G_m(x_i)) \rbrace
+\end{equation*}
+  3. Predecir con $G(x) = \mbox{sign} \left[  \sum_{m=1}^M \alpha_m G_m(x)  \right]$
+
+
+---
+
+## ¿Qué ajusta realmente boosting?
+
+* Ajusta un modelo aditivo (GAM) de la forma 
+
+\begin{equation*}
+f(x) = \sum_{m=1}^M \beta_m b(x; \gamma_m)
+\end{equation*}
+
+* En el ámbito de los GAMs los parámetros $\beta_m, \gamma_m$ se ajustan de forma conjunta.
+
+* En boosting, esos parámetros se ajustan por etapas (en cada $m$), lo que conduce a un **aprendizaje lento** pero que en la práctica **reduce el sobreajuste** (overfitting).
 
 
 ---
 
 ## Mínimos cuadrados por etapas (stagewise LS)
 
+1. Tenemos 
+\begin{equation*}
+f_{m-1}(x) = \sum_{j=1}^{m-1} \beta_j b(x; \gamma_j)
+\end{equation*}
+
+2. Resolvemos
+
+\begin{equation*}
+\min_{\beta, \gamma} \sum_{j=1}^N (y_i - f_{m-1}(x_i) - \beta b(x_i; \gamma))^2
+\end{equation*}
+
+* Esto es: añadimos el término $\beta_m b(x; \gamma_m)$ que mejor ajuste los **residuales** ($y_i-f_{m-1}(x_i)$) tras la iteración $m-1$. 
+
+--
+
+* Podemos **generalizarlo cambiando la función de coste cuadrático**.
+
 
 ---
 
 ## La función de coste exponencial
+
+* Introducimos esta nueva función de coste:
+
+\begin{equation*}
+L(y, f(x)) = \exp (-y f(x))
+\end{equation*}
+
+* En cada iteración, hay que resolver
+
+\begin{equation*}
+\min_{\beta, \gamma} \sum_{j=1}^N \exp(- y_i f_{m-1}(x_i) + \beta b(x_i; \gamma))
+\end{equation*}
+
+--
+
+* ¿Por qué el coste exponencial?
+
+  * Es una cota superior monótona y diferenciable del error de clasificación
 
 
 ---
