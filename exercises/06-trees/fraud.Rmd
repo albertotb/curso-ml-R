@@ -27,22 +27,19 @@ Descomprimer los datos!
 Carga el el train y test de la carpeta data.
 
 ```{r, message=F}
-train = read.csv("../06-trees/data/train_fraud.csv")
-test = read.csv("../06-trees/data/test_fraud.csv")
+# Código
 ```
 
 Explora los datos. ¿Cuál es la prevalencia de fraude en cada conjunto?
 
 ```{r, message=F}
-sum(train$FRAUDE)/nrow(train)
+# Código
 ```
 
 Elimina las variables "X", "ID_TARJETA", "FC_AUTORIZACION" y convierte "FRAUDE" a factor
 ```{r, message=F}
-train[, c("X", "ID_TARJETA", "FC_AUTORIZACION")] = NULL
-train$FRAUDE = as.factor(train$FRAUDE)
+# Código
 ```
-
 
 
 ## Entrenamiento
@@ -50,7 +47,7 @@ train$FRAUDE = as.factor(train$FRAUDE)
 Entrena un random forest con 100 árboles. ¿Qué valores escoge por defect para mtry y nodesize? (Esto puede tardar varios minutos...)
 
 ```{r, message=F}
-rf = randomForest(FRAUDE ~ ., data = train, ntree = 100)
+# Código
 ```
 
 ## Predicción sobre el conjunto de test
@@ -58,13 +55,7 @@ rf = randomForest(FRAUDE ~ ., data = train, ntree = 100)
 Predice la probabilidad de fraude sobre el conjunto de test. Crea un dataframe con dos columnas, prob_fraude y fraude, que contengan la probabilidad de fraude y la etiqueta real respectivamente. Ordena este dataframe en orden decreciente de probabilidad de fraude.
 
 ```{r, message=F}
-vars = colnames(train)
-to_test = test[, vars]
-pred_proba = predict(rf, to_test, type = "prob")
-pred_proba = pred_proba[,2]
-y_true = test$FRAUDE
-results = data.frame("prob_fraude" = pred_proba, "fraude" = y_true)
-res_sort = results[order(-results$prob_fraude),]
+# Código
 ```
 
 ## Análisis de los resultados
@@ -107,15 +98,14 @@ precRecallPlot = function(df, min = 0.0001, max = 0.01, step = 0.00001){
 Pinta la curva para los resultados obtenidos
 
 ```{r}
-precRecallPlot(res_sort)
+# Código
 ```
 
 
 Si se decide inspeccionar una de cada mil transacciones, ¿qué porcentaje del total de fraude se caza?, ¿qué porcentaje de veces nos equivocamos?, ¿qué porcentajes se obtendrían clasificando al azar?
 
 ```{r}
-recall(res_sort, 0.001)
-precision(res_sort, 0.001)
+# Código
 ```
 
 
@@ -124,15 +114,12 @@ precision(res_sort, 0.001)
 Calcula la importancia de las variables usando los dos métodos explicados. Utiliza la funcion var varImpPlot. Tendrás que reentrenar el bosque, fijando importance = True. Hazlo con un subset pequeño del train
 
 ```{r}
-train_ind <- sample(seq_len(nrow(train)), size = 50000)
-def_train = train[train_ind, ]
-rf = randomForest(FRAUDE ~ ., data = def_train, ntree = 50, importance = TRUE)
+# Código
 ```
 
 
 ¿Existe mucha discrepancia entre métodos?
 ```{r}
-varImpPlot(rf, type=2)
-varImpPlot(rf, type=1)
+# Código
 ```
 

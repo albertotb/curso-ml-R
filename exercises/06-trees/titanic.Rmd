@@ -1,0 +1,92 @@
+---
+title: "Árboles de Decisión: Datos del Titanic"
+author: Victor Gallego y Roi Naveiro
+date: "22/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+```
+
+En este ejercicio, entrenaremos un árbol de decisión para predecir la supervivencia de los pasajeros del Titanic.
+
+## Lectura y Limpieza de los datos
+
+Carga el Dataset del Titanic de la carpeta data.
+
+```{r, message=F}
+# Código
+```
+
+Explora los datos. ¿Hay alguna variable con valores ausentes?
+
+```{r, message=F}
+# Código
+```
+
+Imputa los NAs de variables continuas con la mediana y de variables categóricas con la moda.
+
+```{r, message=F}
+# Código
+```
+
+Convierte las variables que sean categóricas a variables tipo factor.
+
+```{r}
+# Código
+```
+
+
+## Creación de conjuntos de train, test y validación.
+
+Divide los datos en train y test, utilizando porcentajes 80, 20; respectivamente.
+
+```{r, message=F}
+# Código
+```
+
+## Entrenamiento del árbol de decisión
+
+Crea un árbol de decisión usando únicamente las variables Embarked, Cabin Sex y Pclass.
+
+```{r, message=F}
+# Código
+```
+
+¿Cuál es su precisión en el conjunto de test?
+```{r}
+# Código
+```
+
+Pinta el árbol usando rpart.plot.
+
+```{r, message=F}
+# Código
+```
+
+## Poda del árbol
+
+Poda el árbol usando el mejor valor de cp (complexity parameter) obtenido usando validación curzada. Pinta el árbol.
+
+```{r}
+# Código
+```
+
+
+¿Cuál es la precisión ahora?
+
+```{r}
+# Código
+```
+
