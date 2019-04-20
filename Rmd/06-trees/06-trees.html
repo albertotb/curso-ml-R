@@ -4,7 +4,7 @@
     <title>Algoritmos de Árboles y Colectividades</title>
     <meta charset="utf-8" />
     <meta name="author" content="Víctor Gallego y Roi Naveiro" />
-    <meta name="date" content="2019-04-19" />
+    <meta name="date" content="2019-04-20" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Algoritmos de Árboles y Colectividades
 ## Curso de aprendizaje automático para el INE
 ### Víctor Gallego y Roi Naveiro
-### 2019-04-19
+### 2019-04-20
 
 ---
 
@@ -397,14 +397,73 @@ Sustituyendo llegamos a la expresión de partida.
 
 ## Muestras *Out of bag*
 
+* RF permite hacer validación cruzada al mismo tiempo que se entrena!!
+
+* En cada muestra bootstrap, es fácil probar que aproximadamente `\(1/3\)` de observaciones quedan fuera del correspondiente árbol.
+
+* Estas se denominan muestras *Out of Bag* (OOB).
+
+--
+
+* Para construír una estimación del OOB: Para cada observación `\((x_i, y_i)\)` construír su predictor promediando únicamente los árboles correspondientes a muestras bootstrap donde no aparece `\((x_i, y_i)\)`.
+
+* Esta estimación es asintóticamente idéntica a la obtenida con N-fold cross validation.
+
+* Usar esto para validar los hiperparámetros de interés!
+
+--
+
+* Se puede probar que RF no incremenetan el error de generalización cuando se añaden más árboles.
+
+* Luego se puede observar el comportamiento del error OOB y terminar el entrenamiento cuando este se estabiliza.
+
 ---
 
 ## Medidas de importancia de las variables
 
+* Dos formas posibles de medir importancia.
+
+
+* Para cada variable `\(m\)` medir cuánto decrece el criterio de impuridad Gini (o la entropía) en cada corte de esta variable y cada árbol del bosque.
+
+* Sumar a todos los árboles.
+
+--
+
+* Pasar las muestras oob por el enésimo árbol y calcular la precisión.
+
+* Permutar aleatoriamente el valor de la variable `\(m\)` en las muestras OOB y calcular de nuevo la precisión.
+
+* Promediar el decrecimiento en precisión en todos los árboles del bosque.
+
+* Cuanto más decrece la precisión debido a permutaciones de la variable `\(m\)`, más importante es la variable-
+
+--
+
+* La medida de decrecimiento del criterio de impuridad puede favorecer a variables con número de categorías muy alto (respecto a variables con pocas categorías).
+
+
 ---
 
-## Gráficos de proximidad
+## Matrices de proximidad y valores ausentes
 
+* Al crecer un RF, se puede calcular la metriz `\(N \times N\)` de proximidad.
+
+* Para cada árbol, cualquier par de observaciones OOB que compartan el nodo terminal, incrementar su proximidad en una unidad.
+
+--
+
+* Esto puede utilizarse para imputar valores ausentes.
+
+* En primer lugar, rellenar los valores ausentes de manera poco precisa (mediana o moda de ejemplos de la misma clase).
+
+* Calcular la matriz de proximidad.
+
+--
+
+* Para una variable contínua `\(m\)`, si es ausente en el ejemplo `\(n\)`, imputarla con la media de los valores no ausentes de esa variable, pesada con la proximidad entre el ejemplo `\(n\)` y el ejemplo no ausente.
+
+* Si es categórica, imputar con el valor más frecuente, con frecuencias pesadas con la proximidad.
 
 ---
 
