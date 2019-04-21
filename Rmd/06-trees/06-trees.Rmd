@@ -204,6 +204,14 @@ G_m(x),\quad m=1,\ldots,M
 
 ---
 
+## Aprendiendo de los errores
+
+<center>
+![:scale 100%](./img/bossting.png)
+</center>
+
+---
+
 ## AdaBoost.M1 (1997) (1)
 
 * **Idea**: remuestrear los datos de entrenamiento, dando mayor peso a las instancias mal clasificadas.
@@ -274,7 +282,7 @@ f_{m-1}(x) = \sum_{j=1}^{m-1} \beta_j b(x; \gamma_j)
 \min_{\beta, \gamma} \sum_{j=1}^N (y_i - f_{m-1}(x_i) - \beta b(x_i; \gamma))^2
 \end{equation*}
 
-* Esto es: añadimos el término $\beta_m b(x; \gamma_m)$ que mejor ajuste los **residuales** ($y_i-f_{m-1}(x_i)$) tras la iteración $m-1$. 
+* Esto es: añadimos el término $\beta_m b(x; \gamma_m)$ que mejor ajuste los **residuales** ( $y_i - f_{m-1}(x_i)$ ) tras la iteración $m-1$. 
 
 --
 
@@ -306,6 +314,28 @@ L(y, f(x)) = \exp (-y f(x))
   * Da lugar a una actualización de remuestreo simple.
   
   * $\mbox{argmin}_{f(x)} \mathbb{E}_{Y|x} \left[ \exp(-Yf(x))\right] = \frac{1}{2} \log \frac{P(Y = +1|x)}{P(Y = -1|x)} \rightarrow P(Y = +1|x) = \frac{1}{1 + \exp(-2 f^*(x))}$, lo cual justifica la regla predictiva del signo.
+<center>  
+![:scale 50%](./img/expVsacc.png)
+</center>
+
+  
+---
+
+## Otras funciones objetivo
+
+* Clasificación
+
+  + Exponencial: $\exp(-yf(x))$.
+  
+  + Desviación binomial (más robusta): $\log (1 + \exp(-2yf(x)))$.
+  
+--
+  
+* Regresión
+
+  + Cuadrático: $\frac{1}{2}(y - f(x))^2$.
+  
+  + Valor absoluto: $| y - f(x) |$.
 
 
 ---
@@ -833,7 +863,7 @@ G_3(x_0) &= 1 \\
 
 --
 
-* Tenemos tres modelos incorrelados entre sí, cada uno con un 70% de precisión. Por tanto, tres ejemplos de predicciones de cada modelo podrían ser
+* Tenemos tres modelos incorrelados entre sí, cada uno con un 70% de tasa de acierto. Por tanto, tres ejemplos de predicciones de cada modelo podrían ser
 
 \begin{align*}
 0110101111 \\
@@ -849,7 +879,7 @@ G_3(x_0) &= 1 \\
 1110111111 
 \end{align*}
 
-(90% de precisión)
+(90% de tasa de acierto)
 
 ---
 
