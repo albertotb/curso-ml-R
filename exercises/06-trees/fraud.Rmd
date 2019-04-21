@@ -1,0 +1,125 @@
+---
+title: "Random Forest: Detección de Fraude"
+author: Victor Gallego y Roi Naveiro
+date: "22/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(randomForest)
+library(reshape2)
+library(ggplot2)
+```
+
+En este ejercicio, entrenaremos un clasificador Random Forest sobre datos bancarios para la detección de fraude. Los datos de fraude son **altamente desbalanceados**-
+
+## Lectura y preparación de los datos
+
+Descomprimer los datos!
+
+Carga el el train y test de la carpeta data.
+
+```{r, message=F}
+# Código
+```
+
+Explora los datos. ¿Cuál es la prevalencia de fraude en cada conjunto?
+
+```{r, message=F}
+# Código
+```
+
+Elimina las variables "X", "ID_TARJETA", "FC_AUTORIZACION" y convierte "FRAUDE" a factor
+```{r, message=F}
+# Código
+```
+
+
+## Entrenamiento
+
+Entrena un random forest con 100 árboles. ¿Qué valores escoge por defect para mtry y nodesize? (Esto puede tardar varios minutos...)
+
+```{r, message=F}
+# Código
+```
+
+## Predicción sobre el conjunto de test
+
+Predice la probabilidad de fraude sobre el conjunto de test. Crea un dataframe con dos columnas, prob_fraude y fraude, que contengan la probabilidad de fraude y la etiqueta real respectivamente. Ordena este dataframe en orden decreciente de probabilidad de fraude.
+
+```{r, message=F}
+# Código
+```
+
+## Análisis de los resultados
+
+A continuación damos un conjunto de funciones auxiliares para calcular precisión y recall a una profundidad dada, así como para pintar la curva precisión-recall
+
+```{r, message=F}
+precision = function(df, depth){
+  tot = dim(df)[1]
+  inspect = floor(depth*tot)
+  return(sum(df[1:inspect,2] == 1)/inspect)
+}
+
+recall = function(df, depth){
+  tot = dim(df)[1]
+  totF = sum(totF = df[,2])
+  inspect = floor(depth*tot)
+  return(sum(df[1:inspect,2] == 1)/totF)
+}
+
+
+precRecallPlot = function(df, min = 0.0001, max = 0.01, step = 0.00001){
+  Recall = c()
+  Precision = c()
+  Depth = c()
+  for(i in seq(min, max, step)){
+    Depth = c(Depth, i)
+    Recall = c(Recall, recall(df, i))
+    Precision = c(Precision, precision(df, i))
+  }
+  
+  results = data.frame(Depth = Depth, recall = Recall, precision = Precision)
+  meltedResults = melt(results, id = "Depth")
+  p = ggplot(meltedResults, aes(x = Depth, y = value, color = variable))
+  p = p + geom_line() + xlab("Depth") + ylab("Value")
+  p
+}
+```
+
+Pinta la curva para los resultados obtenidos
+
+```{r}
+# Código
+```
+
+
+Si se decide inspeccionar una de cada mil transacciones, ¿qué porcentaje del total de fraude se caza?, ¿qué porcentaje de veces nos equivocamos?, ¿qué porcentajes se obtendrían clasificando al azar?
+
+```{r}
+# Código
+```
+
+
+## Importancia de las variables
+
+Calcula la importancia de las variables usando los dos métodos explicados. Utiliza la funcion var varImpPlot. Tendrás que reentrenar el bosque, fijando importance = True. Hazlo con un subset pequeño del train
+
+```{r}
+# Código
+```
+
+
+¿Existe mucha discrepancia entre métodos?
+```{r}
+# Código
+```
+

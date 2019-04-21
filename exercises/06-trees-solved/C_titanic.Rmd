@@ -1,0 +1,102 @@
+---
+title: "Árboles de Decisión: Datos del Titanic"
+author: Victor Gallego y Roi Naveiro
+date: "22/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+```
+
+En este ejercicio, entrenaremos un árbol de decisión para predecir la supervivencia de los pasajeros del Titanic.
+
+## Lectura y Limpieza de los datos
+
+Carga el Dataset del Titanic de la carpeta data.
+
+```{r, message=F}
+data <- read.csv("../06-trees/data/titanic.csv")
+```
+
+Explora los datos. ¿Hay alguna variable con valores ausentes?
+
+```{r, message=F}
+dim(data)
+summary(data)
+```
+
+Imputa los NAs de variables continuas con la mediana y de variables categóricas con la moda.
+
+```{r, message=F}
+data$Age <- sapply(data$Age, FUN=function(x) {ifelse(is.na(x),median(data$Age, na.rm = TRUE),x)})
+```
+
+Convierte las variables que sean categóricas a variables tipo factor.
+
+```{r}
+factor_vars <- c('PassengerId','Pclass','Sex','Embarked','Cabin')
+data[factor_vars] <- lapply(data[factor_vars], function(x) as.factor(x))
+```
+
+
+## Creación de conjuntos de train, test y validación.
+
+Divide los datos en train y test, utilizando porcentajes 80, 20; respectivamente.
+
+```{r, message=F}
+totrain = floor( nrow(data)*0.8  )
+ind_train = sample(seq_len(nrow(data)), size = totrain)
+
+train = data[ind_train, ]
+test = data[-ind_train, ]
+```
+
+## Entrenamiento del árbol de decisión
+
+Crea un árbol de decisión usando únicamente las variables Embarked, Cabin Sex y Pclass.
+
+```{r, message=F}
+fit <- rpart(Survived ~ Pclass + Sex + Embarked + Cabin, train, method = "class", cp=0)
+```
+
+¿Cuál es su precisión en el conjunto de test?
+```{r}
+preds = predict(fit, test, type = "class")
+sum(preds == test$Survived)/nrow(test)
+```
+
+Pinta el árbol usando rpart.plot.
+
+```{r, message=F}
+rpart.plot(fit, type=1, extra = 102)
+```
+
+## Poda del árbol
+
+Poda el árbol usando el mejor valor de cp (complexity parameter) obtenido usando validación curzada. Pinta el árbol.
+
+```{r}
+pfit<- prune(fit, cp=   fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
+rpart.plot(pfit, type=1, extra = 102)
+```
+
+
+¿Cuál es la precisión ahora?
+
+```{r}
+preds = predict(pfit, test, type = "class")
+sum(preds == test$Survived)/nrow(test)
+```
+

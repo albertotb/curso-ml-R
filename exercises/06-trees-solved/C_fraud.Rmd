@@ -1,0 +1,138 @@
+---
+title: "Random Forest: Detección de Fraude"
+author: Victor Gallego y Roi Naveiro
+date: "22/04/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(randomForest)
+library(reshape2)
+library(ggplot2)
+```
+
+En este ejercicio, entrenaremos un clasificador Random Forest sobre datos bancarios para la detección de fraude. Los datos de fraude son **altamente desbalanceados**-
+
+## Lectura y preparación de los datos
+
+Descomprimer los datos!
+
+Carga el el train y test de la carpeta data.
+
+```{r, message=F}
+train = read.csv("../06-trees/data/fraud/train_fraud.csv")
+test = read.csv("../06-trees/data/fraud/test_fraud.csv")
+```
+
+Explora los datos. ¿Cuál es la prevalencia de fraude en cada conjunto?
+
+```{r, message=F}
+sum(train$FRAUDE)/nrow(train)
+```
+
+Elimina las variables "X", "ID_TARJETA", "FC_AUTORIZACION" y convierte "FRAUDE" a factor
+```{r, message=F}
+train[, c("X", "ID_TARJETA", "FC_AUTORIZACION")] = NULL
+train$FRAUDE = as.factor(train$FRAUDE)
+```
+
+
+
+## Entrenamiento
+
+Entrena un random forest con 100 árboles. ¿Qué valores escoge por defect para mtry y nodesize? (Esto puede tardar varios minutos...)
+
+```{r, message=F}
+rf = randomForest(FRAUDE ~ ., data = train, ntree = 100)
+```
+
+## Predicción sobre el conjunto de test
+
+Predice la probabilidad de fraude sobre el conjunto de test. Crea un dataframe con dos columnas, prob_fraude y fraude, que contengan la probabilidad de fraude y la etiqueta real respectivamente. Ordena este dataframe en orden decreciente de probabilidad de fraude.
+
+```{r, message=F}
+vars = colnames(train)
+to_test = test[, vars]
+pred_proba = predict(rf, to_test, type = "prob")
+pred_proba = pred_proba[,2]
+y_true = test$FRAUDE
+results = data.frame("prob_fraude" = pred_proba, "fraude" = y_true)
+res_sort = results[order(-results$prob_fraude),]
+```
+
+## Análisis de los resultados
+
+A continuación damos un conjunto de funciones auxiliares para calcular precisión y recall a una profundidad dada, así como para pintar la curva precisión-recall
+
+```{r, message=F}
+precision = function(df, depth){
+  tot = dim(df)[1]
+  inspect = floor(depth*tot)
+  return(sum(df[1:inspect,2] == 1)/inspect)
+}
+
+recall = function(df, depth){
+  tot = dim(df)[1]
+  totF = sum(df[,2] == 1)
+  inspect = floor(depth*tot)
+  return(sum(df[1:inspect,2] == 1)/totF)
+}
+
+
+precRecallPlot = function(df, min = 0.0001, max = 0.01, step = 0.00001){
+  Recall = c()
+  Precision = c()
+  Depth = c()
+  for(i in seq(min, max, step)){
+    Depth = c(Depth, i)
+    Recall = c(Recall, recall(df, i))
+    Precision = c(Precision, precision(df, i))
+  }
+  
+  results = data.frame(Depth = Depth, recall = Recall, precision = Precision)
+  meltedResults = melt(results, id = "Depth")
+  p = ggplot(meltedResults, aes(x = Depth, y = value, color = variable))
+  p = p + geom_line() + xlab("Depth") + ylab("Value")
+  p
+}
+```
+
+Pinta la curva para los resultados obtenidos
+
+```{r}
+precRecallPlot(res_sort)
+```
+
+
+Si se decide inspeccionar una de cada mil transacciones, ¿qué porcentaje del total de fraude se caza?, ¿qué porcentaje de veces nos equivocamos?, ¿qué porcentajes se obtendrían clasificando al azar?
+
+```{r}
+recall(res_sort, 0.001)
+precision(res_sort, 0.001)
+```
+
+
+## Importancia de las variables
+
+Calcula la importancia de las variables usando los dos métodos explicados. Utiliza la funcion var varImpPlot. Tendrás que reentrenar el bosque, fijando importance = True. Hazlo con un subset pequeño del train
+
+```{r}
+train_ind <- sample(seq_len(nrow(train)), size = 50000)
+def_train = train[train_ind, ]
+rf = randomForest(FRAUDE ~ ., data = def_train, ntree = 50, importance = TRUE)
+```
+
+
+¿Existe mucha discrepancia entre métodos?
+```{r}
+varImpPlot(rf, type=2)
+varImpPlot(rf, type=1)
+```
+

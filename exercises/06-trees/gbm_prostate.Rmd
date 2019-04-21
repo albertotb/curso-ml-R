@@ -1,0 +1,94 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+----
+title: "GBM en R"
+author: "Víctor Gallego, Roi Naveiro"
+date: "21 de abril de 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = T)
+set.seed(1)
+```
+
+## GBM en R
+
+En esta práctica usaremos la librería gbm de R para ajustar un conjunto de árboles de decisión mediante boosting. Lo evaluaremos en el dataset de datos de próstata.
+
+
+1. Cargar fichero en R y librería gbm
+
+```{r}
+library(gbm)
+data <- read.csv('../../data/prostate.data', header = TRUE, row.names = 1)
+```
+
+2. Separar en train/test de acuerdo con los valores de la columna `train`
+
+```{r}
+
+```
+
+
+2. (Opcional, solo para ver que gbm es capaz de tratar con variables a diferentes escalas) Escalar las variables para que tengan media 0 y varianza 1 (menos `lpsa`)
+
+```{r}
+
+```
+
+
+
+
+3. Ajustamos un modelo para predecir el valor mediano en función del resto de variables,
+ para 5000 iteraciones y 4 interacciones máximas en cada árbol, y shrinkage de 0.4
+ Escoger el argumento distribution adecuado
+```{r}
+
+```
+
+4. Obtener la importancia de cada variable usando summary
+```{r}
+
+```
+
+
+5. Obtener el gráfico de dependencia parcial para las dos variables más importantes, tanto de forma independiente como de forma conjunta las dos
+
+```{r}
+
+```
+
+
+6. Representar el RMSE sobre el conjunto de test en función del número de árboles utilizados
+en la predicción 
+```{r}
+
+```
+
+7. Ahora, usaremos la librería caret para ajustar los siguientes hiperparámetros mediante CV.
+Recordatorio:
+* Usa trainControl para especificar validación cruzada con 10 cortes.
+* Usa expand.grid para especificar los siguientes hiperparámetros:
+  + profundidades: de 1 a 4.
+  + número de iteraciones: de 50 a 1500 contando de 50 en 50.
+  + shrinkage: 0.1 o 0.3.
+  + n.minobsinnode: 5.
+```{r}
+
+```
+
+8. Mostrar los hiperparámetros del mejor modelo, y hacer plot del objeto modelo ajustado
+```{r}
+
+```
+
+9. Ajustar gbm al training set entero con los hiperparámetros anteriores. Realizar predicciones sobre el conjunto inicial de test y obtener el nuevo RMSE
+```{r}
+
+```
+
+
