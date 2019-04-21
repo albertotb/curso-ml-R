@@ -45,7 +45,7 @@ class: middle, center, inverse
 * Supongamos que particionamos el espacio de variables predictoras en $M$ regiones $R_1, \dots, R_M$ y para cada una ajustamos una constante $c_m$. La respuestas es
 
 \begin{equation}
-f(x) = \sum_{m=1}^M c_m I()x \in R_m
+f(x) = \sum_{m=1}^M c_m I(x \in R_m)
 \end{equation}
 
 * Si nuestro criterio es minimizar $\sum (y_i - f(x_i))^2$, entonces dada la región $R_m$ la mejor $c_m$ es la media de los $y_i$ de los $x_i \in R_m$.
@@ -301,24 +301,78 @@ L(y, f(x)) = \exp (-y f(x))
 
 * ¿Por qué el coste exponencial?
 
-  * Es una cota superior monótona y diferenciable del error de clasificación
+  * Es una cota superior monótona y diferenciable del error de clasificación.
+  
+  * Da lugar a una actualización de remuestreo simple.
+  
+  * $\mbox{argmin}_{f(x)} \mathbb{E}_{Y|x} \left[ \exp(-Yf(x))\right] = \frac{1}{2} \log \frac{P(Y = +1|x)}{P(Y = -1|x)} \rightarrow P(Y = +1|x) = \frac{1}{1 + \exp(-2 f^*(x))}$, lo cual justifica la regla predictiva del signo.
 
 
 ---
 
 ## Implementación con árboles
 
+* ¿Qué usamos como modelo débil dentro del esquema de boosting?
+
+* Hastie, Tibshirani et al. argumentan que los árboles de decisión son excelentes para ser usados como clasificadores/regresores débiles (ver siguiente slide)
+
+--
+
+* Por tanto, la estructura del modelo colectivo será
+
+\begin{align*}
+f_M(x) = \sum_{m=1}^M T(x, \Theta_m)
+\end{align*}
+
+* donde $T(x, \Theta) = \sum_{j=1}^J c_j I(x \in R_j)$ es un árbol de decisión. 
+
+---
+
+## Implementación con árboles
+
+<center>
+![:scale 70%](./img/models.png)
+</center>
+
 ---
 
 ## Gradient Boosting
 
-* Intuición
+* En cada iteración, habrá que resolver
+
+\begin{equation*}
+\hat{\Theta}_m = \mbox{argmin}_{\Theta_m} \sum_{i=1}^N L(y_i, f_{m-1}(x_i) + T(x_i; \Theta_m))
+\end{equation*}
+
+* Resolverlo de forma exacta es muy costoso.
+
+--
+
+* Aprovechando que la función de coste es diferenciable, calculamos los gradientes
+
+\begin{equation*}
+g_{im} = \left[ \frac{\partial L(y_i, f(x_i))}{\partial f(x_i)} \right]_{f(x_i) = f_{m-1}(x_i)}
+\end{equation*}
+
+* $f_{m-1}(x_i) - lr*g_{im}$ tiene menos pérdida que $f_{m-1}(x_i)$.
+
+* Por tanto, $T(x_i, \Theta_m)$ será un **árbol de regresión** ajustado a predecir los gradientes $g_{im}$ !!
 
 ---
 
-## Gradient Boosting
+## Gradient Boosting (Algoritmo)
 
-* Algoritmo
+* Modelo inicial: $f_0(x) = \mbox{argmin}_{\gamma} \sum_{i=1}^N L(y_i, \gamma)$
+
+* Desde $m=1$ hasta $M$:
+  
+  1. Calcular gradientes $g_{im}$.
+  
+  2. Ajustar un árbol de regresión al target $-g_{im}$, obteniendo las regiones terminales $R_{jm},j=1,\ldots,J_m$.
+  
+  3. Para cada región $R_{jm}$, calcular $\gamma_{jm} = \mbox{argmin}_{\gamma} \sum_{x_i \in R_{jm}} L(y_i, f_{m-1}(x_i) + \gamma)$.
+  
+  4. Actualizar: $f_{m} (x) = f_{m-1}(x) + \sum_{j=1}^{J_{m}} \gamma_{jm} I(x \in R_{jm})$.
 
 ---
 
