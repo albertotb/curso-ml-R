@@ -4,7 +4,7 @@
     <title>Support Vector Machines</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alberto Torres Barrán" />
-    <meta name="date" content="2019-04-22" />
+    <meta name="date" content="2019-04-23" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Support Vector Machines
 ## Curso de aprendizaje automático para el INE
 ### Alberto Torres Barrán
-### 2019-04-22
+### 2019-04-23
 
 ---
 
@@ -234,16 +234,47 @@ No vamos a entrar en detalles
 class: middle, center
 
 ![](./img/toy1.png)
+---
+
+## SVM: solución
+
+* Dada una solución del problema dual `\(\alpha^*\)`, los coeficientes originales son `$$w^* = \sum_{i=1}^n{\alpha_i^* y_i x_i}$$`
+
+* Para cualquier vector de soporte `\((\alpha_i &gt; 0)\)`: 
+`$$y_i(x_i^T w^* + b^*) = 1 \quad \Rightarrow \quad b^* = 1/y_i - x_i^T w^*$$`
+* En la práctica se hace la media para todos los vectores de soporte (estabilidad numérica)
 
 ---
 
-## Soft-margin SVM
+## SVM: margen flexible
 
-* The SVM can be extended to the case where the classes are not separable by an hyperplane.
+* ¿Que pasa si ambas clases no son separables por un hiperplano?
 
-* We introduce *slack variables* `\(\xi_i \geq 0\)` that allow for a point to be inside de margin, `\(0 &lt; \xi_i \leq 1\)`, or missclassified `\(\xi_i &gt; 1\)`.
+* Idea: maximizar el margen, pero permitir que algunos puntos estén en el lado incorrecto
 
-* We want to still maximize the margin while minimizing the missclassified points, which are upper-bounded by `\(\sum{\xi_i}\)`,
+* Cambiar las restricciones por: `$$y_i(x_i^T w + b) \geq M(1 - \xi_i)$$` con `\(\xi_i \geq 0\)` y `\(\sum{\xi_i} \leq \text{cte.}\)`
+
+* `\(\xi_i\)` indican la cantidad en proporcion por la que una variable está en el lado incorrecto:
+
+  1. `\(\xi_i = 0\)`, punto clasificado correctamente
+  
+  2. `\(0 &lt; \xi_i \leq 1\)`, punto **dentro** del margen
+  
+  3. `\(\xi &gt; 1\)`, punto clasificado incorrectamente
+
+---
+
+class: center, middle
+
+![](./img/hard_vs_soft.png)
+
+---
+
+## C-SVM: formulación
+
+* Número de puntos mal clasificados acotado superiormente por `\(\sum{\xi_i}\)`
+
+* Maximizar el margen y minimizar el número de errores de clasificación:
 
 `\begin{aligned}
 \min_{w,b,\xi}  &amp;&amp;&amp; \frac{1}{2}||w||_2^2 + C\sum{\xi_i}\\
@@ -251,30 +282,133 @@ class: middle, center
             &amp;&amp;&amp; \xi_i \geq 0\quad \forall i.\\
 \end{aligned}`
 
----
+* `\(C &gt; 0\)` es un hiper-parámetro que controla la complejidad:
 
-class: center, middle
-
-![:scale 70%](./img/softmargin.png)
-
-[Fuente](http://efavdb.com/svm-classification/)
+  1. `\(\uparrow C\)`, más importancia a clasificar correctamente todos los puntos (menos regularización)
+  
+  2. `\(\downarrow C\)`, más importancia a maximizar el margen (más regularización)
 
 ---
 
-## SVM dual formulation
+## Efecto de C
 
-*  The dual formulation of the soft-margin SVM is
+![](./img/linear_svm_regularization.png)
+
+Andreas C. Müller, [Linear Models for Classification](https://amueller.github.io/COMS4995-s18/slides/aml-06-020518-linear-models-classification/#1)
+
+---
+
+## C-SVM: formulación dual
+
+* La formulación dual es:  
 
 `\begin{aligned}
-\min_{\alpha}  &amp;&amp;&amp; \frac{1}{2}\alpha^T \Qbf \alpha - \alpha^T \mathbf{1}\\
-\mbox{s.t} &amp;&amp;&amp; \sum{\alpha_i y_i} = 0, \\  
-           &amp;&amp;&amp; 0 \leq \alpha_i \leq C,\; i=1,\dots,n. \\
+\max_{\alpha}  &amp;&amp;&amp; \sum_i{\alpha_i} - \frac{1}{2}\sum_{i,j}{\alpha_i \alpha_j y_i y_j x_i^T x_j}\\
+\mbox{s.t}  &amp;&amp;&amp; 0 \leq \alpha_i \leq C\quad \forall i \\
+            &amp;&amp;&amp; \sum_{i}{\alpha_i y_i} = 0. \\
 \end{aligned}`
 
-where `\(\Qbf\)` is a `\(n\times n\)` matrix with entries `\(Q_{ij} = y_i y_j x_i^T x_j\)`.
+* Notación vectorial:
+`$$\min_{\alpha}\, \bigg\{\frac{1}{2}\alpha^T \Qbf \alpha - \alpha^T \mathbf{1}\bigg\} \quad \text{s.t.} \quad {\alpha^T y = 0\quad \text{y}\quad 0 \leq \alpha_i \leq C,\;\forall i}$$`
+donde `\(\Qbf\)` es una matriz `\(n\times n\)` con elementos `\(Q_{ij} = y_i y_j x_i^T x_j\)`.
 
-* It can be easily extended to the non-linear case replacing the dot products by a kernel,
-`$$k(x_i, x_j) = \phi(x_i)^T \phi(x_j),$$` where `\(\phi(\cdot)\)` are non-linear functions.
+---
+
+## SVM no lineal
+
+* C-SVM acepta datos no separables linealmente, pero la frontera de decisión es lineal (hiperplano)
+
+* Idea: transformar variables originales en otras variables de mayor dimensión
+
+* En el espacio ampliado esperamos que las clases sean separables linealmente
+
+* Si las transformaciones son no lineales, se traduce en una frontera de decisión no lineal en el espacio original
+
+* Similar a lo que vimos en regresión lineal de añadir expansiones polinómicas
+
+---
+
+class: middle, center
+
+![](./img/nonlinear_svm.jpg)
+
+Muhammad Awais Bin Altaf, [Research Gate](https://www.researchgate.net/publication/272520997_A_183_mJClassification_8-Channel_Patient-Specific_Epileptic_Seizure_Classification_SoC_Using_a_Non-Linear_Support_Vector_Machine)
+
+
+---
+
+## SVM no lineal: problemas
+
+* `\(\phi(x_i): R^d \rightarrow R^D\)`, con `\(D &gt;&gt; d\)`
+
+* Si intentamos calcular la función `\(\phi(x_i)\)` explicitamente:
+
+  1. El espacio ampliado puede tener dimensión `\(D\)` muy grande, incluso infinita
+  
+  2. Computacionalmente muy costoso calcular la función `\(\phi\)` cada vez que sea necesario
+  
+  3. Complicado de almacenar en memoria
+
+---
+
+## Kernel trick
+
+* Elementos de la matriz `\(\Qbf\)`,  `\(Q_{ij} = y_i y_j x_i^T x_j\)`
+
+* Solo depende del producto escalar de `\(x_i\)` y `\(x_j\)`
+
+* Podemos reemplazar el producto escalar por una función de kernel:
+`$$k(x_i, x_j) = \phi(x_i)^T \phi(x_j)$$` 
+
+* No es necesario calcular `\(\phi\)` explicitamente, solo `\(k\)`
+
+* `\(k\)` cualquier función simétrica (semi-) definida positiva
+
+* Ejemplos:
+  
+  1. Kernel polinómico: `\(k(x, x') = (1 + x^T x')^d\)` 
+
+  2. Kernel RBF: `\(k(x, x') = \exp(-\gamma||x - x'||^2_2)\)`
+  
+
+---
+
+## SVM no lineal
+
+* Problema optimización: `$$\min_{\alpha}\, \bigg\{\frac{1}{2}\alpha^T \Qbf \alpha - \alpha^T \mathbf{1}\bigg\} \quad \text{s.t.} \quad {\alpha^T y = 0\quad \text{y}\quad 0 \leq \alpha_i \leq C,\;\forall i}$$` con `\(Q_{ij} = y_i y_j k(x_i, x_j)\)`
+
+* `\(\Qbf\)` es la **matriz de kernel**
+
+* Valor de hiper-parámetros es crítico para buen rendimiento:
+  
+  1. `\(C\)`, parámetro de complejidad
+  
+  2. Parámetros del kernel, por ejemplo `\(\gamma\)` en el kernel RBF
+
+---
+
+## Cálculo de w y b
+
+* El valor de `\(w\)` es ahora: `$$w^* = \sum_{i=1}^n{\alpha_i^* y_i \phi(x_i)}$$`
+
+* No podemos calcular su valor explicitamente, pero dado un nuevo `\(x'\)`: 
+
+`\begin{aligned}
+f(x') = \phi(x')^T w^* + b^* &amp;= \sum_{i=1}^n{\alpha_i^* y_i \phi(x')^T \phi(x_i)} + b^* \\ 
+                             &amp;= \sum_{i=1}^n{\alpha_i^* y_i k(x', x_i)} + b^*
+\end{aligned}`
+
+* `\(b^*\)` se puede calcular como antes, resolviendo `\(y_i f(x_i) = 1\)` para cualquier vector de soporte `\((\alpha_i &gt; 0)\)`
+
+
+---
+
+## SVM para regresión
+
+---
+
+## SVM como regularización
+
 
 ---
 
@@ -309,6 +443,18 @@ where `\(e_k\)` is the vector with all `\(0\)` but a `\(1\)` in position `\(k\)`
 *  `\(\rho\)` is computed by minimizing the function in the direction `\(d\)` (line search).
 
 *  We may need to clip `\(\rho\)` to satisfy the constraints.
+
+---
+
+## SVM en R
+
+[LIBLINEAR](https://www.csie.ntu.edu.tw/~cjlin/liblinear/)
+
+[LIBSVM](https://www.csie.ntu.edu.tw/~cjlin/libsvm/)
+
+[LiblineaR](https://cran.r-project.org/web/packages/LiblineaR/)
+
+[e1071](https://cran.r-project.org/web/packages/e1071/)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
