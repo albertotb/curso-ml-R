@@ -17,6 +17,14 @@ output:
   keep_md: true
 ---
 
+---
+
+class: middle, inverse, center
+
+# Introducción
+
+---
+
 ## Introducción
 
  * Regresión logística y LDA son clasificadores lineales
@@ -30,6 +38,9 @@ output:
     - Perceptron
     
     - SVM
+    
+ * Dado $y \in \{-1, 1\}$ y $f(x)$, podemos definir la regla de clasificación
+$$G(x) = \text{sign}\,f(x)$$
 
 ---
 
@@ -37,25 +48,46 @@ output:
 
  * Rosenblatt, 1958
  
- * Inspiración de las redes neuronales
+ * Inspirado en las neuronas biológicas
+ 
+ * Inspiración a su vez de las redes neuronales de los 80
  
  * Idea: minimizar la distancia de los puntos mal clasificados:
  
     1. Si $y_i = 1$, $x_i^T w + b < 0$
     
-    2. Si $y_i = -1$, $x_i^T w + b> 0$
+    2. Si $y_i = -1$, $x_i^T w + b > 0$
 
- * Definimos $D(w_0, w) = - \sum_{i \in M}{y_i(x_i^T w + b)}$
+ * Definimos $D(b, w) = - \sum_{i \in M}{y_i(x_i^T w + b)}$
 
     * Positiva
     
-    * Proporcional a la distancia de los puntos mal clasificados a la printera
+    * Proporcional a la distancia de los puntos mal clasificados a la frontera
 
-???
 
-Stochastic gradient descent: a step is taken after each observation is visited.
-Hence the misclassified observations are visited in some sequence, and the
-parameters β are updated
+---
+
+class: middle, center
+
+![](./img/perceptron.png)
+
+[Fuente](https://towardsdatascience.com/perceptron-the-artificial-neuron-4d8c70d5cc8d)
+
+---
+
+## Algoritmo
+
+* Descenso por gradiente estocástico
+
+* Gradiente de un ejemplo mal clasificado: $$\partial_w D(w, b) = - y_i x_i, \quad \partial_b D(w, b) = - y_i$$
+
+* Elegimos una observación $i$ aleatoriamente:
+
+  1. Si está bien clasificada, i.e. $y_i(x_i^T w + b) > 0$, no hacemos nada
+
+  2. Si está mal clasificada, i.e. $y_i(x_i^T w + b) \leq 0$, actualizamos $w$ y $b$, $$w  \leftarrow w + y_i x_i, \quad b  \leftarrow b + y_i$$
+
+* Paramos cuando todas las observaciones están bien clasificadas
 
 ---
 
@@ -84,10 +116,37 @@ parameters β are updated
 
 ---
 
-class: middel, center
+class: middle, center
 
-![](./img/toy.png)
+## Perceptron vs mínimos cuadrados
 
+![:scale 90%](./img/toy.png)
+
+---
+
+class: center
+
+## ¿Qué solución escogemos?
+
+![:scale 90%](./img/Perceptron_cant_choose.svg)
+
+---
+
+class: middle, center, inverse
+
+# Support Vector Machines (SVM)
+
+---
+
+## Margen geométrico
+
+.center[![:scale 50%](./img/margen.png)]
+
+* Dos puntos $x_1$ y $x_2$ de L, $w^T(x_1 - x_2) = 0$ y $\bar{w} = w/||w||$ es el vector normal
+
+* Para cualquier punto $x_0$ de $L$, $w^T x_0 = -b$
+
+* Distancia de un punto $x$ a $L$ (con signo), $\bar{w}^T (x - x_0) = 1/||w||(w^T x + b)$
 ---
 
 ## Clasificación de máximo margen
@@ -105,17 +164,14 @@ class: middel, center
 
 \begin{aligned}
 \max_{w,b}  &&& M\\
-\mbox{s.t}  &&& y_i(x_i^T w + b) \geq M\quad \forall i \\
-            &&& ||w||_2 = 1
+\mbox{s.t}  &&& y_i \frac{1}{||w||_2}(x_i^T w + b) \geq M\quad \forall i \\
 \end{aligned}
 
-* La restricción nos asegura que todos los puntos están en el lado correcto del hiperplano
+* La restricción nos asegura que todos los puntos están en el lado correcto del hiperplano y a una distancia mayor que $M$ (fuera del margen)
 
 ---
 
 ## SVM lineal
-
-* Podemos eliminar la restricción $||w||_2 = 1$ reescalando $$y_i(x_i^T w + b) \geq M||w||_2$$
 
 * Si $w$ y $b$ satisfacen las restricciones, podemos multiplicar por cualquier número positivo
 
@@ -128,12 +184,14 @@ class: middel, center
 \mbox{s.t}  &&& y_i(x_i^T w + b)-1 \geq 0\quad \forall i \\
 \end{aligned}
 
-* **Notas**: 
+* Maximizar se convierte en minimizar porque $w$ está en el denominador
 
-  1. maximizar se convierte en minimizar porque $w$ está en el denominador
+* $1/2$ y el cuadrado se añaden por conveniencia (no cambian la solución)
 
-  2. $1/2$ y el cuadrado se añaden por conveniencia
-  
+* Ningún punto de entrenamiento está dentro del margen (por construcción)
+
+* Esperamos: margen grande $\Rightarrow$ mayor separación en test
+
 ???
 
 la norma obtiene el optimo en el mismo punto, con o sin cuadrado
@@ -293,6 +351,8 @@ Andreas C. Müller, [Linear Models for Classification](https://amueller.github.i
 $$\min_{\alpha}\, \bigg\{\frac{1}{2}\alpha^T \Qbf \alpha - \alpha^T \mathbf{1}\bigg\} \quad \text{s.t.} \quad {\alpha^T y = 0\quad \text{y}\quad 0 \leq \alpha_i \leq C,\;\forall i}$$
 donde $\Qbf$ es una matriz $n\times n$ con elementos $Q_{ij} = y_i y_j x_i^T x_j$.
 
+* Con respecto a SVM *hard margin* solo cambia la restricción $0 \leq \alpha \leq C$
+
 ---
 
 ## SVM no lineal
@@ -347,18 +407,38 @@ $$k(x_i, x_j) = \phi(x_i)^T \phi(x_j)$$
 
 * Ejemplos:
   
-  1. Kernel polinómico: $k(x, x') = (1 + x^T x')^d$ 
+  1. Kernel polinómico: $k(x, x') = (1 + x^T x')^p$ 
 
   2. Kernel RBF: $k(x, x') = \exp(-\gamma||x - x'||^2_2)$
   
 
 ---
 
-## SVM no lineal
+## Ejemplo kernel polinómico
+
+* Si $d=2$ y $p=2$, 
+\begin{aligned}
+k(x, x') &= (1 + x^T x')^2 = (1 + x_1x_1' + x_2x_2')^2 \\
+    &= 1 + 2x_1x_1' + 2x_2x_2' + (x_1x_1')^2 + (x_2x_2')^2 + 2x_1x_1'x_2x_2'
+\end{aligned}
+
+* Por tanto $$\phi(x) = \big(1,\, \sqrt{2}x_1,\, \sqrt{2}x_2,\, x_1^2,\, x_2^2,\, \sqrt{2}x_1x_2\big)$$
+
+* Dimensión espacio original $d=2$
+
+* Dimensión espacio ampliado $D=6$
+
+* En otros kernels (por ej. RBF), $\phi(\cdot)$ no se puede calcular explicitamente
+
+---
+
+## SVM no lineal: formulación
 
 * Problema optimización: $$\min_{\alpha}\, \bigg\{\frac{1}{2}\alpha^T \Qbf \alpha - \alpha^T \mathbf{1}\bigg\} \quad \text{s.t.} \quad {\alpha^T y = 0\quad \text{y}\quad 0 \leq \alpha_i \leq C,\;\forall i}$$ con $Q_{ij} = y_i y_j k(x_i, x_j)$
 
 * $\Qbf$ es la **matriz de kernel**
+
+* Solo cambia $\Qbf$, el resto idéntico
 
 * Valor de hiper-parámetros es crítico para buen rendimiento:
   
@@ -381,58 +461,279 @@ f(x') = \phi(x')^T w^* + b^* &= \sum_{i=1}^n{\alpha_i^* y_i \phi(x')^T \phi(x_i)
 
 * $b^*$ se puede calcular como antes, resolviendo $y_i f(x_i) = 1$ para cualquier vector de soporte $(\alpha_i > 0)$
 
-
 ---
 
-## SVM para regresión
+class: center
+
+## Ejemplo kernel RBF
+
+![:scale 70%](./img/rbf.png)
 
 ---
 
 ## SVM como regularización
 
+* Sea $f(x) = \phi(x)^T w + b$
+
+* Considerar el problema de optimización $$\min_{w, b}\,\sum_{i=1}^n{\max\{1-y_if(x_i),\,0 \}} + \frac{\lambda}{2}||w||_2^2$$
+
+* Tiene la forma *perdida + regularización*
+
+* La solución es la misma que la de C-SVM con $\lambda = 1/C$
+
+* La función de pérdida es la *hinge loss*, $$L(y, f(x)) = \max\{1-yf(x),\,0 \}$$ 
+
 
 ---
 
-## Sequential Minimal Optimization
+class: middle, center
 
-*  SMO is probably the state-of-the-art algorithm to solve non-linear SVMs.
+## Comparación funciones pérdida
 
-*  Solves the dual formulation, since the constraints are simpler and it is easy to include the non-linear version.
-
-*  Similarly to Coordinate Descent, it optimizes only two coefficients at every iteration.
-
-*  However, the coefficients are selected using heuristic rules.
-
-*  Those rules try to maximize approximately the decrease in the objective function.
+![:scale 250%](./img/loss.svg)
 
 ---
 
-## SMO updates
+## SVM para regresión
 
-*  The question is: can we do the same in SMO?
+* Empezamos por el caso lineal, $f(x) = x^T w + b$
 
-*  After selecting the two indexes, the SMO step has the form,
+* Formulación regularizada, $$\sum_{i=1}^n{L(y_i, f(x_i))} + \frac{\lambda}{2}||w||_2^2$$
+  con $$L_\epsilon(y, f(x)) = \left\{ \begin{array}{ll} 0 & \mbox{si}\ |y - f(x)| \leq \epsilon \\ |y - f(x)| - \epsilon & \mbox{otro caso} \end{array} \right .$$
 
-\begin{equation*}
-\alpha^{k+1} = \alpha^{k} + \rho(y_ie_i - y_je_j) = \alpha^{k} + \rho d
-\end{equation*}
+* Pérdida $\epsilon$-insensitiva
 
-where $e_k$ is the vector with all $0$ but a $1$ in position $k$.
+* Ignora errores menores que $\epsilon$ (en valor absoluto)
 
-*  Note that it is only updating two coefficients.
+---
 
-*  $\rho$ is computed by minimizing the function in the direction $d$ (line search).
+class: center
 
-*  We may need to clip $\rho$ to satisfy the constraints.
+## Pérdida $\epsilon$-insensitiva
+
+![](./img/eloss.png)
+
+[Yu et. al, 2012](https://www.mdpi.com/2072-4292/6/1/64)
+
+---
+
+## SVR: problema dual
+
+* $w^*$ y $b^*$ óptimos del problema anterior tienen la forma:
+
+\begin{aligned}
+w^*  &= \sum_{i=1}^n{(\alpha_i^* - (\alpha_i')^*)x_i} \\
+f(x) &= \sum_{i=1}^n (\alpha_i^* - (\alpha_i')^*)k(x_i, x) + b
+\end{aligned}
+
+* $\alpha^*$ y $(\alpha')^*$ son las soluciones del problema:
+
+\begin{aligned}
+\min_{\alpha, \alpha'} &&& \frac{1}{2}(\alpha - \alpha')^T \Qbf (\alpha - \alpha') + \epsilon \sum_{i=1}^{n}{(\alpha_i + \alpha'_i)} +  \sum_{i=1}^{n}{y_i(\alpha_i - \alpha'_i)}\\
+\text{s.t} &&&(\alpha - \alpha')^T \mathbf{1} = 0, \\           
+           &&& 0 \leq \alpha_i,\alpha'_i \leq C,\;\forall i\\
+\end{aligned}
+
+* $\Qbf$ es la matriz de kernel, $Q_{ij} = k(x_i, x_j)$
+
+---
+
+## SVR como problema de clasificación
+
+* Con las transformaciones;¡:
+\begin{align*}
+\widetilde{\alpha} &= \left[ \begin{array}{c} \alpha' \\ \alpha \end{array} \right] \in \Rbb^{2n}, \\
+\tilde{\Qbf} &= \left[ \begin{array}{cc} \hphantom{-}\Qbf & -\Qbf \\ -\Qbf & \hphantom{-}\Qbf \end{array} \right] \in \Rbb^{2n\times 2n}, \\
+p &= \left[ \begin{array}{c} \epsilon \mathbf{1}_n - y \\ \epsilon \mathbf{1}_n + y  \end{array} \right] \in \Rbb^{2n}, \\
+\widetilde{y} &= [1,\dots,1,-1,\dots,-1]^T \in \Rbb^{2n}.
+\end{align*}
+
+* El problema de la SVR se convierte en uno de clasificación:
+
+\begin{aligned}
+\min_{\widetilde{\alpha}} &&& \frac{1}{2}\widetilde{\alpha}^T \tilde{\Qbf} \widetilde{\alpha} + p^T\widetilde{\alpha} \\
+\text{s.t} &&& \widetilde{\alpha}^T \widetilde{y} = 0, \\           
+           &&& 0 \leq \widetilde{\alpha}_i \leq C,\;i=1,\dots, 2n.\\
+\end{aligned}
+
+* En el caso de la SVC, $p = \mathbf{1}$
+
+---
+
+## SVM multiclase
+
+* Dos aproximaciones directas para extender a $K$ clases:
+
+  1. *One-vs-all* (OVA): se construyen $|K|$ clasificadores con los datos de una clase contra el resto
+  
+  2. *One-vs-one* (OVO): se construyen $|K|(|K| - 1)/2$ clasificadores por cada par de clases, y se elige la clase que predice la mayoria
+
+* OVO construye más clasificadores, pero cada uno se entrena con menos datos
+
+* Otras aproximaciones más sofisticadas
+
+* Comparación OVO y OVA: [Hsu y Lin, 2002](https://www.csie.ntu.edu.tw/~cjlin/papers/multisvm.pdf)
+
+---
+
+class: middle, center
+
+![](./img/OVA.png)
+
+Xianxu Hou, [Support Vector Machine](https://houxianxu.github.io/2015/04/25/support-vector-machine/)
+
+---
+
+class: middle, center
+
+![:scale 200%](./img/OVO.jpg)
+
+Sergey Ivanov, [Multiclass classification](https://www.slideshare.net/NdSv94/linear-models-and-multiclass-classification-2)
+
+---
+
+## Algoritmos
+
+* Históricamente los algoritmos para optimizar la SVM resuelven el problema dual:
+
+  1. ![:colorText green](Restricciones más sencillas)
+  
+  2. ![:colorText green](Sencillo extender al caso no lineal)
+  
+  3. ![:colorText red](Escala mal con el número de patrones n)
+  
+* Alternativamente se puede resolver la formulación de Lagrange (perdida + regularización):
+
+  1. ![:colorText green](No tiene restricciones)
+  
+  2. ![:colorText red](Pérdida no diferenciable)
+  
+  3. ![:colorText red](Complicado extender al caso no lineal)
+
+* Existen muchos algoritmos, pero vamos a centrarnos en el más popular: SMO
+
+---
+
+class: middle, center, inverse
+
+# Sequential Minimal Optimization (SMO)
+
+---
+
+## Introducción
+
+* Principal complicación del problema dual: calcular mátriz de kernel $\Qbf$
+
+  * Tamaño $n \times n$
+  
+  * Costoso computacionalmente
+  
+* Solo depende de los datos $\{\Xbf, y\}$ pero precalcular no es buena idea:
+
+  * Solo hacen falta entre 15-50% de los valores $k(x_i, x_j)$ para calcular el óptimo
+  
+  * Al aumentar $n$, puede no haber espacio en memoria para almacenarla
+
+---
+
+## Características
+
+* Descenso coordinado en el problema dual
+
+* Actualiza dos coeficiente por iteración
+  
+* Calcular el kernel a medida que va siendo necesario
+
+* Los coeficientes se eligen usando reglas heurísticas
+
+  * elegir los que maximizan la disminución de la función objetivo 
+
+---
+
+## Subproblema
+
+* Seleccionar coeficientes a optimizar $\alpha_i$ y $\alpha_j$
+
+* Eliminamos términos que no dependen de esos coeficientes:
+
+\begin{aligned}
+\min_{\alpha_i, \alpha_j} &&& \frac{1}{2}\big(\alpha_i^2 Q_{ii} + 2\alpha_i\alpha_j Q_{ij} + \alpha_u^2 Q_{jj}\big) + \alpha_i \sum_{k \not\in \{i, j\}}{Q_{ik}\alpha_k} + \alpha_j \sum_{k \not\in \{i, j\}}{Q_{jk}\alpha_k} - \alpha_i - \alpha_j \\
+\text{s.t} &&& y_i\alpha_i + y_j\alpha_j = -\sum_{k \not\in \{i, j\}}{y_k \alpha_k}, \\           
+           &&& 0 \leq \alpha_i, \alpha_j \leq C.\\
+\end{aligned}
+
+* Hay que optimizar 2 coeficientes por iteración debido a restricción
+
+* Ahora solo aparecen las filas (o columnas) $\Qbf_i$ y $\Qbf_j$
+  
+  * se calculan para esta iteración y no tenemos que almacenar toda la matriz
+  
+* Este subproblema tiene solución analítica!!
+
+---
+
+## Actualizar coeficientes
+
+*  La actualización de los coeficientes es
+$$\alpha^{k+1} = \alpha^{k} + \rho(y_ie_i - y_je_j) = \alpha^{k} + \rho d$$
+donde $e_k$ es el vectot con todo $0$ excepto un $1$ en la posición $k$.
+
+* Solo cambian dos coeficientes!!
+
+* $\rho$ se calcula minimizando la función en la dirección $d$
+
+  1. sencillo, es un problema convexo cuadrático y solo con una dimensión
+
+  2. hay que asegurarse de que al avanzar $\rho$ se satisfacen las restricciones 
+
+* Se itera hasta converger al óptimo $\alpha^*$
+
+---
+
+## Implementación
+
+Dos técnicas principales para implementar SMO de forma eficiente:
+
+1. **Caching**:
+  
+  * almacenar las filas de la matriz de kernel $\Qbf_i, \Qbf_j$ a medida que se calculan
+
+  * si se eligen posteriormente los coeficientes $i$ o $j$ las recuperamos
+  
+  * si se agota el almacenamiento (*cache*), eliminamos las filas más antiguas
+  
+  * tipicamente se indica un valor máximo en Mb
+
+2. **Shrinking**:
+
+  * a lo largo del entrenamiento, muchos $\alpha_i$ tendrán valor $0$ o $C$
+  
+  * el valor de esos coeficientes se mantiene hasta el final
+  
+  * se pueden identificar (aprox.) y eliminar del problema
 
 ---
 
 ## SVM en R
 
-[LIBLINEAR](https://www.csie.ntu.edu.tw/~cjlin/liblinear/)
-
+* La implementación más popular de SMO es 
 [LIBSVM](https://www.csie.ntu.edu.tw/~cjlin/libsvm/)
 
-[LiblineaR](https://cran.r-project.org/web/packages/LiblineaR/)
+* Soporta SVMs:
 
+  1. Lineales y no lineales
+  
+  2. Clasificación y regresión
+  
+  3. Múltiples kernels
+  
+  4. Multiclase (one vs one)
+
+* Implementado en C++, con interfaces para múltiples lenguajes
+
+* La interfaz de R está en el paquete 
 [e1071](https://cran.r-project.org/web/packages/e1071/)
+
+* Existen otros algoritmos específicos, por ej. [LIBLINEAR](https://www.csie.ntu.edu.tw/~cjlin/liblinear/) para SVMs lineales
+
+* La interfaz de R es [LiblineaR](https://cran.r-project.org/web/packages/LiblineaR/)
