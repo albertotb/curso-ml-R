@@ -1,0 +1,45 @@
+------
+title: "Titanic"
+author: "Alberto Torres Barrán"
+date: "24/04/2019"
+output: pdf_document
+---
+
+Vamos a intentar predecir la supervivencia de las víctimas del Titanic a partir de las siguientes veariables:
+
+  * survival: Supervivencia (0 = No; 1 = Si)
+  * pclass: Clase de pasajero (1, 2, 3)
+  * name: Nombre
+  * sex: Sexo
+  * age: Edad
+  * sibsp: Número de hermanos/esposos/as a bordo.
+  * parch: Número de padres/hijos a bordo
+  * ticket: Número de ticket
+  * fare: Coste del billete
+  * cabin: Cabina
+  * embarked: Puerto de embarque
+
+Con el conjunto de datos anterior:
+
+1. Cargar el fichero `titanic.csv` en R.
+  
+2. Ver cuantos valores missing tiene cada variable con summary.
+
+3. Eliminar la variable cabin, name y ticket.
+  
+4. Convertir `survived` a factor
+
+5. Imputar los valores de `age` con la mediana
+
+6. Eliminar las filas que contengan algún NA (función na.omit).
+  
+7. Dividir datos en 80% entrenamiento y 20% test, aleatoriamente.
+
+8. Ajustar SVM con parámetros por defecto
+
+9. Calcular matriz de confusión
+
+10. Buscar parámetros óptimos usando validación cruzada con búsqueda exhaustiva
+
+11. Calcular la matriz de confusión del modelo con los parámetros óptimos
+

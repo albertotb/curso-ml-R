@@ -1,0 +1,44 @@
+---
+title: "Support Vector Machines"
+author: Alberto Torres Barrán
+date: "24/04/2019"
+output: pdf_document
+---
+
+En este ejercicio, entrenaremos una SVM utilizando los datos que nos habéis proporcionado.
+
+## Lectura y Limpieza de los datos
+
+1. Carga el Dataset del ENSE
+
+2. Crear la variable target (True si `edCNO_AS` es igual a `rawCNO_AS`, y False en otro caso).
+
+3. Eliminar las variables categóricas con más de 53 categorías
+
+4. Convertir a factor el resto de variables categóricas.
+
+
+## Train y Test
+
+1. Separar los datos en train y test con la proporción 75/25
+
+2. A su vez, separar el conjunto de train en train y validación con la proporción 70/30, manteniendo además la proporción de la variable respuesta (función `createDataPartition`)
+
+3. Ver la proporción de la variable respuesta en cada uno de los conjuntos
+
+
+## Entrenamiento 
+
+1. Entrenar una SVM con los valores de los parámetros por defecto, pero con los pesos de las clases TRUE=1 y FALSE=10 (parámetro `class.weights`)
+
+2. Predecir la probabilidad de la respuesta para le conjunto de test
+
+3. Calcular el AUC (librería `pROC`)
+
+
+## Búsqueda de parámetros óptimos
+
+1. Probar con varios valores de $C$ y $\gamma$, calculando el AUC en el conjunto de validación
+
+2. ¿Cuales son los parámetros con el mayor AUC?
+

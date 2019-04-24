@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Support Vector Machines</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alberto Torres Barrán" />
+    <meta name="date" content="2019-04-24" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Support Vector Machines
+## Curso de aprendizaje automático para el INE
+### Alberto Torres Barrán
+### 2019-04-24
+
+---
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+    Macros: {
+      Xcal: "{\\mathcal{X}}",
+      Xbf: "{\\mathbf{X}}",
+      Qbf: "{\\mathbf{Q}}",
+      Zbf: "{\\mathbf{Z}}",
+      Vbf: "{\\mathbf{V}}",
+      Hbf: "{\\mathbf{H}}",
+      Rbb: "{\\mathbb{R}}"
+    },
+    extensions: ["AMSmath.js","AMSsymbols.js"]
+  }
+});
+</script>
+
+---
+
+class: middle, inverse, center
+
+# Introducción
+
+---
+
+## Introducción
+
+ * Regresión logística y LDA son clasificadores lineales
+
+ * Lineal `\(\Rightarrow\)` la frontera de decisión es un hyperplano en `\(\Rbb^d\)`,
+
+ `$$f(x) = w_0 + w^T x = 0$$`
+
+ * Existen clasificadores que intentan separar las clases lo mejor posible:
+
+    - Perceptron
+
+    - SVM
+
+ * Dado `\(y \in \{-1, 1\}\)` y `\(f(x)\)`, podemos definir la regla de clasificación
+`$$G(x) = \text{sign}\,f(x)$$`
+
+---
+
+## Perceptron
+
+ * Rosenblatt, 1958
+
+ * Inspirado en las neuronas biológicas
+
+ * Inspiración a su vez de las redes neuronales de los 80
+
+ * Idea: minimizar la distancia de los puntos mal clasificados:
+
+    1. Si `\(y_i = 1\)`, `\(x_i^T w + b &lt; 0\)`
+
+    2. Si `\(y_i = -1\)`, `\(x_i^T w + b &gt; 0\)`
+
+ * Definimos `\(D(b, w) = - \sum_{i \in M}{y_i(x_i^T w + b)}\)`
+
+    * Positiva
+
+    * Proporcional a la distancia de los puntos mal clasificados a la frontera
+
+
+---
+
+class: middle, center
+
+![](./img/perceptron.png)
+
+[Fuente](https://towardsdatascience.com/perceptron-the-artificial-neuron-4d8c70d5cc8d)
+
+---
+
+## Algoritmo
+
+* Descenso por gradiente estocástico
+
+* Gradiente de un ejemplo mal clasificado: `$$\partial_w D(w, b) = - y_i x_i, \quad \partial_b D(w, b) = - y_i$$`
+
+* Elegimos una observación `\(i\)` aleatoriamente:
+
+  1. Si está bien clasificada, i.e. `\(y_i(x_i^T w + b) &gt; 0\)`, no hacemos nada
+
+  2. Si está mal clasificada, i.e. `\(y_i(x_i^T w + b) \leq 0\)`, actualizamos `\(w\)` y `\(b\)`, `$$w  \leftarrow w + y_i x_i, \quad b  \leftarrow b + y_i$$`
+
+* Paramos cuando todas las observaciones están bien clasificadas
+
+---
+
+## Ejemplo perceptron
+
+[
+![](https://raw.githubusercontent.com/miku/nntour/master/gifs/perceptron-pla-14-steps.gif)](https://github.com/miku/nntour)  
+
+---
+
+## Problemas perceptron
+
+* Si las clases son linealmente separables:
+
+  1. Converge a una solución
+
+  2. Número de iteraciones finito
+
+* Pero:
+
+  1. Muchas soluciones posibles, dependen del punto inicial
+
+  2. Convergencia lenta
+
+  3. No converge si las clases no son linealmente separables
+
+---
+
+class: middle, center
+
+## Perceptron vs mínimos cuadrados
+
+![:scale 90%](./img/toy.png)
+
+---
+
+class: center
+
+## ¿Qué solución escogemos?
+
+![:scale 90%](./img/Perceptron_cant_choose.svg)
+
+---
+
+class: middle, center, inverse
+
+# Support Vector Machines (SVM)
+
+---
+
+## Margen geométrico
+
+.center[![:scale 50%](./img/margen.png)]
+
+* Dos puntos `\(x_1\)` y `\(x_2\)` de L, `\(w^T(x_1 - x_2) = 0\)` y `\(\bar{w} = w/||w||\)` es el vector normal
+
+* Para cualquier punto `\(x_0\)` de `\(L\)`, `\(w^T x_0 = -b\)`
+
+* Distancia de un punto `\(x\)` a `\(L\)` (con signo), `\(\bar{w}^T (x - x_0) = 1/||w||(w^T x + b)\)`
+---
+
+## Clasificación de máximo margen
+
+* Margen: distancia entre el hiperplano y el punto más cercano de una de las clases
+
+* Idea: maximizar el margen
+
+  1. solución única
+
+  2. mejor generalización en el conjunto de test
+
+
+* `\(M\)` es el margen, queremos encontrar el hiperplano:
+
+`\begin{aligned}
+\max_{w,b}  &amp;&amp;&amp; M\\
+\mbox{s.t}  &amp;&amp;&amp; y_i \frac{1}{||w||_2}(x_i^T w + b) \geq M\quad \forall i \\
+\end{aligned}`
+
+* La restricción nos asegura que todos los puntos están en el lado correcto del hiperplano y a una distancia mayor que `\(M\)` (fuera del margen)
+
+---
+
+## SVM lineal
+
+* Si `\(w\)` y `\(b\)` satisfacen las restricciones, podemos multiplicar por cualquier número positivo
+
+* Por comodidad escogemos `\(||w||_2 = 1/M\)`
+
+* Problema de optimización
+
+`\begin{aligned}
+\min_{w,b}  &amp;&amp;&amp; \frac{1}{2}||w||_2^2\\
+\mbox{s.t}  &amp;&amp;&amp; y_i(x_i^T w + b)-1 \geq 0\quad \forall i \\
+\end{aligned}`
+
+* Maximizar se convierte en minimizar porque `\(w\)` está en el denominador
+
+* `\(1/2\)` y el cuadrado se añaden por conveniencia (no cambian la solución)
+
+* Ningún punto de entrenamiento está dentro del margen (por construcción)
+
+* Esperamos: margen grande `\(\Rightarrow\)` mayor separación en test
+
+???
+
+la norma obtiene el optimo en el mismo punto, con o sin cuadrado
+
+---
+
+class: center, middle
+
+![:scale 70%](./img/SVM_margin.png)
+
+[Wikipedia](https://en.wikipedia.org/wiki/Support_vector_machine)
+
+---
+
+## Dualidad (Lagrange)
+
+
+*  Dado un problema de optimización (problema **primal**), se puede definir otro relacionado (problema **dual**)
+
+*  A menudo tiene propiedades complementarias
+
+*  Dualidad fuerte: los problemas primal y dual tienen la misma solución:
+
+    * un ejemplo: función convexa y restricciones afines `\(h(x) = Ax-b\)`
+
+*  En esos casos podemos elegir resolver uno u otro indistintamente
+
+---
+
+## Dualidad fuerte
+
+.center[![:scale 400%](./img/primal_dual.svg)]
+
+.center[[Fuente](http://www.onmyphd.com/?p=duality.theory)]
+
+---
+
+## SVM: derivación problema dual
+
+* Lagrangiano `$$L_P = \frac{1}{2}||w||_2^2 - \sum_{i=1}^{n}{\alpha_i y_i(x_i^T w + b)} + \sum_{i=1}^n{\alpha_i}$$`
+
+* Problema dual: `$$\max_\alpha\, \{ \min_{w, b}\, L_P \}\quad\text{s.t.}\quad \alpha &gt; 0$$`
+
+* Resolvemos el problema interior igualando derivadas a 0:
+`\begin{align}
+w &amp;= \sum_{i=1}^{n}{\alpha_i y_i x_i}\\
+0 &amp;= \sum_{i=1}^{n}{\alpha_i y_i}
+\end{align}`
+
+* Finalmente sustituimos en `\(L_P\)`
+
+---
+
+## SVM: problema dual
+
+* Problema optimización:
+
+`\begin{aligned}
+\max_{\alpha} &amp;&amp;&amp; \sum_i{\alpha_i} - \frac{1}{2}\sum_{i,j}{\alpha_i \alpha_j y_i y_j x_i^T x_j}\\
+\mbox{s.t}  &amp;&amp;&amp; \alpha_i \geq 0 \quad \text{y} \quad \sum_{i}{\alpha_i y_i} = 0 \\
+\end{aligned}`
+
+* La solución tiene que satisfacer las condiciones KKT, nos interesa una: `$$\alpha_i[y_i(x_i^T w + b)-1] = 0$$`
+
+* Dos casos:
+
+  1. `\(\alpha_i &gt; 0\)`, entonces `\(y_i(x_i^T w + b) = 1\)` y `\(x_i\)` está justo en el margen
+  2. `\(\alpha_i = 0\)`, y por tanto `\(y_i(x_i^T w + b) &gt; 1\)`
+
+* `\(w^*\)` solo depende de los `\(x_i\)` asociados a `\(\alpha_i &gt; 0\)` `\(\Rightarrow\)` **vectores de soporte**
+
+???
+
+KKT = Karush–Kuhn–Tucker
+No vamos a entrar en detalles
+
+---
+
+class: middle, center
+
+![](./img/toy1.png)
+---
+
+## SVM: solución
+
+* Dada una solución del problema dual `\(\alpha^*\)`, los coeficientes originales son `$$w^* = \sum_{i=1}^n{\alpha_i^* y_i x_i}$$`
+
+* Para cualquier vector de soporte `\((\alpha_i &gt; 0)\)`:
+`$$y_i(x_i^T w^* + b^*) = 1 \quad \Rightarrow \quad b^* = 1/y_i - x_i^T w^*$$`
+* En la práctica se hace la media para todos los vectores de soporte (estabilidad numérica)
+
+---
+
+## SVM: margen flexible
+
+* ¿Que pasa si ambas clases no son separables por un hiperplano?
+
+* Idea: maximizar el margen, pero permitir que algunos puntos estén en el lado incorrecto
+
+* Cambiar las restricciones por: `$$y_i(x_i^T w + b) \geq M(1 - \xi_i)$$` con `\(\xi_i \geq 0\)` y `\(\sum{\xi_i} \leq \text{cte.}\)`
+
+* `\(\xi_i\)` indican la cantidad en proporcion por la que una variable está en el lado incorrecto:
+
+  1. `\(\xi_i = 0\)`, punto clasificado correctamente
+
+  2. `\(0 &lt; \xi_i \leq 1\)`, punto **dentro** del margen
+
+  3. `\(\xi &gt; 1\)`, punto clasificado incorrectamente
+
+---
+
+class: center, middle
+
+![](./img/hard_vs_soft.png)
+
+---
+
+## C-SVM: formulación
+
+* Número de puntos mal clasificados acotado superiormente por `\(\sum{\xi_i}\)`
+
+* Maximizar el margen y minimizar el número de errores de clasificación:
+
+`\begin{aligned}
+\min_{w,b,\xi}  &amp;&amp;&amp; \frac{1}{2}||w||_2^2 + C\sum{\xi_i}\\
+\mbox{s.t}  &amp;&amp;&amp; y_i(x_i^T w+b) \geq 1 - \xi_i \quad \forall i \\
+            &amp;&amp;&amp; \xi_i \geq 0\quad \forall i.\\
+\end{aligned}`
+
+* `\(C &gt; 0\)` es un hiper-parámetro que controla la complejidad:
+
+  1. `\(\uparrow C\)`, más importancia a clasificar correctamente todos los puntos (menos regularización)
+
+  2. `\(\downarrow C\)`, más importancia a maximizar el margen (más regularización)
+
+---
+
+## Efecto de C
+
+![](./img/linear_svm_regularization.png)
+
+Andreas C. Müller, [Linear Models for Classification](https://amueller.github.io/COMS4995-s18/slides/aml-06-020518-linear-models-classification/#1)
+
+---
+
+## C-SVM: formulación dual
+
+* La formulación dual es:  
+
+`\begin{aligned}
+\max_{\alpha}  &amp;&amp;&amp; \sum_i{\alpha_i} - \frac{1}{2}\sum_{i,j}{\alpha_i \alpha_j y_i y_j x_i^T x_j}\\
+\mbox{s.t}  &amp;&amp;&amp; 0 \leq \alpha_i \leq C\quad \forall i \\
+            &amp;&amp;&amp; \sum_{i}{\alpha_i y_i} = 0. \\
+\end{aligned}`
+
+* Notación vectorial:
+`$$\min_{\alpha}\, \bigg\{\frac{1}{2}\alpha^T \Qbf \alpha - \alpha^T \mathbf{1}\bigg\} \quad \text{s.t.} \quad {\alpha^T y = 0\quad \text{y}\quad 0 \leq \alpha_i \leq C,\;\forall i}$$`
+donde `\(\Qbf\)` es una matriz `\(n\times n\)` con elementos `\(Q_{ij} = y_i y_j x_i^T x_j\)`.
+
+* Con respecto a SVM *hard margin* solo cambia la restricción `\(0 \leq \alpha \leq C\)`
+
+---
+
+## SVM no lineal
+
+* C-SVM acepta datos no separables linealmente, pero la frontera de decisión es lineal (hiperplano)
+
+* Idea: transformar variables originales en otras variables de mayor dimensión
+
+* En el espacio ampliado esperamos que las clases sean separables linealmente
+
+* Si las transformaciones son no lineales, se traduce en una frontera de decisión no lineal en el espacio original
+
+* Similar a lo que vimos en regresión lineal de añadir expansiones polinómicas
+
+---
+
+class: middle, center
+
+![](./img/nonlinear_svm.jpg)
+
+Muhammad Awais Bin Altaf, [Research Gate](https://www.researchgate.net/publication/272520997_A_183_mJClassification_8-Channel_Patient-Specific_Epileptic_Seizure_Classification_SoC_Using_a_Non-Linear_Support_Vector_Machine)
+
+
+---
+
+## SVM no lineal: problemas
+
+* `\(\phi(x_i): R^d \rightarrow R^D\)`, con `\(D &gt;&gt; d\)`
+
+* Si intentamos calcular la función `\(\phi(x_i)\)` explicitamente:
+
+  1. El espacio ampliado puede tener dimensión `\(D\)` muy grande, incluso infinita
+
+  2. Computacionalmente muy costoso calcular la función `\(\phi\)` cada vez que sea necesario
+
+  3. Complicado de almacenar en memoria
+
+---
+
+## Kernel trick
+
+* Elementos de la matriz `\(\Qbf\)`,  `\(Q_{ij} = y_i y_j x_i^T x_j\)`
+
+* Solo depende del producto escalar de `\(x_i\)` y `\(x_j\)`
+
+* Podemos reemplazar el producto escalar por una función de kernel:
+`$$k(x_i, x_j) = \phi(x_i)^T \phi(x_j)$$`
+
+* No es necesario calcular `\(\phi\)` explicitamente, solo `\(k\)`
+
+* `\(k\)` cualquier función simétrica (semi-) definida positiva
+
+* Ejemplos:
+
+  1. Kernel polinómico: `\(k(x, x') = (1 + x^T x')^p\)`
+
+  2. Kernel RBF: `\(k(x, x') = \exp(-\gamma||x - x'||^2_2)\)`
+
+
+---
+
+## Ejemplo kernel polinómico
+
+* Si `\(d=2\)` y `\(p=2\)`,
+`\begin{aligned}
+k(x, x') &amp;= (1 + x^T x')^2 = (1 + x_1x_1' + x_2x_2')^2 \\
+    &amp;= 1 + 2x_1x_1' + 2x_2x_2' + (x_1x_1')^2 + (x_2x_2')^2 + 2x_1x_1'x_2x_2'
+\end{aligned}`
+
+* Por tanto `$$\phi(x) = \big(1,\, \sqrt{2}x_1,\, \sqrt{2}x_2,\, x_1^2,\, x_2^2,\, \sqrt{2}x_1x_2\big)$$`
+
+* Dimensión espacio original `\(d=2\)`
+
+* Dimensión espacio ampliado `\(D=6\)`
+
+* En otros kernels (por ej. RBF), `\(\phi(\cdot)\)` no se puede calcular explicitamente
+
+---
+
+## SVM no lineal: formulación
+
+* Problema optimización: `$$\min_{\alpha}\, \bigg\{\frac{1}{2}\alpha^T \Qbf \alpha - \alpha^T \mathbf{1}\bigg\} \quad \text{s.t.} \quad {\alpha^T y = 0\quad \text{y}\quad 0 \leq \alpha_i \leq C,\;\forall i}$$` con `\(Q_{ij} = y_i y_j k(x_i, x_j)\)`
+
+* `\(\Qbf\)` es la **matriz de kernel**
+
+* Solo cambia `\(\Qbf\)`, el resto idéntico
+
+* Valor de hiper-parámetros es crítico para buen rendimiento:
+
+  1. `\(C\)`, parámetro de complejidad
+
+  2. Parámetros del kernel, por ejemplo `\(\gamma\)` en el kernel RBF
+
+---
+
+## Cálculo de w y b
+
+* El valor de `\(w\)` es ahora: `$$w^* = \sum_{i=1}^n{\alpha_i^* y_i \phi(x_i)}$$`
+
+* No podemos calcular su valor explicitamente, pero dado un nuevo `\(x'\)`:
+
+`\begin{aligned}
+f(x') = \phi(x')^T w^* + b^* &amp;= \sum_{i=1}^n{\alpha_i^* y_i \phi(x')^T \phi(x_i)} + b^* \\
+                             &amp;= \sum_{i=1}^n{\alpha_i^* y_i k(x', x_i)} + b^*
+\end{aligned}`
+
+* `\(b^*\)` se puede calcular como antes, resolviendo `\(y_i f(x_i) = 1\)` para cualquier vector de soporte `\((\alpha_i &gt; 0)\)`
+
+---
+
+class: center
+
+## Ejemplo kernel RBF
+
+![:scale 70%](./img/rbf.png)
+
+---
+
+## SVM como regularización
+
+* Sea `\(f(x) = \phi(x)^T w + b\)`
+
+* Considerar el problema de optimización `$$\min_{w, b}\,\sum_{i=1}^n{\max\{1-y_if(x_i),\,0 \}} + \frac{\lambda}{2}||w||_2^2$$`
+
+* Tiene la forma *perdida + regularización*
+
+* La solución es la misma que la de C-SVM con `\(\lambda = 1/C\)`
+
+* La función de pérdida es la *hinge loss*, `$$L(y, f(x)) = \max\{1-yf(x),\,0 \}$$`
+
+
+---
+
+class: middle, center
+
+## Comparación funciones pérdida
+
+![:scale 250%](./img/loss.svg)
+
+---
+
+## SVM para regresión
+
+* Empezamos por el caso lineal, `\(f(x) = x^T w + b\)`
+
+* Formulación regularizada, `$$\sum_{i=1}^n{L(y_i, f(x_i))} + \frac{\lambda}{2}||w||_2^2$$`
+  con `$$L_\epsilon(y, f(x)) = \left\{ \begin{array}{ll} 0 &amp; \mbox{si}\ |y - f(x)| \leq \epsilon \\ |y - f(x)| - \epsilon &amp; \mbox{otro caso} \end{array} \right .$$`
+
+* Pérdida `\(\epsilon\)`-insensitiva
+
+* Ignora errores menores que `\(\epsilon\)` (en valor absoluto)
+
+---
+
+class: center
+
+## Pérdida `\(\epsilon\)`-insensitiva
+
+![](./img/eloss.png)
+
+[Yu et. al, 2012](https://www.mdpi.com/2072-4292/6/1/64)
+
+---
+
+## SVR: problema dual
+
+* `\(w^*\)` y `\(b^*\)` óptimos del problema anterior tienen la forma:
+
+`\begin{aligned}
+w^*  &amp;= \sum_{i=1}^n{(\alpha_i^* - (\alpha_i')^*)x_i} \\
+f(x) &amp;= \sum_{i=1}^n (\alpha_i^* - (\alpha_i')^*)k(x_i, x) + b
+\end{aligned}`
+
+* `\(\alpha^*\)` y `\((\alpha')^*\)` son las soluciones del problema:
+
+`\begin{aligned}
+\min_{\alpha, \alpha'} &amp;&amp;&amp; \frac{1}{2}(\alpha - \alpha')^T \Qbf (\alpha - \alpha') + \epsilon \sum_{i=1}^{n}{(\alpha_i + \alpha'_i)} +  \sum_{i=1}^{n}{y_i(\alpha_i - \alpha'_i)}\\
+\text{s.t} &amp;&amp;&amp;(\alpha - \alpha')^T \mathbf{1} = 0, \\           
+           &amp;&amp;&amp; 0 \leq \alpha_i,\alpha'_i \leq C,\;\forall i\\
+\end{aligned}`
+
+* `\(\Qbf\)` es la matriz de kernel, `\(Q_{ij} = k(x_i, x_j)\)`
+
+---
+
+## SVR como problema de clasificación
+
+* Con las transformaciones;¡:
+`\begin{align*}
+\widetilde{\alpha} &amp;= \left[ \begin{array}{c} \alpha' \\ \alpha \end{array} \right] \in \Rbb^{2n}, \\
+\tilde{\Qbf} &amp;= \left[ \begin{array}{cc} \hphantom{-}\Qbf &amp; -\Qbf \\ -\Qbf &amp; \hphantom{-}\Qbf \end{array} \right] \in \Rbb^{2n\times 2n}, \\
+p &amp;= \left[ \begin{array}{c} \epsilon \mathbf{1}_n - y \\ \epsilon \mathbf{1}_n + y  \end{array} \right] \in \Rbb^{2n}, \\
+\widetilde{y} &amp;= [1,\dots,1,-1,\dots,-1]^T \in \Rbb^{2n}.
+\end{align*}`
+
+* El problema de la SVR se convierte en uno de clasificación:
+
+`\begin{aligned}
+\min_{\widetilde{\alpha}} &amp;&amp;&amp; \frac{1}{2}\widetilde{\alpha}^T \tilde{\Qbf} \widetilde{\alpha} + p^T\widetilde{\alpha} \\
+\text{s.t} &amp;&amp;&amp; \widetilde{\alpha}^T \widetilde{y} = 0, \\           
+           &amp;&amp;&amp; 0 \leq \widetilde{\alpha}_i \leq C,\;i=1,\dots, 2n.\\
+\end{aligned}`
+
+* En el caso de la SVC, `\(p = \mathbf{1}\)`
+
+---
+
+## SVM multiclase
+
+* Dos aproximaciones directas para extender a `\(K\)` clases:
+
+  1. *One-vs-all* (OVA): se construyen `\(|K|\)` clasificadores con los datos de una clase contra el resto
+
+  2. *One-vs-one* (OVO): se construyen `\(|K|(|K| - 1)/2\)` clasificadores por cada par de clases, y se elige la clase que predice la mayoria
+
+* OVO construye más clasificadores, pero cada uno se entrena con menos datos
+
+* Otras aproximaciones más sofisticadas
+
+* Comparación OVO y OVA: [Hsu y Lin, 2002](https://www.csie.ntu.edu.tw/~cjlin/papers/multisvm.pdf)
+
+---
+
+class: middle, center
+
+![](./img/OVA.png)
+
+Xianxu Hou, [Support Vector Machine](https://houxianxu.github.io/2015/04/25/support-vector-machine/)
+
+---
+
+class: middle, center
+
+![:scale 200%](./img/OVO.jpg)
+
+Sergey Ivanov, [Multiclass classification](https://www.slideshare.net/NdSv94/linear-models-and-multiclass-classification-2)
+
+---
+
+## SVM: selección de hiperparámetros
+
+* El valor de los hiper-parámetros es crítico para el rendimiento de la SVM
+
+* El kernel RBF es el más popular, aunque se podría considerar como otro hiper-parámetro
+
+* Generalmente se seleccionan usando búsqueda exhaustiva:
+
+  * comparar error de validación cruzada en una rejilla de valores (escala logarítmica base 2)
+
+* Clasificación:
+
+  1. `\(C\)`, coste: de -5 a 15, paso 2
+
+  2. `\(\gamma\)`, parámetro kernel RBF: de -15 a 3, paso 2
+
+* Regresión: los anteriores y, además,
+
+  3. `\(\epsilon\)`, parámetro de la función de pérdida: de -8 a -1, paso 1
+---
+
+## Algoritmos
+
+* Históricamente los algoritmos para optimizar la SVM resuelven el problema dual:
+
+  1. ![:colorText green](Restricciones más sencillas)
+
+  2. ![:colorText green](Sencillo extender al caso no lineal)
+
+  3. ![:colorText red](Escala mal con el número de patrones n)
+
+* Alternativamente se puede resolver la formulación de Lagrange (perdida + regularización):
+
+  1. ![:colorText green](No tiene restricciones)
+
+  2. ![:colorText red](Pérdida no diferenciable)
+
+  3. ![:colorText red](Complicado extender al caso no lineal)
+
+* Existen muchos algoritmos, pero vamos a centrarnos en el más popular: SMO
+
+---
+
+class: middle, center, inverse
+
+# Sequential Minimal Optimization (SMO)
+
+---
+
+## Introducción
+
+* Principal complicación del problema dual: calcular mátriz de kernel `\(\Qbf\)`
+
+  * Tamaño `\(n \times n\)`
+
+  * Costoso computacionalmente
+
+* Solo depende de los datos `\(\{\Xbf, y\}\)` pero precalcular no es buena idea:
+
+  * Solo hacen falta entre 15-50% de los valores `\(k(x_i, x_j)\)` para calcular el óptimo
+
+  * Al aumentar `\(n\)`, puede no haber espacio en memoria para almacenarla
+
+---
+
+## Características
+
+* Descenso coordinado en el problema dual
+
+* Actualiza dos coeficiente por iteración
+
+* Calcular el kernel a medida que va siendo necesario
+
+* Los coeficientes se eligen usando reglas heurísticas
+
+  * elegir los que maximizan la disminución de la función objetivo
+
+---
+
+## Subproblema
+
+* Seleccionar coeficientes a optimizar `\(\alpha_i\)` y `\(\alpha_j\)`
+
+* Eliminamos términos que no dependen de esos coeficientes:
+
+`\begin{aligned}
+\min_{\alpha_i, \alpha_j} &amp;&amp;&amp; \frac{1}{2}\big(\alpha_i^2 Q_{ii} + 2\alpha_i\alpha_j Q_{ij} + \alpha_u^2 Q_{jj}\big) + \alpha_i \sum_{k \not\in \{i, j\}}{Q_{ik}\alpha_k} + \alpha_j \sum_{k \not\in \{i, j\}}{Q_{jk}\alpha_k} - \alpha_i - \alpha_j \\
+\text{s.t} &amp;&amp;&amp; y_i\alpha_i + y_j\alpha_j = -\sum_{k \not\in \{i, j\}}{y_k \alpha_k}, \\           
+           &amp;&amp;&amp; 0 \leq \alpha_i, \alpha_j \leq C.\\
+\end{aligned}`
+
+* Hay que optimizar 2 coeficientes por iteración debido a restricción
+
+* Ahora solo aparecen las filas (o columnas) `\(\Qbf_i\)` y `\(\Qbf_j\)`
+
+  * se calculan para esta iteración y no tenemos que almacenar toda la matriz
+
+* Este subproblema tiene solución analítica!!
+
+---
+
+## Actualizar coeficientes
+
+*  La actualización de los coeficientes es
+`$$\alpha^{k+1} = \alpha^{k} + \rho(y_ie_i - y_je_j) = \alpha^{k} + \rho d$$`
+donde `\(e_k\)` es el vectot con todo `\(0\)` excepto un `\(1\)` en la posición `\(k\)`.
+
+* Solo cambian dos coeficientes!!
+
+* `\(\rho\)` se calcula minimizando la función en la dirección `\(d\)`
+
+  1. sencillo, es un problema convexo cuadrático y solo con una dimensión
+
+  2. hay que asegurarse de que al avanzar `\(\rho\)` se satisfacen las restricciones
+
+* Se itera hasta converger al óptimo `\(\alpha^*\)`
+
+---
+
+## Implementación
+
+Dos técnicas principales para implementar SMO de forma eficiente:
+
+1. **Caching**:
+
+  * almacenar las filas de la matriz de kernel `\(\Qbf_i, \Qbf_j\)` a medida que se calculan
+
+  * si se eligen posteriormente los coeficientes `\(i\)` o `\(j\)` las recuperamos
+
+  * si se agota el almacenamiento (*cache*), eliminamos las filas más antiguas
+
+  * tipicamente se indica un valor máximo en Mb
+
+2. **Shrinking**:
+
+  * a lo largo del entrenamiento, muchos `\(\alpha_i\)` tendrán valor `\(0\)` o `\(C\)`
+
+  * el valor de esos coeficientes se mantiene hasta el final
+
+  * se pueden identificar (aprox.) y eliminar del problema
+
+---
+
+## SVM en R
+
+* La implementación más popular de SMO es
+[LIBSVM](https://www.csie.ntu.edu.tw/~cjlin/libsvm/)
+
+* Soporta SVMs:
+
+  1. Lineales y no lineales
+
+  2. Clasificación y regresión
+
+  3. Múltiples kernels
+
+  4. Multiclase (one vs one)
+
+* Implementado en C++, con interfaces para múltiples lenguajes
+
+* La interfaz de R está en el paquete
+[e1071](https://cran.r-project.org/web/packages/e1071/)
+
+* Existen otros algoritmos específicos, por ej. [LIBLINEAR](https://www.csie.ntu.edu.tw/~cjlin/liblinear/) para SVMs lineales
+
+* La interfaz de R es [LiblineaR](https://cran.r-project.org/web/packages/LiblineaR/)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
