@@ -28,17 +28,17 @@ class: middle, inverse, center
 ## Introducción
 
  * Regresión logística y LDA son clasificadores lineales
- 
+
  * Lineal $\Rightarrow$ la frontera de decisión es un hyperplano en $\Rbb^d$,
- 
+
  $$f(x) = w_0 + w^T x = 0$$
 
  * Existen clasificadores que intentan separar las clases lo mejor posible:
- 
+
     - Perceptron
-    
+
     - SVM
-    
+
  * Dado $y \in \{-1, 1\}$ y $f(x)$, podemos definir la regla de clasificación
 $$G(x) = \text{sign}\,f(x)$$
 
@@ -47,21 +47,21 @@ $$G(x) = \text{sign}\,f(x)$$
 ## Perceptron
 
  * Rosenblatt, 1958
- 
+
  * Inspirado en las neuronas biológicas
- 
+
  * Inspiración a su vez de las redes neuronales de los 80
- 
+
  * Idea: minimizar la distancia de los puntos mal clasificados:
- 
+
     1. Si $y_i = 1$, $x_i^T w + b < 0$
-    
+
     2. Si $y_i = -1$, $x_i^T w + b > 0$
 
  * Definimos $D(b, w) = - \sum_{i \in M}{y_i(x_i^T w + b)}$
 
     * Positiva
-    
+
     * Proporcional a la distancia de los puntos mal clasificados a la frontera
 
 
@@ -103,7 +103,7 @@ class: middle, center
 * Si las clases son linealmente separables:
 
   1. Converge a una solución
-  
+
   2. Número de iteraciones finito
 
 * Pero:
@@ -111,7 +111,7 @@ class: middle, center
   1. Muchas soluciones posibles, dependen del punto inicial
 
   2. Convergencia lenta
-  
+
   3. No converge si las clases no son linealmente separables
 
 ---
@@ -156,7 +156,7 @@ class: middle, center, inverse
 * Idea: maximizar el margen
 
   1. solución única
-  
+
   2. mejor generalización en el conjunto de test
 
 
@@ -260,7 +260,7 @@ w &= \sum_{i=1}^{n}{\alpha_i y_i x_i}\\
 
   1. $\alpha_i > 0$, entonces $y_i(x_i^T w + b) = 1$ y $x_i$ está justo en el margen
   2. $\alpha_i = 0$, y por tanto $y_i(x_i^T w + b) > 1$
-  
+
 * $w^*$ solo depende de los $x_i$ asociados a $\alpha_i > 0$ $\Rightarrow$ **vectores de soporte**
 
 ???
@@ -279,7 +279,7 @@ class: middle, center
 
 * Dada una solución del problema dual $\alpha^*$, los coeficientes originales son $$w^* = \sum_{i=1}^n{\alpha_i^* y_i x_i}$$
 
-* Para cualquier vector de soporte $(\alpha_i > 0)$: 
+* Para cualquier vector de soporte $(\alpha_i > 0)$:
 $$y_i(x_i^T w^* + b^*) = 1 \quad \Rightarrow \quad b^* = 1/y_i - x_i^T w^*$$
 * En la práctica se hace la media para todos los vectores de soporte (estabilidad numérica)
 
@@ -296,9 +296,9 @@ $$y_i(x_i^T w^* + b^*) = 1 \quad \Rightarrow \quad b^* = 1/y_i - x_i^T w^*$$
 * $\xi_i$ indican la cantidad en proporcion por la que una variable está en el lado incorrecto:
 
   1. $\xi_i = 0$, punto clasificado correctamente
-  
+
   2. $0 < \xi_i \leq 1$, punto **dentro** del margen
-  
+
   3. $\xi > 1$, punto clasificado incorrectamente
 
 ---
@@ -324,7 +324,7 @@ class: center, middle
 * $C > 0$ es un hiper-parámetro que controla la complejidad:
 
   1. $\uparrow C$, más importancia a clasificar correctamente todos los puntos (menos regularización)
-  
+
   2. $\downarrow C$, más importancia a maximizar el margen (más regularización)
 
 ---
@@ -385,9 +385,9 @@ Muhammad Awais Bin Altaf, [Research Gate](https://www.researchgate.net/publicati
 * Si intentamos calcular la función $\phi(x_i)$ explicitamente:
 
   1. El espacio ampliado puede tener dimensión $D$ muy grande, incluso infinita
-  
+
   2. Computacionalmente muy costoso calcular la función $\phi$ cada vez que sea necesario
-  
+
   3. Complicado de almacenar en memoria
 
 ---
@@ -399,24 +399,24 @@ Muhammad Awais Bin Altaf, [Research Gate](https://www.researchgate.net/publicati
 * Solo depende del producto escalar de $x_i$ y $x_j$
 
 * Podemos reemplazar el producto escalar por una función de kernel:
-$$k(x_i, x_j) = \phi(x_i)^T \phi(x_j)$$ 
+$$k(x_i, x_j) = \phi(x_i)^T \phi(x_j)$$
 
 * No es necesario calcular $\phi$ explicitamente, solo $k$
 
 * $k$ cualquier función simétrica (semi-) definida positiva
 
 * Ejemplos:
-  
-  1. Kernel polinómico: $k(x, x') = (1 + x^T x')^p$ 
+
+  1. Kernel polinómico: $k(x, x') = (1 + x^T x')^p$
 
   2. Kernel RBF: $k(x, x') = \exp(-\gamma||x - x'||^2_2)$
-  
+
 
 ---
 
 ## Ejemplo kernel polinómico
 
-* Si $d=2$ y $p=2$, 
+* Si $d=2$ y $p=2$,
 \begin{aligned}
 k(x, x') &= (1 + x^T x')^2 = (1 + x_1x_1' + x_2x_2')^2 \\
     &= 1 + 2x_1x_1' + 2x_2x_2' + (x_1x_1')^2 + (x_2x_2')^2 + 2x_1x_1'x_2x_2'
@@ -441,9 +441,9 @@ k(x, x') &= (1 + x^T x')^2 = (1 + x_1x_1' + x_2x_2')^2 \\
 * Solo cambia $\Qbf$, el resto idéntico
 
 * Valor de hiper-parámetros es crítico para buen rendimiento:
-  
+
   1. $C$, parámetro de complejidad
-  
+
   2. Parámetros del kernel, por ejemplo $\gamma$ en el kernel RBF
 
 ---
@@ -452,10 +452,10 @@ k(x, x') &= (1 + x^T x')^2 = (1 + x_1x_1' + x_2x_2')^2 \\
 
 * El valor de $w$ es ahora: $$w^* = \sum_{i=1}^n{\alpha_i^* y_i \phi(x_i)}$$
 
-* No podemos calcular su valor explicitamente, pero dado un nuevo $x'$: 
+* No podemos calcular su valor explicitamente, pero dado un nuevo $x'$:
 
 \begin{aligned}
-f(x') = \phi(x')^T w^* + b^* &= \sum_{i=1}^n{\alpha_i^* y_i \phi(x')^T \phi(x_i)} + b^* \\ 
+f(x') = \phi(x')^T w^* + b^* &= \sum_{i=1}^n{\alpha_i^* y_i \phi(x')^T \phi(x_i)} + b^* \\
                              &= \sum_{i=1}^n{\alpha_i^* y_i k(x', x_i)} + b^*
 \end{aligned}
 
@@ -481,7 +481,7 @@ class: center
 
 * La solución es la misma que la de C-SVM con $\lambda = 1/C$
 
-* La función de pérdida es la *hinge loss*, $$L(y, f(x)) = \max\{1-yf(x),\,0 \}$$ 
+* La función de pérdida es la *hinge loss*, $$L(y, f(x)) = \max\{1-yf(x),\,0 \}$$
 
 
 ---
@@ -565,7 +565,7 @@ p &= \left[ \begin{array}{c} \epsilon \mathbf{1}_n - y \\ \epsilon \mathbf{1}_n 
 * Dos aproximaciones directas para extender a $K$ clases:
 
   1. *One-vs-all* (OVA): se construyen $|K|$ clasificadores con los datos de una clase contra el resto
-  
+
   2. *One-vs-one* (OVO): se construyen $|K|(|K| - 1)/2$ clasificadores por cada par de clases, y se elige la clase que predice la mayoria
 
 * OVO construye más clasificadores, pero cada uno se entrena con menos datos
@@ -592,22 +592,43 @@ Sergey Ivanov, [Multiclass classification](https://www.slideshare.net/NdSv94/lin
 
 ---
 
+## SVM: selección de hiperparámetros
+
+* El valor de los hiper-parámetros es crítico para el rendimiento de la SVM
+
+* El kernel RBF es el más popular, aunque se podría considerar como otro hiper-parámetro
+
+* Generalmente se seleccionan usando búsqueda exhaustiva:
+
+  * comparar error de validación cruzada en una rejilla de valores (escala logarítmica base 2)
+
+* Clasificación:
+
+  1. $C$, coste: de -5 a 15, paso 2
+
+  2. $\gamma$, parámetro kernel RBF: de -15 a 3, paso 2
+
+* Regresión: los anteriores y, además,
+
+  3. $\epsilon$, parámetro de la función de pérdida: de -8 a -1, paso 1
+---
+
 ## Algoritmos
 
 * Históricamente los algoritmos para optimizar la SVM resuelven el problema dual:
 
   1. ![:colorText green](Restricciones más sencillas)
-  
+
   2. ![:colorText green](Sencillo extender al caso no lineal)
-  
+
   3. ![:colorText red](Escala mal con el número de patrones n)
-  
+
 * Alternativamente se puede resolver la formulación de Lagrange (perdida + regularización):
 
   1. ![:colorText green](No tiene restricciones)
-  
+
   2. ![:colorText red](Pérdida no diferenciable)
-  
+
   3. ![:colorText red](Complicado extender al caso no lineal)
 
 * Existen muchos algoritmos, pero vamos a centrarnos en el más popular: SMO
@@ -625,13 +646,13 @@ class: middle, center, inverse
 * Principal complicación del problema dual: calcular mátriz de kernel $\Qbf$
 
   * Tamaño $n \times n$
-  
+
   * Costoso computacionalmente
-  
+
 * Solo depende de los datos $\{\Xbf, y\}$ pero precalcular no es buena idea:
 
   * Solo hacen falta entre 15-50% de los valores $k(x_i, x_j)$ para calcular el óptimo
-  
+
   * Al aumentar $n$, puede no haber espacio en memoria para almacenarla
 
 ---
@@ -641,12 +662,12 @@ class: middle, center, inverse
 * Descenso coordinado en el problema dual
 
 * Actualiza dos coeficiente por iteración
-  
+
 * Calcular el kernel a medida que va siendo necesario
 
 * Los coeficientes se eligen usando reglas heurísticas
 
-  * elegir los que maximizan la disminución de la función objetivo 
+  * elegir los que maximizan la disminución de la función objetivo
 
 ---
 
@@ -665,9 +686,9 @@ class: middle, center, inverse
 * Hay que optimizar 2 coeficientes por iteración debido a restricción
 
 * Ahora solo aparecen las filas (o columnas) $\Qbf_i$ y $\Qbf_j$
-  
+
   * se calculan para esta iteración y no tenemos que almacenar toda la matriz
-  
+
 * Este subproblema tiene solución analítica!!
 
 ---
@@ -684,7 +705,7 @@ donde $e_k$ es el vectot con todo $0$ excepto un $1$ en la posición $k$.
 
   1. sencillo, es un problema convexo cuadrático y solo con una dimensión
 
-  2. hay que asegurarse de que al avanzar $\rho$ se satisfacen las restricciones 
+  2. hay que asegurarse de que al avanzar $\rho$ se satisfacen las restricciones
 
 * Se itera hasta converger al óptimo $\alpha^*$
 
@@ -695,43 +716,43 @@ donde $e_k$ es el vectot con todo $0$ excepto un $1$ en la posición $k$.
 Dos técnicas principales para implementar SMO de forma eficiente:
 
 1. **Caching**:
-  
+
   * almacenar las filas de la matriz de kernel $\Qbf_i, \Qbf_j$ a medida que se calculan
 
   * si se eligen posteriormente los coeficientes $i$ o $j$ las recuperamos
-  
+
   * si se agota el almacenamiento (*cache*), eliminamos las filas más antiguas
-  
+
   * tipicamente se indica un valor máximo en Mb
 
 2. **Shrinking**:
 
   * a lo largo del entrenamiento, muchos $\alpha_i$ tendrán valor $0$ o $C$
-  
+
   * el valor de esos coeficientes se mantiene hasta el final
-  
+
   * se pueden identificar (aprox.) y eliminar del problema
 
 ---
 
 ## SVM en R
 
-* La implementación más popular de SMO es 
+* La implementación más popular de SMO es
 [LIBSVM](https://www.csie.ntu.edu.tw/~cjlin/libsvm/)
 
 * Soporta SVMs:
 
   1. Lineales y no lineales
-  
+
   2. Clasificación y regresión
-  
+
   3. Múltiples kernels
-  
+
   4. Multiclase (one vs one)
 
 * Implementado en C++, con interfaces para múltiples lenguajes
 
-* La interfaz de R está en el paquete 
+* La interfaz de R está en el paquete
 [e1071](https://cran.r-project.org/web/packages/e1071/)
 
 * Existen otros algoritmos específicos, por ej. [LIBLINEAR](https://www.csie.ntu.edu.tw/~cjlin/liblinear/) para SVMs lineales
