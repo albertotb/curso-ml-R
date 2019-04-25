@@ -1,0 +1,143 @@
+---
+title: "Support Vector Machines"
+author: Alberto Torres Barrán
+date: "24/04/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+```
+
+En este ejercicio, entrenaremos una SVM utilizando los datos que nos habéis proporcionado.
+
+## Lectura y Limpieza de los datos
+
+1. Carga el Dataset del ENSE
+
+```{r, message=F}
+data <- readxl::read_xlsx('../../data/DatosENSE.xlsx')
+```
+
+2. Crear la variable target (True si `edCNO_AS` es igual a `rawCNO_AS`, y False en otro caso).
+
+3. Eliminar las variables categóricas con más de 53 categorías
+
+4. Convertir a factor el resto de variables categóricas.
+
+```{r, message=F}
+data$target <- as.factor(data$edCNO_AS == data$rawCNO_AS) 
+data <- select(data, -c(edCNO_AS, rawCNO_AS, CNAE_AS, CNAE2_AS))
+data <- mutate_if(data, is.character, as.factor)
+```
+
+## Train y Test
+
+1. Separar los datos en train y test con la proporción 75/25
+
+2. A su vez, separar el conjunto de train en train y validación con la proporción 70/30, manteniendo además la proporción de la variable respuesta (función `createDataPartition`)
+
+```{r message=FALSE, warning=FALSE}
+library(caret)
+set.seed(1234)
+idx <- createDataPartition(data$target, p = 0.75, list = FALSE)
+train_val <- data[ idx, ]
+test      <- data[-idx,]
+
+idx_val <- createDataPartition(train_val$target, p = 0.7, list = FALSE)
+train <- train_val[ idx_val, ]
+val   <- train_val[-idx_val, ]
+```
+
+3. Ver la proporción de la variable respuesta en cada uno de los conjuntos
+
+```{r}
+table(train$target)
+```
+
+```{r}
+table(test$target)
+```
+
+```{r}
+table(val$target)
+```
+
+
+## Entrenamiento 
+
+1. Entrenar una SVM con los valores de los parámetros por defecto, pero con los pesos de las clases TRUE=1 y FALSE=10 (parámetro `class.weights`)
+
+```{r message=FALSE, warning=FALSE}
+library(e1071)
+
+svm_model <- svm(target ~ ., 
+                 data = train,
+                 cachesize = 200,
+                 class.weights = c("TRUE" = 1, "FALSE" = 10),
+                 probability = TRUE)
+```
+
+2. Predecir la probabilidad de la respuesta para le conjunto de test
+
+```{r}
+svm_pred <- predict(svm_model, test, probability = TRUE)
+prob_true <- attr(svm_pred, "probabilities")[, "TRUE"]
+```
+
+3. Calcular el AUC (librería `pROC`)
+
+```{r message=FALSE, warning=FALSE}
+library(pROC)
+auc(test$target, prob_true)
+```
+
+## Búsqueda de parámetros óptimos
+
+1. Probar con varios valores de $C$ y $\gamma$, calculando el AUC en el conjunto de validación
+
+```{r}
+custom_pred <- function(object = NULL, newdata = NULL, probability = NULL) {
+  svm_pred <- predict(object, newdata = newdata, probability = TRUE)
+  prob_true <- attr(svm_pred, "probabilities")[, "TRUE"]
+}
+
+auc_err <- function(true, pred) {
+  -as.numeric(auc(true, pred))
+}
+```
+
+```{r message=FALSE, warning=FALSE}
+tc <- tune.control(sampling = "fix", error.fun = auc_err)
+
+cv <- tune(svm,
+           target ~ ., 
+           data = train,
+           tunecontrol = tc,
+           validation.x = val,
+           ranges = list(cost = c(1, 10, 100, 1000),
+                         gamma = c(0.0001, 0.001, 0.01, 0.1)),
+           cache = 1000,
+           class.weights = c("TRUE" = 1, "FALSE" = 10),
+           probability = TRUE,
+           predict.func = custom_pred)
+```
+
+2. ¿Cuales son los parámetros con el mayor AUC?
+
+```{r}
+cv$best.performance
+```
+
+```{r}
+cv$best.parameters
+```
+
+
