@@ -12,15 +12,15 @@
     * Algoritmos de clasificación: KNN, Naive Bayes, ... (12/04, 4 horas) [[slides]](./Rmd/05-classification/05-classification.html)
     * Arboles de decisión, bosques aleatorios y boosting (22/04, 4 horas) [[slides]](./Rmd/06-trees/06-trees.html)
     * Support vector machines (25/04, 4 horas) [[slides]](./Rmd/07-svm/07-svm.html)
-    * Análisis de conglomerados: cuantización vectorial (29/04, 4 horas)
-    * Modelos gráficos probabilisticos (10/05, 4 horas)
+    * Análisis de conglomerados: cuantización vectorial (10/05, 4 horas)
     * DLMs (16/05, 4 horas)
-    * Algoritmos bayesianos para clasificación y regresión (17/05, 4 horas)
+    * Modelos gráficos probabilisticos (17/05, 4 horas)
+    * Algoritmos bayesianos para clasificación y regresión (27/05, 4 horas)
 
  3. Aprendizaje profundo
-    * Introducción (23/05, 2 horas)
-    * Redes neuronales (23/05 y 24/05, 4 horas)
-    * Introducción al aprendizaje profundo (24/05, 2 horas)
+    * Introducción (24/05, 2 horas)
+    * Redes neuronales (24/05 y 31/05, 4 horas)
+    * Introducción al aprendizaje profundo (31/05, 2 horas)
 
 ## Bibliografía
 
