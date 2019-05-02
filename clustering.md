@@ -4,7 +4,7 @@
 
   * Proximity Matrices. (V)
   * Attribute based dissimilarity. (R)
-  * xample based dissimilarity . (R)
+  * Example based dissimilarity . (R)
 
  2. Clustering Algos
 

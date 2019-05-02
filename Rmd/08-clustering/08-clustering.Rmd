@@ -1,0 +1,58 @@
+---
+title: "Análisis de conglomerados (Clustering)"
+subtitle: "Curso de aprendizaje automático para el INE"
+author: "Víctor Gallego y Roi Naveiro"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+    
+---
+
+class: middle, center, inverse
+
+# Introducción
+
+---
+
+## Introducción
+
+* bla
+
+---
+class: middle, center, inverse
+
+# Algoritmos de clustering: K-Means
+
+---
+
+class: middle, center, inverse
+
+# Algoritmos de clustering: Cuantización Vectorial
+
+
+---
+
+class: middle, center, inverse
+
+# Algoritmos de clustering: K-Mediodes
+
+
+---
+
+class: middle, center, inverse
+
+# Algoritmos de clustering: Clustering jerárquico
+
+
+---
+
+class: middle, center, inverse
+
+# Clustering Probabilístico
