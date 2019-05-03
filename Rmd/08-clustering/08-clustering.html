@@ -4,7 +4,7 @@
     <title>Análisis de conglomerados (Clustering)</title>
     <meta charset="utf-8" />
     <meta name="author" content="Víctor Gallego y Roi Naveiro" />
-    <meta name="date" content="2019-05-02" />
+    <meta name="date" content="2019-05-03" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Análisis de conglomerados (Clustering)
 ## Curso de aprendizaje automático para el INE
 ### Víctor Gallego y Roi Naveiro
-### 2019-05-02
+### 2019-05-03
 
 ---
 
@@ -142,17 +142,71 @@ Con
 
 * Aunque no se diga: esta es la parte más importante (y más costosa).
 
+
+---
+class: middle, center, inverse
+# Algoritmos de clustering
+
+---
+## Tipos de algoritmos de clustering
+
+* Algoritmos combinatorios: trabajan con los datos observados sin hacer referencia al modelo probabilístico subyacente.
+
+* Modelos de mixturas: asumen que datos son muestas iid de una mixtura de densidades de probabilidad. Cada componente describe un cluster.
+
+* *Mode Seekers*: modelos no paramétricos que estiman modas.
+
 ---
 class: middle, center, inverse
 
-# Algoritmos de clustering: K-Means
+# Algoritmos de clustering combinatorios: K-Means
 
 ---
+## Algoritmos combinatorios
 
+* Asignan cada observación a un cluster, sin preocuparse de la distribución de probailidad de subyacente.
+
+* Etiquetamos cada observación con `\(i \in \lbrace 1,2,\dots,N   \rbrace\)`
+
+* Postulamos un número fijo de clusters `\(K&lt;N\)`, etiquetados con `\(k \in \lbrace 1, \dots, K\)`.
+
+--
+
+* Objetivos construír función de asignación `\(k = C(i)\)` para cada `\(i\)`.
+
+* Buscar asignación que minimice **dispersión dentro del cluster**
+
+`\begin{equation}
+W(C) = \frac{1}{2} \sum_{k=1}^K \sum_{i:C(i)=k} \sum_{i':C(i')=k} d(x_i, x_{i'})
+\end{equation}`
+
+---
+## Algoritmos combinatorios
+
+* La dispersión total es
+
+`\begin{eqnarray}
+T &amp;=&amp; \frac{1}{2} \sum_{i=1}^N \sum_{i'=1}^N d(x_i, x_{i'}) = \frac{1}{2} \sum_{k=1}^K \sum_{i:C(i)=k} \left[ \sum_{i':C(i')=k} d(x_i, x_{i'}) + \sum_{i':C(i')\neq k} d(x_i, x_{i'}) \right] \\
+&amp;=&amp; W(C) + B(C)
+\end{eqnarray}`
+
+* `\(B(C)\)` es la **dispersión entre clusters**.
+
+* Minimizar `\(W(C)\)` es equivalente a maximizar `\(B(C)\)`.
+
+--
+
+* Optimiziación por enumeración complete **inviable**.
+* `\(N=19\)`, `\(K=4\)` número de asignaciónes del orden de `\(10^10\)`.
+* Estrategia: *iterative greedy descent*
+  1. Asignación inicial.
+  2. Iterativamente, cambiar asignación tal que se diminuya `\(W(C)\)`.
+  3. Parar cuando se deje de mejorar.
+
+---
 class: middle, center, inverse
 
 # Algoritmos de clustering: Cuantización Vectorial
-
 
 ---
 
