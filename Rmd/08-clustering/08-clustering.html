@@ -4,7 +4,7 @@
     <title>Análisis de conglomerados (Clustering)</title>
     <meta charset="utf-8" />
     <meta name="author" content="Víctor Gallego y Roi Naveiro" />
-    <meta name="date" content="2019-05-03" />
+    <meta name="date" content="2019-05-04" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Análisis de conglomerados (Clustering)
 ## Curso de aprendizaje automático para el INE
 ### Víctor Gallego y Roi Naveiro
-### 2019-05-03
+### 2019-05-04
 
 ---
 
@@ -198,11 +198,58 @@ T &amp;=&amp; \frac{1}{2} \sum_{i=1}^N \sum_{i'=1}^N d(x_i, x_{i'}) = \frac{1}{2
 
 * Optimiziación por enumeración complete **inviable**.
 * `\(N=19\)`, `\(K=4\)` número de asignaciónes del orden de `\(10^10\)`.
+
+---
+## Algoritmos combinatorios
+
 * Estrategia: *iterative greedy descent*
   1. Asignación inicial.
   2. Iterativamente, cambiar asignación tal que se diminuya `\(W(C)\)`.
   3. Parar cuando se deje de mejorar.
+  
+* Distintos algoritmos de clustering en función del paso 2.
 
+* Asegurada convergencia a óptimo local...
+
+---
+## K-Means
+
+* Todas las variables son cuantitativas. 
+
+* Disimilaridad = distancia Euclídea
+
+`\begin{equation}
+d(x_i, x_{i'}) = \Vert x_i - x_{i'} \Vert^2
+\end{equation}`
+
+* La distancia Euclídea con pesos puede usarse redefiniendo `\(x_{ij}\)`.
+--
+
+* En este caso,
+
+`\begin{equation}
+W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
+\end{equation}`
+
+* Como `\(\mu_k = \arg\min_m \sum_{i:C(i) = k} \Vert x_i - m \Vert^2\)`, vemos que la asignación óptima puede obtenerse resolviendo
+
+`\begin{equation}
+\min_{C, \lbrace m_k \rbrace_1^K}  \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - m_k \Vert^2
+\end{equation}`
+
+---
+## K-means
+
+* K-means resuelve utilizando *descenso coordenado*:
+
+  1. Fijar asignación `\(C\)` y minimizar respecto `\(\lbrace m_1, \dots m_K \rbrace\)`, asignando las medias de cada cluster.
+  2. Fijar las medias `\(\lbrace m_1, \dots m_K \rbrace\)` y minimizar asignando cada observación al cluster de la media más cercana.
+  
+  \begin{equation}
+C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
+\end{equation}`
+
+  3. Iterar 1 y 2 hasta que no cambien las asignaciones.
 ---
 class: middle, center, inverse
 

@@ -206,7 +206,45 @@ T &=& \frac{1}{2} \sum_{i=1}^N \sum_{i'=1}^N d(x_i, x_{i'}) = \frac{1}{2} \sum_{
 
 * Asegurada convergencia a óptimo local...
 
+---
+## K-Means
 
+* Todas las variables son cuantitativas. 
+
+* Disimilaridad = distancia Euclídea
+
+\begin{equation}
+d(x_i, x_{i'}) = \Vert x_i - x_{i'} \Vert^2
+\end{equation}
+
+* La distancia Euclídea con pesos puede usarse redefiniendo $x_{ij}$.
+--
+
+* En este caso,
+
+\begin{equation}
+W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
+\end{equation}
+
+* Como $\mu_k = \arg\min_m \sum_{i:C(i) = k} \Vert x_i - m \Vert^2$, vemos que la asignación óptima puede obtenerse resolviendo
+
+\begin{equation}
+\min_{C, \lbrace m_k \rbrace_1^K}  \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - m_k \Vert^2
+\end{equation}
+
+---
+## K-means
+
+* K-means resuelve utilizando *descenso coordenado*:
+
+  1. Fijar asignación $C$ y minimizar respecto $\lbrace m_1, \dots m_K \rbrace$, asignando las medias de cada cluster.
+  2. Fijar las medias $\lbrace m_1, \dots m_K \rbrace$ y minimizar asignando cada observación al cluster de la media más cercana.
+  
+  \begin{equation}
+C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
+\end{equation}
+
+  3. Iterar 1 y 2 hasta que no cambien las asignaciones.
 ---
 class: middle, center, inverse
 
