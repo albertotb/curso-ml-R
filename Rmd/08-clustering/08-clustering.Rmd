@@ -192,7 +192,7 @@ T &=& \frac{1}{2} \sum_{i=1}^N \sum_{i'=1}^N d(x_i, x_{i'}) = \frac{1}{2} \sum_{
 --
 
 * Optimiziación por enumeración complete **inviable**.
-* $N=19$, $K=4$ número de asignaciónes del orden de $10^10$.
+* $N=19$, $K=4$ número de asignaciones del orden de $10^{10}$.
 
 ---
 ## Algoritmos combinatorios
@@ -245,13 +245,26 @@ C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
 \end{equation}
 
   3. Iterar 1 y 2 hasta que no cambien las asignaciones.
----
-class: middle, center, inverse
-
-# Algoritmos de clustering: Cuantización Vectorial
 
 ---
+## Cuantización vectorial
 
+* Técnica de teoría de la señal para aproximar datos de alta dimensión.
+
+* Utilizada para compresión de datos.
+
+* Idea: dividir conjunto grande de puntos en grupos y aproximar cada grupo por su centroide.
+
+* En compresión de imágenes:
+
+  1. Dividir imagen de NxN pixels en grupos de kxk pixels (k < N).
+  2. Considerar cada grupo como un vector de dimensión kxk.
+  3. Aplicar K-means y aproximar cada grupo por su centroide más próximo. (Conjunto de centroides se conoce como codebook).
+
+* Puede usarse también para imputar datos.
+  
+
+---
 class: middle, center, inverse
 
 # Algoritmos de clustering: K-Mediodes
