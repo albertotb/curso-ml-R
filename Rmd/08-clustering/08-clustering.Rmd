@@ -233,6 +233,7 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
 \end{equation}
 
 ---
+
 ## K-means
 
 * K-means resuelve utilizando *descenso coordenado*:
@@ -240,13 +241,14 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
   1. Fijar asignación $C$ y minimizar respecto $\lbrace m_1, \dots m_K \rbrace$, asignando las medias de cada cluster.
   2. Fijar las medias $\lbrace m_1, \dots m_K \rbrace$ y minimizar asignando cada observación al cluster de la media más cercana.
   
-  \begin{equation}
-C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
-\end{equation}
-
+  \begin{equation*}
+  C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
+  \end{equation*}
+  
   3. Iterar 1 y 2 hasta que no cambien las asignaciones.
 
 ---
+
 ## Cuantización vectorial
 
 * Técnica de teoría de la señal para aproximar datos de alta dimensión.
@@ -263,8 +265,8 @@ C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
 
 * Puede usarse también para imputar datos.
   
-
 ---
+
 class: middle, center, inverse
 
 # Algoritmos de clustering: K-Mediodes
@@ -282,3 +284,170 @@ class: middle, center, inverse
 class: middle, center, inverse
 
 # Clustering Probabilístico
+
+---
+
+## Mixturas de Gaussianas (MoG)
+
+* Consisten en una combinación convexa de $K$ distribuciones normales,
+
+\begin{equation*}
+p(x) = \sum_{k=1}^K \pi_k \mathcal{N}(x| \mu_k, \Sigma_k)
+\end{equation*}
+
+* donde $\sum_{k=1}^K \pi_k = 1$ y $\pi_k \geq 0$, consiguiendo modelizar distribuciones *multimodales*.
+
+<center>
+![:scale 50%](./img/mog_intro.png)
+</center>
+
+---
+
+## Modelos probabilísticos
+
+* Podemos refinar nuestras inferencias si distinguimos dos tipos de variables (aleatorias):
+
+  1. Variables **observadas**: $x$, los datos del problema.
+  
+  2. Variables **latentes**: $z$, no son observables, queremos inferirlas a partir de las observaciones.
+  
+* Distinguir entre los dos tipos de variables anteriores es la base de los **modelos probabilísticos**.
+
+* Estos modelos definen una distribución conjunta $p(x,z)$.
+
+* Estamos interesados en hacer inferencias de la forma $p(z|x)$ (la distribución a posteriori), para ello recurrimos al Teorema de Bayes:
+
+\begin{equation*}
+p(z|x)  = \frac{p(x,z)}{p(x)} = \frac{p(x,z)}{\int p(z,x) dz}
+\end{equation*}
+
+--
+
+* $p(x)$ suele ser intratable de calcular: surgen numerosas técnicas de aproximación Bayesiana (Markov Chain Monte Carlo, Expectation-Maximization, Variational Inference, ...)
+  
+---
+
+## Mixturas de Gaussianas (MoG)
+
+* En el caso de la mixtura de Gaussianas, ¿qué representan las variables latentes $z$?
+
+--
+
+* Intuición con clustering: $z$ será una **variable categórica (factor)** que indica a que componente (cluster) pertenece la observación $x$.
+
+* Podemos simular de una mixtura de Gaussianas mediante el siguiente proceso:
+
+  1. $z \sim \mathcal{C}ategorical\lbrace 1, \ldots, K \rbrace$ (seleccionamos cluster)
+  
+  2. Sea $z = k$, $x \sim \mathcal{N}(\mu_k, \Sigma_k)$ (simulamos de ese cluster)
+  
+--
+
+* Gráficamente, lo representamos mediante
+<center>
+![:scale 15%](./img/mog.png)
+</center>
+donde los nodos son variables aleatorias, y los arcos indican dependencia probabilista.
+
+---
+
+## Mixturas de Gaussianas (MoG)
+
+<center>
+![:scale 15%](./img/mog.png)
+</center>
+
+* Nos indica que la probabilidad conjunta $p(x,z)$ se ha factorizado de la siguiente manera al definir el modelo
+
+\begin{equation*}
+p(x,z) = p(z)p(x|z)
+\end{equation*}
+
+--
+
+* ¿Quiénes son los factores?
+
+  * $p(z)$: lo definimos tal que $p(z_k = 1) = \pi_k$, donde $z$ es una variable categórica representada mediante OHE.
+  
+  * $p(x|z_k = 1) = \mathcal{N}(x| \mu_k, \Sigma_k)$
+  
+* De esta forma, tenemos que la marginal es (**coincide con lo original**)
+
+\begin{equation*}
+p(x) = \sum_z p(x,z) = \sum_z p(z)p(x|z) = \sum_{k=1}^K \pi_k \mathcal{N}(x| \mu_k, \Sigma_k)
+\end{equation*}
+
+
+---
+
+## Mixturas de Gaussianas (MoG)
+
+* Si hemos llegado a lo mismo que al principio, **¿para qué hemos hecho todo esto?**
+
+--
+
+* Al introducir las variables latentes $z$, podemos responder de forma natural a inferencias del tipo: ¿a qué cluster asignamos $x$? mediante el posterior $p(z|x)$.
+
+* En el ámbito de MoGs, al posterior también se le denomina **responsabilidad**, y su expresión es
+
+\begin{equation*}
+p(z_k = 1|x) = \frac{\pi_k \mathcal{N}(x| \mu_k, \Sigma_k)}{\sum_{k=1}^K \pi_k \mathcal{N}(x| \mu_k, \Sigma_k)}
+\end{equation*}
+
+* En lugar de obtener una asignación **rígida** a un cluster, tenemos una noción de incertidumbre via $p(z|x)$.
+
+* Además, al introducir las variables latentes $z$, se pueden desarrollar algoritmos de inferencia más sofisticados (como EM).
+
+---
+
+## Máxima Verosimilitud (ML)
+
+* Todavía no hemos visto cómo obtener valores buenos para los parámetros de las dos distribuciones involucradas:
+
+\begin{equation*}
+\pi_k, \mu_k, \Sigma_k
+\end{equation*}
+
+* El algoritmo más básico (no necesita latentes $z$) es el de **máxima verosimilitud**.
+
+* Supongamos que tenemos $x_1, \ldots, x_N$ observaciones (independientes), escribimos la log-verosimilitud del modelo
+
+\begin{equation*}
+\log p(x|\pi, \mu, \Sigma) = \sum_{n=1}^N \log \lbrace \sum_{k=1}^K \pi_k \mathcal{N}(x_n| \mu_k, \Sigma_k) \rbrace
+\end{equation*}
+
+* Hemos obtenido un problema de optimización
+
+\begin{equation*}
+\pi^* , \mu^* , \Sigma^* =  \arg\max_{\pi, \mu, \Sigma} \log p(x|\pi, \mu, \Sigma) 
+\end{equation*}
+
+
+---
+
+## Cuestiones técnicas sobre ML
+
+* Desafortunadamente, no hay una solución explícita para el óptimo, pero podemos utilizar **descenso por el gradiente** o similares.
+
+* El problema de optimización presenta **singularidades**. Si "tenemos suerte", puede ocurrir que durante la optimización $x_n = \mu_j$, teniendo que
+
+\begin{equation*}
+\mathcal{N}(x_n|x_n, \sigma_j^2 I) = \frac{1}{\sqrt{2 \pi}} \frac{1}{\sigma_j} \rightarrow\infty
+\end{equation*}
+
+cuando $\sigma_j \rightarrow 0$.
+
+* Es decir, ajustando una componente a un único punto $x_n$, podemos maximizar la función objetivo tanto como queramos. **El overfitting es real**.
+
+<center>
+![:scale 30%](./img/mog_of.png)
+</center>
+
+
+---
+
+## MoG mediante EM 
+
+
+---
+
