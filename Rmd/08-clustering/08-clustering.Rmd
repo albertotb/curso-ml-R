@@ -281,6 +281,175 @@ class: middle, center, inverse
 
 ---
 
+## Clustering jerárquico
+
+* **Problema**: ¿cómo elegimos el número de clústers de antemano?
+
+* Los algoritmos de clustering jerárquico evitan este problema: en lugar de tener que especificarlo:
+
+* construyen toda una jerarquía sobre las observaciones.
+
+
+* Ejemplos típicos de Biología y Genética:
+
+<center>
+![:scale 50%](./img/taxo.png)
+</center>
+
+
+---
+
+
+## Tipos de clustering jerárquico
+
+* Clustering **divisivo** (de arriba a abajo)
+
+  * Empieza con todos los puntos en un único clúster (la raíz), luego:
+  
+  * Parte la raíz en un conjunto de clústers hijos, y sigue dividiendo recursivamente
+  
+  * Para cuando hay un único clúster por observación.
+
+* Clustering **aglomerativo** (de abajo a arriba)
+
+  * Cada observación es un clúster.
+  
+  * Se van fusionando clústers más similares en cada iteración.
+  
+  * Más estudiado que los divisivos.
+  
+<center>
+![:scale 30%](./img/agg.png)
+</center>
+
+---
+
+## Dendrogramas
+
+
+
+---
+
+
+## Clustering aglomerativo
+
+El algoritmo es el siguiente:
+
+1. Empezar con $n$ observaciones y una medida de todas las disimilaridades de los 
+$n \choose 2$ posibles emparejamientos. Tratar cada observación como un único clúster.
+
+2. Para $i = n, n-1, \ldots ,2$:
+
+  * Examinar todas las disimilaridades inter-cluster e identificar el par de clústers
+  más similar, fusionándolos. La disimilaridad entre estos dos clústers indica la altura del dendrograma a la que irá anotada la fusión.
+  
+  * Calcular las nuevas disimilaridades inter-clusters entre los $i-1$ grupos restantes.
+  
+  
+* **Importante**: tenemos que generalizar nuestra noción de distancia entre observaciones a una que mida distancia entre clústers de observaciones.
+
+
+---
+
+## Clustering aglomerativo
+
+* Ejemplo de un posible resultado:
+
+<center>
+![:scale 90%](./img/agg_example.png)
+</center>
+
+---
+
+## Funciones de link
+
+* ¿Cómo definimos una noción de distancia entre clusters? Hay varias opciones
+
+* **Single link**: $d_{SL}(G,H) = \min_{i \in G, j \in H} d_{ij}$.
+
+<center>
+![:scale 30%](./img/SL.png)
+</center>
+
+* **Complete link**: $d_{CL}(G,H) = \max_{i \in G, j \in H} d_{ij}$.
+
+<center>
+![:scale 30%](./img/CL.png)
+</center>
+
+* **Promedio** (group average): $d_{GA}(G,H) = \frac{1}{N_G N_H} \sum_{i \in G} \sum_{j \in H} d_{ij}$.
+
+* También hay otras, como las de la familia Ward que minimizan la varianza intracluster total.
+
+---
+
+## Funciones de link
+
+* ¿Cómo escogemos la función de link?
+
+--
+
+* Solo hay algunas heurísticas:
+
+  * Single link: puede generar clústers alargados (chaining: a cada clúste solo se le añade una observación cada vez).
+  
+  * Complete link: tiende a producir clústers mucho más compactos, aunque puede violar la propiedad de cercanía.
+  
+  * Link Promedio: supone un compromiso entre los dos, aunque es sensible a la escala de las distancias $d_{ij}$.
+
+
+
+
+---
+
+## Funciones de link
+
+
+<center>
+![:scale 90%](./img/links.png)
+</center>
+
+
+---
+
+## Correlación cofenética
+
+* Cophenetic correlation.
+
+---
+
+
+## Resumen de clustering jerárquico
+
+* Para un dataset consistente en $n$ puntos:
+
+  * Requiere $\mathcal{O}(n^2)$ memoria (por la matriz de distancias).
+  
+  * Requiere $\mathcal{O}(n^3)$ de tiempo en la mayoría de casos (aglomerativo).
+  
+  
+* Ventajas:
+
+  * Muy útiles para visualización (dendrograma).
+  
+  * Cuando los datos tienen estructura jerárquica, más útil que otros tipos de clustering.
+  
+* Inconvenientes:
+
+  * Elevado coste computacional (ver arriba).
+  
+  * Sensibles a tipo de algoritmo/distancia escogidas.
+  
+* En R:
+
+  * hclust de la librería estándar, bastante sólida.
+  
+  * dendextend para trabajar con dendrogramas (ver práctica).
+
+---
+
+
+
 class: middle, center, inverse
 
 # Clustering Probabilístico
