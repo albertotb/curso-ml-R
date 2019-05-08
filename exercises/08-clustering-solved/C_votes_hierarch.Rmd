@@ -68,7 +68,7 @@ Explorar el objeto resultante
 hc_votes <- hclust(d_votes, method = "complete")
 ```
 
-5. Representa el dendograma usando la función plot y as.dendogram del objeto anterior
+5. Representa el dendrograma usando la función plot y as.dendrogram del objeto anterior
 
 ¿Cuáles son los estados más parecidos?
 
@@ -78,7 +78,7 @@ plot(dend)
 ```
 
 
-6. Ahora utilizaremos la librería dendextend para tener más flexibilidad con los dendogramas.
+6. Ahora utilizaremos la librería dendextend para tener más flexibilidad con los dendrogramas.
 Usando la función color_branches, obtén dos clusters
 
 ```{r }
@@ -111,5 +111,44 @@ heatmap.2(as.matrix(votes.repub),
           density.info = "density"
          )
 
+```
+
+8. Teniendo en cuenta el siguiente gráfico de correlaciones entre dendogramas
+```{r }
+hclust_methods <- c("ward.D", "single", "complete", "average")
+votes.repub_dendlist <- dendlist()
+
+for(i in seq_along(hclust_methods)) {
+   tmp_dend <- votes.repub %>% asinTransform %>% dist %>% hclust(method = hclust_methods[i]) %>% as.dendrogram 
+   votes.repub_dendlist <- dendlist(votes.repub_dendlist, tmp_dend)
+}
+names(votes.repub_dendlist) <- hclust_methods
+
+
+corrplot::corrplot(cor.dendlist(votes.repub_dendlist), "pie", "full")
+```
+
+representa el tanglegram entre el completo y el método que menos se le parezca.
+```{r }
+
+dend_com <- color_branches(as.dendrogram(hclust(d_votes, method = "complete")), k=2)
+dend_com <- rotate(dend_com, labels(dend))
+dend_ward <- color_branches(as.dendrogram(hclust(d_votes, method = "ward.D")), k=2)
+dend_ward <- rotate(dend_ward, labels(dend))
+
+dends <- dendlist(complete = dend_com, ward = dend_ward)
+tanglegram(dends, margin_inner = 6)
+```
+
+Ahora repetimos lo mismo pero con el método más distinto al completo
+```{r }
+
+dend_com <- color_branches(as.dendrogram(hclust(d_votes, method = "complete")), k=2)
+dend_com <- rotate(dend_com, labels(dend))
+dend_sing <- color_branches(as.dendrogram(hclust(d_votes, method = "single")), k=2)
+dend_sing <- rotate(dend_sing, labels(dend))
+
+dends <- dendlist(complete = dend_com, single = dend_sing)
+tanglegram(dends, margin_inner = 6)
 ```
 
