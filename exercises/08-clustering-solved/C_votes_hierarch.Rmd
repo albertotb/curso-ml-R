@@ -1,0 +1,64 @@
+---
+title: "Ejercicio clustering jerárquico"
+author: "Roi Naveiro, Victor Gallego"
+date: "8/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Clustering jerárquico
+
+Utilizaremos el dataset votes.repub, consistente en una tabla con el porcentaje de votos dados al candidato republicano en elecciones presidenciales desde 1856 a 1976. La fuente del dataset es
+
+S. Peterson (1973): A Statistical History of the American Presidential Elections. New York: Frederick Ungar Publishing Co. Data from 1964 to 1976 is from R. M. Scammon, American Votes 12, Congressional Quarterly.
+
+
+1. Obtenemos el dataset desde la librería cluster
+
+```{r}
+votes.repub <- cluster::votes.repub
+```
+
+2. Explorar el dataset. Observar que contiene 50 filas (1 por estado) y 31 columnas (1 por cada elección desde 1856 hasta 1976)
+
+Representar gráficamente el porcentaje de voto para cada estado a lo largo de los años.
+
+
+```{r}
+library(ggplot2)
+votes <- reshape2::melt(t(votes.repub))
+
+votes$Var1 <- sub(pattern = "X", 
+                replacement = "", x=votes$Var1)
+votes$Var1 <- strtoi(votes$Var1)
+colnames(votes) <- c('Year',  'State', 'VotePerc.')
+
+ggplot(votes, aes(x=Year)) + 
+  geom_line(aes(y=VotePerc., col=State)) +
+  theme(legend.position = "none")+
+  scale_color_manual(values=cm.colors(50))
+#
+```
+
+3. Calcular la matriz de distancias usando la función dist
+Previamente, aplicar la transformación angular (arcsin(sqrt(x/100))) a los datos.
+
+Representar la matriz de distancias utilizando la función image
+
+
+```{r }
+asinTransform <- function(p) { asin(sqrt(p/100.)) }
+
+d_votes <- dist(asinTransform(votes.repub))
+
+dim <- nrow(votes.repub)
+image(1:dim, 1:dim, as.matrix(d_votes), axes = FALSE, xlab="", ylab="")
+
+axis(1, 1:dim, rownames(votes.repub), cex.axis = 0.5, las=3)
+axis(2, 1:dim, rownames(votes.repub), cex.axis = 0.5, las=1)
+```
+
+
