@@ -288,7 +288,7 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
 
 ---
 
-## K-means
+## K-Means
 
 * K-means resuelve utilizando *descenso coordenado*:
 
@@ -573,77 +573,6 @@ class: middle, center, inverse
 
 ---
 
-## Algoritmo EM (1)
-
-* Técnica general para encontrar soluciones de máxima verosimilitud en modelos probabilísticos con variables latentes.
-
-* Sea un modelo probabilístico en el que denotamos por $X$ el vector de variables observadas y $Z$ el vector de variables latentes (discretas).
-
-* La distribución conjunta, $p(X,Z|\theta)$ viene gobernada por el vector de parámetros $\theta$. Queremos maximizar
-
-\begin{equation}
-p(X|\theta) = \sum_{Z} p(X,Z|\theta)
-\end{equation}
-
-
-* Asumimos que la optimización directa de $p(X|\theta)$ es difícil, pero la de $p(X,Z|\theta)$ es fácil.
-
----
-## Algoritmo EM (2)
-
-* Para cualquier distribución $q(Z)$ sobre las variables latentes se verifica
-
-\begin{equation}
-\log\left[p(X|\theta)\right] = \mathcal{L}(q,\theta) + KL(q \Vert p)
-\end{equation}
-
-* Donde
-
-\begin{eqnarray}
-\mathcal{L}(q,\theta) &=& \sum_{Z} q(Z) \log \left[ \frac{p(X,Z \vert \theta)}{q(z)}\right] \\
-KL(q \Vert p) &=& - \sum_{Z} q(Z) \log \left[ \frac{p(Z \vert X, \theta)}{q(z)}\right]
-\end{eqnarray}
-
-* **Ejercicio**: demostrarlo.
-
---
-
-* La divergencia de Kullback-Leibler verifica $KL(q \Vert p) \geq 0$ y $KL(q \Vert p) = 0$ si y solo si $q(Z) = p(Z \vert X,\theta)$.
-
-* Por tanto, $\mathcal{L}(q,\theta) \leq \log\left[p(X|\theta)\right]$.
-
----
-## Algoritmo EM (3)
-
-* El algoritmo EM es un algoritmo de optimización iterativo con dos etapas utilizado para encontrar $\theta$ que maximiza la verosimilitud.
-
-* Supongamos que l valor actual de $\theta$ es $\theta^{old}$
-
-* Paso E: Maximizar $\mathcal{L}(q,\theta^{old})$ con respecto a $q(Z)$. (Demostrar que el máximo se alcanza cuando $q(Z) = p(Z| X, \theta^{old})$).
-
-* Paso M: Mantener fija $q(Z)$ y maximizar  $\mathcal{L}(q,\theta)$ con respecto a $\theta$, dando lugar a $\theta^{new}$.
-
-* El paso M hace que $\mathcal{L}(q,\theta)$ crezca y por tanto también la log verosimilitud.
-
-* Como $q$ está determinada usando los parámetros viejos, ya no es idéntica a $p(Z| X, \theta^{new})$ y por tanto la KL será distinta de 0.
-
-* El aumento en log verosimilitud es mayor que el aumento en su cota inferior.
-
----
-## Algoritmo EM (4)
-
-* Después del paso E tenemos que
-
-\begin{equation}
-\mathcal{L}(q,\theta) = \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta) - \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta^{old}) 
-\end{equation}
-
-* En el paso M maximizamos el calor esperado de $\log p(X,Z | \theta)$.
-
-* $\theta$ aparece únicamente en el logaritmo. Si la distribución conjunto es de la familia exponencial, la optimización es muy sencilla.
-
----
-
 ## Mixturas de Gaussianas (MoG)
 
 * Consisten en una combinación convexa de $K$ distribuciones normales,
@@ -803,7 +732,173 @@ cuando $\sigma_j \rightarrow 0$.
 
 ---
 
-## MoG mediante EM 
+## Algoritmo EM (1)
+
+* Técnica general para encontrar soluciones de máxima verosimilitud en modelos probabilísticos con variables latentes.
+
+* Sea un modelo probabilístico en el que denotamos por $X$ el vector de variables observadas y $Z$ el vector de variables latentes (discretas).
+
+* La distribución conjunta, $p(X,Z|\theta)$ viene gobernada por el vector de parámetros $\theta$. Queremos maximizar
+
+\begin{equation}
+p(X|\theta) = \sum_{Z} p(X,Z|\theta)
+\end{equation}
+
+
+* Asumimos que la optimización directa de $p(X|\theta)$ es difícil, pero la de $p(X,Z|\theta)$ es fácil.
+
+---
+## Algoritmo EM (2)
+
+* Para cualquier distribución $q(Z)$ sobre las variables latentes se verifica
+
+\begin{equation}
+\log\left[p(X|\theta)\right] = \mathcal{L}(q,\theta) + KL(q \Vert p)
+\end{equation}
+
+* Donde
+
+\begin{eqnarray}
+\mathcal{L}(q,\theta) &=& \sum_{Z} q(Z) \log \left[ \frac{p(X,Z \vert \theta)}{q(z)}\right] \\
+KL(q \Vert p) &=& - \sum_{Z} q(Z) \log \left[ \frac{p(Z \vert X, \theta)}{q(z)}\right]
+\end{eqnarray}
+
+* **Ejercicio**: demostrarlo.
+
+--
+
+* La divergencia de Kullback-Leibler verifica $KL(q \Vert p) \geq 0$ y $KL(q \Vert p) = 0$ si y solo si $q(Z) = p(Z \vert X,\theta)$.
+
+* Por tanto, $\mathcal{L}(q,\theta) \leq \log\left[p(X|\theta)\right]$.
+
+---
+## Algoritmo EM (3)
+
+* El algoritmo EM es un algoritmo de optimización iterativo con dos etapas utilizado para encontrar $\theta$ que maximiza la verosimilitud.
+
+* Supongamos que l valor actual de $\theta$ es $\theta^{old}$
+
+* Paso E: Maximizar $\mathcal{L}(q,\theta^{old})$ con respecto a $q(Z)$. (Demostrar que el máximo se alcanza cuando $q(Z) = p(Z| X, \theta^{old})$).
+
+* Paso M: Mantener fija $q(Z)$ y maximizar  $\mathcal{L}(q,\theta)$ con respecto a $\theta$, dando lugar a $\theta^{new}$.
+
+* El paso M hace que $\mathcal{L}(q,\theta)$ crezca y por tanto también la log verosimilitud.
+
+* Como $q$ está determinada usando los parámetros viejos, ya no es idéntica a $p(Z| X, \theta^{new})$ y por tanto la KL será distinta de 0.
+
+* El aumento en log verosimilitud es mayor que el aumento en su cota inferior.
+
+---
+## Algoritmo EM (4)
+
+* Después del paso E tenemos que
+
+\begin{equation}
+\mathcal{L}(q,\theta) = \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta) - \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta^{old}) 
+\end{equation}
+
+* En el paso M maximizamos el calor esperado de $\log p(X,Z | \theta)$.
+
+* $\theta$ aparece únicamente en el logaritmo. Si la distribución conjunto es de la familia exponencial, la optimización es muy sencilla.
+
+---
+
+## MoG mediante EM (1)
+
+* En MoG queremos maximizar
+
+\begin{equation*}
+\log p(X|\pi, \mu, \Sigma) = \sum_{n=1}^N \log \lbrace \sum_{k=1}^K \pi_k \mathcal{N}(x_n| \mu_k, \Sigma_k) \rbrace
+\end{equation*}
+
+* Difícil pues la suma ocurre dentro del logaritmo.
+
+* En cambio, la **verosimlitud completa**, más fácil pues cambia orden de logaritmo y suma
+
+\begin{equation*}
+\log p(X,Z|\pi, \mu, \Sigma) = \sum_{n=1}^N  \sum_{k=1}^K z_{nk} \left \lbrace \log \pi_k  + \log \mathcal{N}(x_n| \mu_k, \Sigma_k) \right \rbrace
+\end{equation*}
+
+
+---
+
+## MoG mediante EM (2)
+
+* Usamos EM. 
+
+* En el paso $E$ debemos evaluar $p(Z|X,\mu^{old},\Sigma^{old},\pi^{old})$
+
+\begin{equation*}
+p(z_k = 1|x) = \frac{\pi^{old}_k \mathcal{N}(x| \mu^{old}_k, \Sigma^{old}_k)}{\sum_{k=1}^K \pi^{old}_k \mathcal{N}(x| \mu^{old}_k, \Sigma^{old}_k)} = \gamma(z_{nk})
+\end{equation*}
+
+* En el paso $M$, calculamos $\mu^{new},\Sigma^{new},\pi^{new}$, maximizando
+
+\begin{equation}
+\mathbb{E}[\log p (X,Z \vert \mu, \Sigma, \pi)] = \sum_{n=1}^N  \sum_{k=1}^K \gamma(z_{nk}) \left \lbrace \log \pi_k  + \log \mathcal{N}(x_n| \mu_k, \Sigma_k) \right \rbrace
+\end{equation}
+
+
+---
+
+## MoG mediante EM (3)
+
+* Para $\mu_k$ (definiendo $N_k = \sum{n=1}^N \gamma{z_{nk}}$)
+
+\begin{equation}
+\mu_k = \frac{1}{N_k} \sum_{n=1}^N \gamma{z_{nk}}x_n
+\end{equation}
+
+* Para $\Sigma_k$
+
+\begin{equation}
+\Sigma_k = \frac{1}{N_k} \sum_{n=1}^N \gamma{z_{nk}}(x_n - \mu_k)(x_n - \mu_k)^{\top}
+\end{equation}
+
+* Para $\pi_k$
+
+\begin{equation}
+\pi_k = \frac{N_k}{N}
+\end{equation}
+
+---
+
+## Relación entre K-medias y MoG
+
+* Considérese una MoG con $\Sigma_k = \epsilon I$.
+
+\begin{equation}
+p(x|\mu_k, \Sigma_k) = \frac{1}{(2\pi \epsilon)^{1/2}} \exp \left \lbrace -\frac{1}{2 \epsilon} \Vert x-\mu_k \Vert^2 \right \rbrace
+\end{equation}
+
+* Usemos EM en este caso. La distribución a posteriori de $z$ será
+
+\begin{equation}
+\gamma(z_{nk}) = \frac{\pi_k \exp \left \lbrace -\frac{1}{2 \epsilon} \Vert x-\mu_k \Vert^2 \right \rbrace }{\sum_j \pi_j \exp \left \lbrace -\frac{1}{2 \epsilon} \Vert x -\mu_j \Vert^2 \right \rbrace}
+\end{equation}
+
+* En el límite $\epsilon \rightarrow 0$, $\gamma(z_{nk}) = 0$ para todo $k$ excepto aquel para el cual $\Vert x -\mu_k \Vert^2$ sea mínimo.
+
+* Cada punto asignado al cluster con centroide más cercano!!
+
+
+---
+
+## Relación entre K-medias y MoG
+
+* En este límite, el valor esperado de la log verosimilitud completa se puede escribir como
+
+\begin{equation}
+-\frac{1}{2} \sum_{n=1}^N  \sum_{k=1}^K I(C(n) = k) \Vert x_n - \mu_k \Vert^2 + \text{cte}
+\end{equation}
+
+* Maximizarlo (respecto a $\mu_k$) equivale a escoger
+
+\begin{equation}
+\mu_k = \arg\min_m \sum_{n:C(n) = k} \Vert x_n - m \Vert^2
+\end{equation}
+
+
 
 
 
