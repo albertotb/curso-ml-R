@@ -12,7 +12,7 @@
     * Algoritmos de clasificación: KNN, Naive Bayes, ... (12/04, 4 horas) [[slides]](./Rmd/05-classification/05-classification.html)
     * Arboles de decisión, bosques aleatorios y boosting (22/04, 4 horas) [[slides]](./Rmd/06-trees/06-trees.html)
     * Support vector machines (25/04, 4 horas) [[slides]](./Rmd/07-svm/07-svm.html)
-    * Análisis de conglomerados: cuantización vectorial (10/05, 4 horas)
+    * Análisis de conglomerados: cuantización vectorial (10/05, 4 horas) [[slides]](./Rmd/08-clustering/08-clustering.html)
     * DLMs (16/05, 4 horas)
     * Modelos gráficos probabilisticos (17/05, 4 horas)
     * Algoritmos bayesianos para clasificación y regresión (27/05, 4 horas)
