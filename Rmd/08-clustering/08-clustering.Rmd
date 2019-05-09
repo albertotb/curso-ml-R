@@ -21,11 +21,29 @@ class: middle, center, inverse
 
 ---
 
-## Introducción
+## Repaso
 
-* Objetivo: agrupar un conjunto de ejemplos en *clusters*.
+* **Aprendizaje no supervisado**: solo tenemos datos $\mathcal{X} = \lbrace x_1, \ldots, x_N \rbrace$ sin etiquetar.
 
-* Ejemplos del mismo cluster más parecidos entre sí que ejemplos de diferentes clusters.
+* Hasta ahora hemos visto PCA y NMF, que tratan de aprender una representación de los datos en un espacio de menor dimensión.
+
+--
+
+* Hoy nos centraremos en las técnicas de **clustering** (también conocidas como **segmentación de datos**), que buscan construir agrupaciones de datos basados en su similaridad.
+
+* Ejemplo típico en banca:
+
+<center>
+![:scale 50%](./img/Clust1.gif)
+</center>
+
+---
+
+### Introducción
+
+* Objetivo: agrupar un conjunto de ejemplos en grupos denominados *clústers*.
+
+* Ejemplos del mismo clúster más parecidos entre sí que ejemplos de diferentes clústers.
 
 --
 
@@ -43,9 +61,33 @@ class: middle, center, inverse
 * Esto depende del problema concreto (similar a elección de coste en aprendizaje supervisado).
 
 ---
+
+
 ## Matrices de proximidad
 
+La mayoría de algoritmos para clustering requieren la siguiente representación para los datos $x_1, \ldots, x_N$:
+
+\begin{equation*}
+  \mathbf{D} = 
+  \begin{pmatrix}
+  d_{11} & \ldots & d_{1N} \\
+  \ldots & \ldots & \ldots \\
+  d_{N1} & \ldots & d_{NN}
+  \end{pmatrix}
+\end{equation*}
+
+* donde $d_{ii'}$ mide la **disimilaridad** entre $x_i$ y $x_{i'}$.
+
+* $\mathbf{D}$ es una matriz de tamaño $N \times N$ (lo cual impone un requisito en la complejidad en memoria de los algoritmos de clustering).
+
+* La mayoría de algoritmos asume una matriz simétrica (si no lo es, usar ( $\mathbf{D}+\mathbf{D}^\intercal)/2$ ).
+
+* Las disimilaridades no son distancias en el sentido estricto, pues no verifican la desigualdad triangular $d_{ii'} \leq d_{ik} + d_{ki'}$.
+
+* A continuación veremos como obtener medidas de disimilaridad de una forma estructurada.
+
 ---
+
 ## Medidas de disimilaridad entre atributos
 
 * Datos: $x_{ij}$ con $i = 1,2,\dots,N$ y $j=1,2,\dots, p$. $N$ ejemplos con $p$ atributos.
@@ -64,6 +106,7 @@ D(x_i, x_{i'}) = \sum_{j=1}^p d_j(x_{ij}, x_{i'j})
 * No hay por qué pesar todos los atributos igual...
 
 ---
+
 ## Medidas de disimilaridad entre atributos
 
 * En función del tipo de atributo:
@@ -79,7 +122,9 @@ con $l$ función monótona creciente. Error cuadrático o absoluto. También es 
 \begin{equation}
 \rho(x_i, x_{i'}) = \frac{\sum_{j} (x_{ij} - \bar{x}_i) (x_{i'j} - \bar{x}_{i'})}{\sqrt{\sum_{j} (x_{ij} - \bar{x}_i)^2 \sum_{j} (x_{i'j} - \bar{x}_{i'})^2}}
 \end{equation}
+
 ---
+
 ## Medidas de disimilaridad entre atributos
 
 * En función del tipo de atributo:
@@ -95,6 +140,7 @@ L_{jj} = 0 & ~ & L_{jj'} = 1
 
 
 ---
+
 ## Medidas de disimilaridad entre objetos
 
 * Procedimiento para combinar $p$ medidas de disimilaridad entre atributos en una medida de disimilarida entre ejemplos $D(x_i, x_{i'})$.
@@ -108,6 +154,7 @@ L_{jj} = 0 & ~ & L_{jj'} = 1
 * Elección de pesos, depende del problema en cuestión.
 
 ---
+
 ## Medidas de disimilaridad entre objetos
 
 * Ojo: dar el mismo peso a todos los atributos, no signfica que todos contribuyan en la misma cantidad a la medida total de disimilaridad.
@@ -129,6 +176,7 @@ Con
 * **Ejercicio**: Si se usa distancia Euclídea $\bar{d}_j ~ 2\cdot \text{var}_j$.
 
 ---
+
 ## Medidas de disimilaridad entre objetos
 
 * No suele ser conveniente dar a todas las variables la misma influencia.
@@ -139,10 +187,12 @@ Con
 
 
 ---
+
 class: middle, center, inverse
 # Algoritmos de clustering
 
 ---
+
 ## Tipos de algoritmos de clustering
 
 * Algoritmos combinatorios: trabajan con los datos observados sin hacer referencia al modelo probabilístico subyacente.
@@ -152,18 +202,20 @@ class: middle, center, inverse
 * *Mode Seekers*: modelos no paramétricos que estiman modas.
 
 ---
+
 class: middle, center, inverse
 
 # Algoritmos de clustering combinatorios: K-Means
 
 ---
+
 ## Algoritmos combinatorios
 
 * Asignan cada observación a un cluster, sin preocuparse de la distribución de probailidad de subyacente.
 
 * Etiquetamos cada observación con $i \in \lbrace 1,2,\dots,N   \rbrace$
 
-* Postulamos un número fijo de clusters $K<N$, etiquetados con $k \in \lbrace 1, \dots, K$.
+* Postulamos un número fijo de clusters $K<N$, etiquetados con $k \in \lbrace 1, \dots, K \rbrace$.
 
 --
 
@@ -176,6 +228,7 @@ W(C) = \frac{1}{2} \sum_{k=1}^K \sum_{i:C(i)=k} \sum_{i':C(i')=k} d(x_i, x_{i'})
 \end{equation}
 
 ---
+
 ## Algoritmos combinatorios
 
 * La dispersión total es
@@ -195,6 +248,7 @@ T &=& \frac{1}{2} \sum_{i=1}^N \sum_{i'=1}^N d(x_i, x_{i'}) = \frac{1}{2} \sum_{
 * $N=19$, $K=4$ número de asignaciones del orden de $10^{10}$.
 
 ---
+
 ## Algoritmos combinatorios
 
 * Estrategia: *iterative greedy descent*
@@ -241,9 +295,9 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
   1. Fijar asignación $C$ y minimizar respecto $\lbrace m_1, \dots m_K \rbrace$, asignando las medias de cada cluster.
   2. Fijar las medias $\lbrace m_1, \dots m_K \rbrace$ y minimizar asignando cada observación al cluster de la media más cercana.
   
-  \begin{equation*}
-  C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
-  \end{equation*}
+\begin{equation*}
+C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
+\end{equation*}
   
   3. Iterar 1 y 2 hasta que no cambien las asignaciones.
 
@@ -269,7 +323,58 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
 
 class: middle, center, inverse
 
-# Algoritmos de clustering: K-Mediodes
+# Algoritmos de clustering: K-Medoids
+
+---
+
+## K-Medoids
+
+* K-means es apropiado cuando la disimilaridad es la euclídea cuadrática (datos continuos).
+
+* Además, por estar elevada al cuadrado, pone mucha influencia a distancias grandes, lo que provoca **sensibilidad a outliers**.
+
+* Podemos evitar esto sacrificando eficiencia computacional a cambio de robustez.
+
+* Basta cambiar el paso de minimización en K-means: en lugar de tomar como representante de un cluster las medias de sus observaciones, hacemos que sea alguna observación de ese clúster.
+
+---
+
+## K-Medoids
+
+* Para una asignación de clúster $C$, encontrar la observación que minimice:
+
+\begin{equation*}
+i^*_k = \arg\min_{i:C(i) = k} \sum_{C(i') = k} D(x_i, x_{i'})
+\end{equation*}
+
+* Entonces $m_k = x_{i^*_k}$.
+
+* Dado un conjunto de centros de clusters $\lbrace m_1, \ldots, m_K \rbrace$, calcular
+
+\begin{equation*}
+C(i) = \arg\min_{1 \leq k \leq K} D(x_i, m_k)
+\end{equation*}
+
+
+--
+
+* El paso 1 pasa de tener complejidad lineal a ser $\mathcal{O}(N^2_k)$
+
+---
+
+## Cuestiones prácticas
+
+* Para aplicar K-Means o K-Medoids es necesario seleccionar el número de clústers $K^*$ y una inicialización.
+
+* Para las inicializaciones, la heurística más común es escogerlos **uniformemente aleatorios**, y ejecutar el algoritmo varias veces.
+
+* En cuanto al número de clústers:
+
+  * En aplicaciones de segmentación, $K$ suele venir especificado (ejemplo, segmentar una cartera de clientes teniendo $K$ encargados de marketing).
+  
+  * En descubrimiento de datos, no es tan fácil.
+  
+  * Una heurística es ir probando con $K$ desde $1, 2, \ldots, K_{max}$, e ir calculando las disimilaridades intra-clúster $W_1, W_2, \ldots, W_{K_{max}}, \ldots$.
 
 
 ---
@@ -524,7 +629,7 @@ KL(q \Vert p) &=& - \sum_{Z} q(Z) \log \left[ \frac{p(Z \vert X, \theta)}{q(z)}\
 
 * $\theta$ aparece únicamente en el logaritmo. Si la distribución conjunto es de la familia exponencial, la optimización es muy sencilla.
 
-=======
+---
 
 ## Mixturas de Gaussianas (MoG)
 
@@ -688,6 +793,4 @@ cuando $\sigma_j \rightarrow 0$.
 ## MoG mediante EM 
 
 
----
->>>>>>> d6a7004dad61ddcb88d8edd809416856cbca8354
 

@@ -4,7 +4,7 @@
     <title>Análisis de conglomerados (Clustering)</title>
     <meta charset="utf-8" />
     <meta name="author" content="Víctor Gallego y Roi Naveiro" />
-    <meta name="date" content="2019-05-08" />
+    <meta name="date" content="2019-05-09" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Análisis de conglomerados (Clustering)
 ## Curso de aprendizaje automático para el INE
 ### Víctor Gallego y Roi Naveiro
-### 2019-05-08
+### 2019-05-09
 
 ---
 
@@ -26,11 +26,29 @@ class: middle, center, inverse
 
 ---
 
-## Introducción
+## Repaso
 
-* Objetivo: agrupar un conjunto de ejemplos en *clusters*.
+* **Aprendizaje no supervisado**: solo tenemos datos `\(\mathcal{X} = \lbrace x_1, \ldots, x_N \rbrace\)` sin etiquetar.
 
-* Ejemplos del mismo cluster más parecidos entre sí que ejemplos de diferentes clusters.
+* Hasta ahora hemos visto PCA y NMF, que tratan de aprender una representación de los datos en un espacio de menor dimensión.
+
+--
+
+* Hoy nos centraremos en las técnicas de **clustering** (también conocidas como **segmentación de datos**), que buscan construir agrupaciones de datos basados en su similaridad.
+
+* Ejemplo típico en banca:
+
+&lt;center&gt;
+![:scale 50%](./img/Clust1.gif)
+&lt;/center&gt;
+
+---
+
+### Introducción
+
+* Objetivo: agrupar un conjunto de ejemplos en grupos denominados *clústers*.
+
+* Ejemplos del mismo clúster más parecidos entre sí que ejemplos de diferentes clústers.
 
 --
 
@@ -48,9 +66,33 @@ class: middle, center, inverse
 * Esto depende del problema concreto (similar a elección de coste en aprendizaje supervisado).
 
 ---
+
+
 ## Matrices de proximidad
 
+La mayoría de algoritmos para clustering requieren la siguiente representación para los datos `\(x_1, \ldots, x_N\)`:
+
+`\begin{equation*}
+  \mathbf{D} = 
+  \begin{pmatrix}
+  d_{11} &amp; \ldots &amp; d_{1N} \\
+  \ldots &amp; \ldots &amp; \ldots \\
+  d_{N1} &amp; \ldots &amp; d_{NN}
+  \end{pmatrix}
+\end{equation*}`
+
+* donde `\(d_{ii'}\)` mide la **disimilaridad** entre `\(x_i\)` y `\(x_{i'}\)`.
+
+* `\(\mathbf{D}\)` es una matriz de tamaño `\(N \times N\)` (lo cual impone un requisito en la complejidad en memoria de los algoritmos de clustering).
+
+* La mayoría de algoritmos asume una matriz simétrica (si no lo es, usar ( `\(\mathbf{D}+\mathbf{D}^\intercal)/2\)` ).
+
+* Las disimilaridades no son distancias en el sentido estricto, pues no verifican la desigualdad triangular `\(d_{ii'} \leq d_{ik} + d_{ki'}\)`.
+
+* A continuación veremos como obtener medidas de disimilaridad de una forma estructurada.
+
 ---
+
 ## Medidas de disimilaridad entre atributos
 
 * Datos: `\(x_{ij}\)` con `\(i = 1,2,\dots,N\)` y `\(j=1,2,\dots, p\)`. `\(N\)` ejemplos con `\(p\)` atributos.
@@ -69,6 +111,7 @@ D(x_i, x_{i'}) = \sum_{j=1}^p d_j(x_{ij}, x_{i'j})
 * No hay por qué pesar todos los atributos igual...
 
 ---
+
 ## Medidas de disimilaridad entre atributos
 
 * En función del tipo de atributo:
@@ -84,7 +127,9 @@ con `\(l\)` función monótona creciente. Error cuadrático o absoluto. También
 `\begin{equation}
 \rho(x_i, x_{i'}) = \frac{\sum_{j} (x_{ij} - \bar{x}_i) (x_{i'j} - \bar{x}_{i'})}{\sqrt{\sum_{j} (x_{ij} - \bar{x}_i)^2 \sum_{j} (x_{i'j} - \bar{x}_{i'})^2}}
 \end{equation}`
+
 ---
+
 ## Medidas de disimilaridad entre atributos
 
 * En función del tipo de atributo:
@@ -100,6 +145,7 @@ L_{jj} = 0 &amp; ~ &amp; L_{jj'} = 1
 
 
 ---
+
 ## Medidas de disimilaridad entre objetos
 
 * Procedimiento para combinar `\(p\)` medidas de disimilaridad entre atributos en una medida de disimilarida entre ejemplos `\(D(x_i, x_{i'})\)`.
@@ -113,6 +159,7 @@ L_{jj} = 0 &amp; ~ &amp; L_{jj'} = 1
 * Elección de pesos, depende del problema en cuestión.
 
 ---
+
 ## Medidas de disimilaridad entre objetos
 
 * Ojo: dar el mismo peso a todos los atributos, no signfica que todos contribuyan en la misma cantidad a la medida total de disimilaridad.
@@ -134,6 +181,7 @@ Con
 * **Ejercicio**: Si se usa distancia Euclídea `\(\bar{d}_j ~ 2\cdot \text{var}_j\)`.
 
 ---
+
 ## Medidas de disimilaridad entre objetos
 
 * No suele ser conveniente dar a todas las variables la misma influencia.
@@ -144,10 +192,12 @@ Con
 
 
 ---
+
 class: middle, center, inverse
 # Algoritmos de clustering
 
 ---
+
 ## Tipos de algoritmos de clustering
 
 * Algoritmos combinatorios: trabajan con los datos observados sin hacer referencia al modelo probabilístico subyacente.
@@ -157,11 +207,13 @@ class: middle, center, inverse
 * *Mode Seekers*: modelos no paramétricos que estiman modas.
 
 ---
+
 class: middle, center, inverse
 
 # Algoritmos de clustering combinatorios: K-Means
 
 ---
+
 ## Algoritmos combinatorios
 
 * Asignan cada observación a un cluster, sin preocuparse de la distribución de probailidad de subyacente.
@@ -181,6 +233,7 @@ W(C) = \frac{1}{2} \sum_{k=1}^K \sum_{i:C(i)=k} \sum_{i':C(i')=k} d(x_i, x_{i'})
 \end{equation}`
 
 ---
+
 ## Algoritmos combinatorios
 
 * La dispersión total es
@@ -200,6 +253,7 @@ T &amp;=&amp; \frac{1}{2} \sum_{i=1}^N \sum_{i'=1}^N d(x_i, x_{i'}) = \frac{1}{2
 * `\(N=19\)`, `\(K=4\)` número de asignaciones del orden de `\(10^{10}\)`.
 
 ---
+
 ## Algoritmos combinatorios
 
 * Estrategia: *iterative greedy descent*
@@ -246,9 +300,9 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
   1. Fijar asignación `\(C\)` y minimizar respecto `\(\lbrace m_1, \dots m_K \rbrace\)`, asignando las medias de cada cluster.
   2. Fijar las medias `\(\lbrace m_1, \dots m_K \rbrace\)` y minimizar asignando cada observación al cluster de la media más cercana.
   
-  \begin{equation*}
-  C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
-  \end{equation*}
+`\begin{equation*}
+C(i) = \arg\min_{k}  \Vert x_i - m_k \Vert^2
+\end{equation*}`
   
   3. Iterar 1 y 2 hasta que no cambien las asignaciones.
 
@@ -264,8 +318,8 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
 
 * En compresión de imágenes:
 
-  1. Dividir imagen de NxN pixels en grupos de kxk pixels (k &lt; N).
-  2. Considerar cada grupo como un vector de dimensión kxk.
+  1. Dividir imagen de `\(N \times N\)` pixels en grupos de `\(k \times k\)` pixels `\((k &lt; N)\)`.
+  2. Considerar cada grupo como un vector de dimensión `\(k \times k\)`.
   3. Aplicar K-means y aproximar cada grupo por su centroide más próximo. (Conjunto de centroides se conoce como codebook).
 
 * Puede usarse también para imputar datos.
@@ -274,7 +328,58 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
 
 class: middle, center, inverse
 
-# Algoritmos de clustering: K-Mediodes
+# Algoritmos de clustering: K-Medoids
+
+---
+
+## K-Medoids
+
+* K-means es apropiado cuando la disimilaridad es la euclídea cuadrática (datos continuos).
+
+* Además, por estar elevada al cuadrado, pone mucha influencia a distancias grandes, lo que provoca **sensibilidad a outliers**.
+
+* Podemos evitar esto sacrificando eficiencia computacional a cambio de robustez.
+
+* Basta cambiar el paso de minimización en K-means: en lugar de tomar como representante de un cluster las medias de sus observaciones, hacemos que sea alguna observación de ese clúster.
+
+---
+
+## K-Medoids
+
+* Para una asignación de clúster `\(C\)`, encontrar la observación que minimice:
+
+`\begin{equation*}
+i^*_k = \arg\min_{i:C(i) = k} \sum_{C(i') = k} D(x_i, x_{i'})
+\end{equation*}`
+
+* Entonces `\(m_k = x_{i^*_k}\)`.
+
+* Dado un conjunto de centros de clusters `\(\lbrace m_1, \ldots, m_K \rbrace\)`, calcular
+
+`\begin{equation*}
+C(i) = \arg\min_{1 \leq k \leq K} D(x_i, m_k)
+\end{equation*}`
+
+
+--
+
+* El paso 1 pasa de tener complejidad lineal a ser `\(\mathcal{O}(N^2_k)\)`
+
+---
+
+## Cuestiones prácticas
+
+* Para aplicar K-Means o K-Medoids es necesario seleccionar el número de clústers `\(K^*\)` y una inicialización.
+
+* Para las inicializaciones, la heurística más común es escogerlos **uniformemente aleatorios**, y ejecutar el algoritmo varias veces.
+
+* En cuanto al número de clústers:
+
+  * En aplicaciones de segmentación, `\(K\)` suele venir especificado (ejemplo, segmentar una cartera de clientes teniendo `\(K\)` encargados de marketing).
+  
+  * En descubrimiento de datos, no es tan fácil.
+  
+  * Una heurística es ir probando con `\(K\)` desde `\(1, 2, \ldots, K_{max}\)`, e ir calculando las disimilaridades intra-clúster `\(W_1, W_2, \ldots, W_{K_{max}}, \ldots\)`.
 
 
 ---
@@ -330,7 +435,6 @@ class: middle, center, inverse
 ---
 
 ## Dendrogramas
-
 
 
 ---
@@ -458,6 +562,77 @@ El algoritmo es el siguiente:
 class: middle, center, inverse
 
 # Clustering Probabilístico
+
+---
+
+## Algoritmo EM (1)
+
+* Técnica general para encontrar soluciones de máxima verosimilitud en modelos probabilísticos con variables latentes.
+
+* Sea un modelo probabilístico en el que denotamos por `\(X\)` el vector de variables observadas y `\(Z\)` el vector de variables latentes (discretas).
+
+* La distribución conjunta, `\(p(X,Z|\theta)\)` viene gobernada por el vector de parámetros `\(\theta\)`. Queremos maximizar
+
+`\begin{equation}
+p(X|\theta) = \sum_{Z} p(X,Z|\theta)
+\end{equation}`
+
+
+* Asumimos que la optimización directa de `\(p(X|\theta)\)` es difícil, pero la de `\(p(X,Z|\theta)\)` es fácil.
+
+---
+## Algoritmo EM (2)
+
+* Para cualquier distribución `\(q(Z)\)` sobre las variables latentes se verifica
+
+`\begin{equation}
+\log\left[p(X|\theta)\right] = \mathcal{L}(q,\theta) + KL(q \Vert p)
+\end{equation}`
+
+* Donde
+
+`\begin{eqnarray}
+\mathcal{L}(q,\theta) &amp;=&amp; \sum_{Z} q(Z) \log \left[ \frac{p(X,Z \vert \theta)}{q(z)}\right] \\
+KL(q \Vert p) &amp;=&amp; - \sum_{Z} q(Z) \log \left[ \frac{p(Z \vert X, \theta)}{q(z)}\right]
+\end{eqnarray}`
+
+* **Ejercicio**: demostrarlo.
+
+--
+
+* La divergencia de Kullback-Leibler verifica `\(KL(q \Vert p) \geq 0\)` y `\(KL(q \Vert p) = 0\)` si y solo si `\(q(Z) = p(Z \vert X,\theta)\)`.
+
+* Por tanto, `\(\mathcal{L}(q,\theta) \leq \log\left[p(X|\theta)\right]\)`.
+
+---
+## Algoritmo EM (3)
+
+* El algoritmo EM es un algoritmo de optimización iterativo con dos etapas utilizado para encontrar `\(\theta\)` que maximiza la verosimilitud.
+
+* Supongamos que l valor actual de `\(\theta\)` es `\(\theta^{old}\)`
+
+* Paso E: Maximizar `\(\mathcal{L}(q,\theta^{old})\)` con respecto a `\(q(Z)\)`. (Demostrar que el máximo se alcanza cuando `\(q(Z) = p(Z| X, \theta^{old})\)`).
+
+* Paso M: Mantener fija `\(q(Z)\)` y maximizar  `\(\mathcal{L}(q,\theta)\)` con respecto a `\(\theta\)`, dando lugar a `\(\theta^{new}\)`.
+
+* El paso M hace que `\(\mathcal{L}(q,\theta)\)` crezca y por tanto también la log verosimilitud.
+
+* Como `\(q\)` está determinada usando los parámetros viejos, ya no es idéntica a `\(p(Z| X, \theta^{new})\)` y por tanto la KL será distinta de 0.
+
+* El aumento en log verosimilitud es mayor que el aumento en su cota inferior.
+
+---
+## Algoritmo EM (4)
+
+* Después del paso E tenemos que
+
+`\begin{equation}
+\mathcal{L}(q,\theta) = \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta) - \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta^{old}) 
+\end{equation}`
+
+* En el paso M maximizamos el calor esperado de `\(\log p(X,Z | \theta)\)`.
+
+* `\(\theta\)` aparece únicamente en el logaritmo. Si la distribución conjunto es de la familia exponencial, la optimización es muy sencilla.
 
 ---
 
@@ -620,10 +795,7 @@ cuando `\(\sigma_j \rightarrow 0\)`.
 
 ---
 
-## MoG mediante EM 
-
-
----
+## MoG mediante EM
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
