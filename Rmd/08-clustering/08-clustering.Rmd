@@ -442,11 +442,6 @@ class: middle, center, inverse
 
 ---
 
-## Dendrogramas
-
-
----
-
 
 ## Clustering aglomerativo
 
@@ -467,6 +462,32 @@ $n \choose 2$ posibles emparejamientos. Tratar cada observación como un único 
 
 
 ---
+
+## Dendrogramas
+
+* Los algoritmos aglomerativos pueden ser representados como un árbol binario:
+
+  * Los nodos representan los diversos clústers.
+  
+  * El nodo raíz es todo el dataset.
+  
+  * Los $N$ nodos terminales son cada una de las $N$ observaciones.
+  
+  * Dado un nodo, sus dos hijos representan qué clústers han sido fusionados.
+  
+* La mayoría de algoritmos aglomerativos poseen la **propiedad de monotonía**: la disimilaridad entre clústers que se fusionan es monótona creciente a medida que aumentamos en la jerarquía.
+
+* Representación gráfica mediante un **dendrograma**:
+
+  * Los nodos terminales (observaciones) los ponemos a altura 0.
+  
+  * La altura del resto de nodos es proporcional al valor de la disimilaridad entre sus dos hijos.
+  
+  
+
+
+---
+
 
 ## Clustering aglomerativo
 
@@ -531,7 +552,15 @@ $n \choose 2$ posibles emparejamientos. Tratar cada observación como un único 
 
 ## Correlación cofenética
 
-* Cophenetic correlation.
+* El *cophenetic correlation coefficient* se define como la correlación entre las disimilaridades entre observaciones $d_{ii'}$ y las disimilaridades cofenéticas $C_{ii'}$.
+
+* $C_{ii'}$ se define como la disimilaridad entre los grupos cuando las observaciones $i$ e $i'$ se fusionan en el dendrograma.
+
+* Esto es, $C_{ii'}$ puede verse como la altura a la que $i$ e $i'$ se fusionaron.
+
+* También podemos calcular la correlación cofenética entre dos dendrogramas (generados mediante diferentes funciones de link), para obtener una medida de **cómo de distintos son dos dendrogramas**.
+
+
 
 ---
 
