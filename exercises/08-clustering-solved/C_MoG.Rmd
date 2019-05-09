@@ -1,0 +1,84 @@
+---
+title: "C_MoG"
+author: "Roi Naveiro, Victor Gallego"
+date: "8/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Mixtura de Gaussianas
+
+En esta práctica ajustaremos una mixtura de Gaussianas con la librería mixtools
+y el dataset del geiser Old Faithful
+
+```{r cars}
+#install.packages('mixtools')
+library(mixtools)
+data(faithful)
+attach(faithful)
+```
+
+1. Representa la distribución de los tiempos de espera entre erupciones
+¿Cuántas modas se aprecian?
+
+```{r }
+hist(waiting, main="Tiempo entre erupciones del Old Faithful",
+     xlab="Minutos", ylab="", cex.main=1.5, cex.lab=1.5, cex.axis=1.4)
+```
+
+
+2. Usando el método normalmixEM ajusta dos MoG, una para 2 componentes y otra para 3.
+Especifica un número máximo de iteraciones de 30, y pesos iniciales iguales para cada componente
+
+```{r }
+wait2 <- normalmixEM(waiting, lambda = 1, k=2, maxit = 30)
+wait3 <- normalmixEM(waiting, lambda = 1, k=3, maxit = 30)
+```
+
+3. En términos de log-verosimilitud, ¿qué modelo ha hecho el mejor ajuste?
+
+```{r }
+print(wait2$loglik)
+print(wait3$loglik)
+```
+
+4. Usando plot, observa el ajuste para cada MoG:
+
+```{r }
+plot(wait2, density=TRUE, cex.axis=1.4, cex.lab=1.4, cex.main=1.8, main2="Time between Old Faithful eruptions", xlab2="Minutes")
+```
+```{r }
+plot(wait3, density=TRUE, cex.axis=1.4, cex.lab=1.4, cex.main=1.8, main2="Time between Old Faithful eruptions", xlab2="Minutes")
+```
+
+
+5. El criterio de la log-verosimilitud no tiene en cuenta el número de parámetros en cada modelo.
+Para ello, usaremos el criterio AIC, definido como
+
+$$
+AIC = 2\cdot|\mbox{parametros}| - 2\cdot\log lik
+$$
+
+Implementa una función que calcule el AIC para cada MoG y decide cuál da el mejor ajuste
+
+```{r }
+print(2*(2 + 2 + 1) - 2*(wait2$loglik))
+print(2*(3 + 3 + 2) - 2*(wait3$loglik))
+```
+
+6. Para el modelo con mejor AIC, calcula p(z | x) tomando x distribuidos a lo largo del dominio:
+
+```{r }
+xs <- seq(20, 120, 0.05)
+
+c1 <- wait2$lambda[1]*dnorm(xs, mean = wait2$mu[1], sd=wait2$sigma[1])
+c2 <- wait2$lambda[2]*dnorm(xs, mean = wait2$mu[2], sd=wait2$sigma[2])
+s <- c1 + c2
+
+p_z1 <- c1 / s
+p_z2 <- c2 / s
+plot(xs, p_z1)
+```

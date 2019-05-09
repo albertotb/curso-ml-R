@@ -1,0 +1,76 @@
+---
+title: "MoG"
+author: "Roi Naveiro, Victor Gallego"
+date: "8/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Mixtura de Gaussianas
+
+En esta práctica ajustaremos una mixtura de Gaussianas con la librería mixtools
+y el dataset del geiser Old Faithful
+
+```{r }
+#install.packages('mixtools')
+library(mixtools)
+data(faithful)
+attach(faithful)
+```
+
+1. Representa la distribución de los tiempos de espera entre erupciones
+¿Cuántas modas se aprecian?
+
+```{r }
+
+
+```
+
+
+2. Usando el método normalmixEM ajusta dos MoG, una para 2 componentes y otra para 3.
+Especifica un número máximo de iteraciones de 30, y pesos iniciales iguales para cada componente
+
+```{r }
+
+
+```
+
+3. En términos de log-verosimilitud, ¿qué modelo ha hecho el mejor ajuste?
+
+```{r }
+
+```
+
+4. Usando plot, observa el ajuste para cada MoG:
+
+```{r }
+
+
+```
+
+
+5. El criterio de la log-verosimilitud no tiene en cuenta el número de parámetros en cada modelo.
+Para ello, usaremos el criterio AIC, definido como
+
+$$
+AIC = 2\cdot|\mbox{parametros}| - 2\cdot\log lik
+$$
+
+Implementa una función que calcule el AIC para cada MoG y decide cuál da el mejor ajuste
+
+```{r }
+
+
+```
+
+6. Para el modelo con mejor AIC, calcula p(z | x) tomando x distribuidos a lo largo del dominio:
+
+```{r }
+xs <- seq(20, 120, 0.05)
+
+
+
+```

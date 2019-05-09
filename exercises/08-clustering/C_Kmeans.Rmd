@@ -1,0 +1,78 @@
+---
+title: "K-means: los barrios de Nueva York"
+author: Victor Gallego y Roi Naveiro
+date: "10/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(ggmap)
+```
+
+En este ejercicio, aplicaremos K-means a los datos generados por UBER en la ciudad de Nueva York para así tratar de localizar los barrios de NYC: Queens, Bronx, Brooklyn, Manhattan y Staten Island.
+
+## Lectura y exploración de los datos
+
+Descarga y explora los datos. Para descargarlos usa este enlace:
+
+https://drive.google.com/file/d/1jB8Qu1NtF9mfSPpQRmTErNB89-HAxFUx/view?usp=sharing
+```{r}
+# CÓDIGO
+```
+
+## K-Means
+
+Aplica el algoritmo K-means a los datos de longitud y latitud de cada recogida de UBER.
+```{r}
+# CÓDIGO
+```
+
+Explora el objeto devuelto
+
+```{r}
+# CÓDIGO
+```
+
+* cluster: vector de enteros que indica a que cluster pertenece cada observación.
+* centers: matriz de los centroides de cada cluster.
+* withinss: vector con la dispersión dentro de cada cluster.
+* tot.withinss: sum(withinss).
+* size: número de puntos de cada cluster
+
+Repite la asginación de clusters 10 veces y selecciona el mejor clustering.
+
+```{r}
+# CÓDIGO
+```
+
+## Representación gráfica
+
+Selecciona un subconjunto de tamaño 100000 de los datos, y representa gráficamente estos puntos sobre el mapa de NYC, pintando los distintos cluster de diferente color.
+
+```{r}
+# CÓDIGO
+```
+
+## Estudia el uso de UBER por hora y por barrio
+
+```{r}
+# CÓDIGO
+```
+
+## Estudia la evolución (mensual) de uso de uber por barrio
+
+```{r}
+# CÓDIGO
+```
+
+
+

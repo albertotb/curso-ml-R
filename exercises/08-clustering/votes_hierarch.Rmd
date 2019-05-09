@@ -1,0 +1,136 @@
+---
+title: "Ejercicio clustering jerárquico"
+author: "Roi Naveiro, Victor Gallego"
+date: "8/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Clustering jerárquico
+
+Utilizaremos el dataset votes.repub, consistente en una tabla con el porcentaje de votos dados al candidato republicano en elecciones presidenciales desde 1856 a 1976. La fuente del dataset es
+
+S. Peterson (1973): A Statistical History of the American Presidential Elections. New York: Frederick Ungar Publishing Co. Data from 1964 to 1976 is from R. M. Scammon, American Votes 12, Congressional Quarterly.
+
+
+1. Obtenemos el dataset desde la librería cluster
+
+```{r}
+votes.repub <- cluster::votes.repub
+```
+
+2. Explorar el dataset. Observar que contiene 50 filas (1 por estado) y 31 columnas (1 por cada elección desde 1856 hasta 1976)
+
+Representar gráficamente el porcentaje de voto para cada estado a lo largo de los años.
+
+
+```{r}
+
+```
+
+3. Calcular la matriz de distancias usando la función dist
+Previamente, aplicar la transformación angular (arcsin(sqrt(x/100))) a los datos.
+
+Representar la matriz de distancias utilizando la función image
+
+
+```{r }
+
+
+```
+
+4. Realiza un clustering jerárquico usando link completo mediante la función hclust
+Explorar el objeto resultante
+
+```{r }
+
+```
+
+5. Representa el dendrograma usando la función plot y as.dendrogram del objeto anterior
+
+¿Cuáles son los estados más parecidos?
+
+```{r }
+
+```
+
+
+6. Ahora utilizaremos la librería dendextend para tener más flexibilidad con los dendrogramas.
+Usando la función color_branches, obtén dos clusters
+
+```{r }
+#devtools::install_version("fpc", version = "2.1-4", repos = "http://cran.us.r-project.org")
+#install.packages('dendextend')
+library(dendextend)
+
+
+
+plot(dend)
+```
+
+7. Con la librería gplots, representaremos además un heatmap para comprobar el dendograma
+
+```{r }
+#install.packages('gplots')
+library(gplots)
+
+heatmap.2(as.matrix(votes.repub), 
+          main = "Votos al candidato presidencial republicano",
+          srtCol = 60,
+          dendrogram = "row",
+          Rowv = dend,
+          Colv = "NA", # this to make sure the columns are not ordered
+          trace="none",          
+          margins =c(3,6),      
+          key.xlab = "% Votos",
+          labCol = votes$Year,
+          denscol = "grey",
+          density.info = "density"
+         )
+
+```
+
+8. Teniendo en cuenta el siguiente gráfico de correlaciones entre dendogramas
+```{r }
+#install.packages('corrplot')
+hclust_methods <- c("ward.D", "single", "complete", "average")
+votes.repub_dendlist <- dendlist()
+
+for(i in seq_along(hclust_methods)) {
+   tmp_dend <- votes.repub %>% asinTransform %>% dist %>% hclust(method = hclust_methods[i]) %>% as.dendrogram 
+   votes.repub_dendlist <- dendlist(votes.repub_dendlist, tmp_dend)
+}
+names(votes.repub_dendlist) <- hclust_methods
+
+
+corrplot::corrplot(cor.dendlist(votes.repub_dendlist), "pie", "full")
+```
+
+representa el tanglegram entre el completo y el método que menos se le parezca.
+```{r }
+
+dend_com <- color_branches(as.dendrogram(hclust(d_votes, method = "complete")), k=2)
+dend_com <- rotate(dend_com, labels(dend))
+dend_2 <- color_branches(as.dendrogram(hclust(d_votes, method = "...")), k=2)
+dend_2 <- rotate(dend_2, labels(dend))
+
+dends <- dendlist(complete = dend_com, alternativo = dend_2)
+
+
+tanglegram(dends, margin_inner = 6)
+```
+
+Ahora repetimos lo mismo pero con el método más distinto al completo
+```{r }
+
+dend_com <- color_branches(as.dendrogram(hclust(d_votes, method = "complete")), k=2)
+dend_com <- rotate(dend_com, labels(dend))
+dend_3 <- color_branches(as.dendrogram(hclust(d_votes, method = "...")), k=2)
+dend_3 <- rotate(dend_3, labels(dend))
+
+dends <- dendlist(complete = dend_com, distinto = dend_3)
+tanglegram(dends, margin_inner = 6)
+```
