@@ -868,10 +868,15 @@ p(x|\mu_k, \Sigma_k) = \frac{1}{(2\pi \epsilon)^{1/2}} \exp \left \lbrace -\frac
 
 * Cada punto asignado al cluster con centroide más cercano!!
 
+
+---
+
+## Relación entre K-medias y MoG
+
 * En este límite, el valor esperado de la log verosimilitud completa se puede escribir como
 
 \begin{equation}
-- \frac{1}{2} \sum_{n=1}^N  \sum_{k=1}^K I(C(n) = k) \Vert x_n - \mu_k \Vert^2 + \text{cte}
+-\frac{1}{2} \sum_{n=1}^N  \sum_{k=1}^K I(C(n) = k) \Vert x_n - \mu_k \Vert^2 + \text{cte}
 \end{equation}
 
 * Maximizarlo (respecto a $\mu_k$) equivale a escoger
@@ -879,8 +884,6 @@ p(x|\mu_k, \Sigma_k) = \frac{1}{(2\pi \epsilon)^{1/2}} \exp \left \lbrace -\frac
 \begin{equation}
 \mu_k = \arg\min_m \sum_{n:C(n) = k} \Vert x_n - m \Vert^2
 \end{equation}
-
-
 
 
 
