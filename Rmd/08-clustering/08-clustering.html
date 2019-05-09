@@ -379,7 +379,20 @@ C(i) = \arg\min_{1 \leq k \leq K} D(x_i, m_k)
   
   * En descubrimiento de datos, no es tan fácil.
   
-  * Una heurística es ir probando con `\(K\)` desde `\(1, 2, \ldots, K_{max}\)`, e ir calculando las disimilaridades intra-clúster `\(W_1, W_2, \ldots, W_{K_{max}}, \ldots\)`.
+  * Una heurística es ir probando con `\(K\)` desde `\(1, 2, \ldots, K_{max}\)`, e ir calculando las disimilaridades intra-clúster `\(W_1, W_2, \ldots, W_{K_{max}}\)`.
+  
+  * Habrá un fuerte decrecimiento en sucesivas diferencias `\(W_K - W_{K+1}\)` en `\(K = K^*\)`. Esto es, `\(\lbrace W_K - W_{K+1} | K &lt; K^* \rbrace &gt;&gt; \lbrace W_K - W_{K+1} | K \geq K^* \rbrace\)`. Por tanto, podemos identificar `\(K^*\)` buscando un "codo" en la gráfica de `\(W_K\)` como función de `\(K\)`.
+
+---
+
+## Cuestiones prácticas
+
+* En este ejemplo el "codo" se ubica en `\(K = 2\)`.
+
+&lt;center&gt;
+![:scale 50%](./img/gap.png)
+&lt;/center&gt;
+
 
 
 ---

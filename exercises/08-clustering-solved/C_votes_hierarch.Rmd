@@ -38,8 +38,7 @@ colnames(votes) <- c('Year',  'State', 'VotePerc.')
 
 ggplot(votes, aes(x=Year)) + 
   geom_line(aes(y=VotePerc., col=State)) +
-  theme(legend.position = "none")+
-  scale_color_manual(values=cm.colors(50))
+  theme(legend.position = "none")
 #
 ```
 
