@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(dplyr)
 library(ggmap)
+library(lubridate)
 ```
 
 En este ejercicio, aplicaremos K-means a los datos generados por UBER en la ciudad de Nueva York para así tratar de localizar los barrios de NYC: Queens, Bronx, Brooklyn, Manhattan y Staten Island.
@@ -82,4 +83,33 @@ ggmap(nyc)  + geom_point(aes(x = Lon, y = Lat, colour = as.factor(barrio)), data
 ```
 
 
+## Estudia el uso de UBER por hora y por barrio
+
+```{r}
+data$Date.Time = mdy_hms(data$Date.Time,tz=Sys.timezone())
+```
+
+```{r}
+data$Mes = month(data$Date.Time)
+data$Hora = hour(data$Date.Time)
+```
+
+
+```{r}
+ggplot(data = data, aes(x = Hora ,colour = barrio, fill = barrio)) + geom_histogram(binwidth = 24) + facet_wrap(~barrio)
+```
+
+## Estudia la evolución (mensual) de uso de uber por barrio
+
+```{r}
+data$Mes <- as.double(data$Mes)
+data$Hora <- as.double(data$Hora)
+data_MB <- count_(data, vars = c('Mes', 'barrio'), sort = TRUE) %>% 
+  arrange(Mes, barrio)
+data_MB = data.frame(data_MB)
+```
+
+```{r}
+ggplot(data = data_MB, aes(x = Mes, y=n, colour = barrio)) + geom_line()
+```
 

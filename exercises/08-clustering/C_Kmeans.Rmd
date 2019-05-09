@@ -62,6 +62,17 @@ Selecciona un subconjunto de tamaño 100000 de los datos, y representa gráficam
 # CÓDIGO
 ```
 
+## Estudia el uso de UBER por hora y por barrio
+
+```{r}
+# CÓDIGO
+```
+
+## Estudia la evolución (mensual) de uso de uber por barrio
+
+```{r}
+# CÓDIGO
+```
 
 
 
