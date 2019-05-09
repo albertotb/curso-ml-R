@@ -259,8 +259,8 @@ W(C) = \sum_{k=1}^K N_k \sum_{i:C(i) = k} \Vert x_i - \mu_k \Vert^2
 
 * En compresión de imágenes:
 
-  1. Dividir imagen de NxN pixels en grupos de kxk pixels (k < N).
-  2. Considerar cada grupo como un vector de dimensión kxk.
+  1. Dividir imagen de $N \times N$ pixels en grupos de $k \times k$ pixels $(k < N)$.
+  2. Considerar cada grupo como un vector de dimensión $k \times k$.
   3. Aplicar K-means y aproximar cada grupo por su centroide más próximo. (Conjunto de centroides se conoce como codebook).
 
 * Puede usarse también para imputar datos.
@@ -325,7 +325,6 @@ class: middle, center, inverse
 ---
 
 ## Dendrogramas
-
 
 
 ---
@@ -455,6 +454,77 @@ class: middle, center, inverse
 # Clustering Probabilístico
 
 ---
+
+## Algoritmo EM (1)
+
+* Técnica general para encontrar soluciones de máxima verosimilitud en modelos probabilísticos con variables latentes.
+
+* Sea un modelo probabilístico en el que denotamos por $X$ el vector de variables observadas y $Z$ el vector de variables latentes (discretas).
+
+* La distribución conjunta, $p(X,Z|\theta)$ viene gobernada por el vector de parámetros $\theta$. Queremos maximizar
+
+\begin{equation}
+p(X|\theta) = \sum_{Z} p(X,Z|\theta)
+\end{equation}
+
+
+* Asumimos que la optimización directa de $p(X|\theta)$ es difícil, pero la de $p(X,Z|\theta)$ es fácil.
+
+---
+## Algoritmo EM (2)
+
+* Para cualquier distribución $q(Z)$ sobre las variables latentes se verifica
+
+\begin{equation}
+\log\left[p(X|\theta)\right] = \mathcal{L}(q,\theta) + KL(q \Vert p)
+\end{equation}
+
+* Donde
+
+\begin{eqnarray}
+\mathcal{L}(q,\theta) &=& \sum_{Z} q(Z) \log \left[ \frac{p(X,Z \vert \theta)}{q(z)}\right] \\
+KL(q \Vert p) &=& - \sum_{Z} q(Z) \log \left[ \frac{p(Z \vert X, \theta)}{q(z)}\right]
+\end{eqnarray}
+
+* **Ejercicio**: demostrarlo.
+
+--
+
+* La divergencia de Kullback-Leibler verifica $KL(q \Vert p) \geq 0$ y $KL(q \Vert p) = 0$ si y solo si $q(Z) = p(Z \vert X,\theta)$.
+
+* Por tanto, $\mathcal{L}(q,\theta) \leq \log\left[p(X|\theta)\right]$.
+
+---
+## Algoritmo EM (3)
+
+* El algoritmo EM es un algoritmo de optimización iterativo con dos etapas utilizado para encontrar $\theta$ que maximiza la verosimilitud.
+
+* Supongamos que l valor actual de $\theta$ es $\theta^{old}$
+
+* Paso E: Maximizar $\mathcal{L}(q,\theta^{old})$ con respecto a $q(Z)$. (Demostrar que el máximo se alcanza cuando $q(Z) = p(Z| X, \theta^{old})$).
+
+* Paso M: Mantener fija $q(Z)$ y maximizar  $\mathcal{L}(q,\theta)$ con respecto a $\theta$, dando lugar a $\theta^{new}$.
+
+* El paso M hace que $\mathcal{L}(q,\theta)$ crezca y por tanto también la log verosimilitud.
+
+* Como $q$ está determinada usando los parámetros viejos, ya no es idéntica a $p(Z| X, \theta^{new})$ y por tanto la KL será distinta de 0.
+
+* El aumento en log verosimilitud es mayor que el aumento en su cota inferior.
+
+---
+## Algoritmo EM (4)
+
+* Después del paso E tenemos que
+
+\begin{equation}
+\mathcal{L}(q,\theta) = \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta) - \sum_Z p(Z|X, \theta^{old}) \log p(X,Z | \theta^{old}) 
+\end{equation}
+
+* En el paso M maximizamos el calor esperado de $\log p(X,Z | \theta)$.
+
+* $\theta$ aparece únicamente en el logaritmo. Si la distribución conjunto es de la familia exponencial, la optimización es muy sencilla.
+
+=======
 
 ## Mixturas de Gaussianas (MoG)
 
@@ -619,4 +689,5 @@ cuando $\sigma_j \rightarrow 0$.
 
 
 ---
+>>>>>>> d6a7004dad61ddcb88d8edd809416856cbca8354
 
