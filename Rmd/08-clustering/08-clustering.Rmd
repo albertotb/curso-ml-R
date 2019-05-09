@@ -29,27 +29,18 @@ class: middle, center, inverse
 
 --
 
-* Hoy nos centraremos en las técnicas de **clustering** (también conocidas como **segmentación de datos**), que buscan construir agrupaciones de datos basados en su similaridad.
+* Hoy nos centraremos en las técnicas de **clustering** (también conocidas como **segmentación de datos**).
 
-* Ejemplo típico en banca:
-
-<center>
-![:scale 50%](./img/Clust1.gif)
-</center>
 
 ---
 
-### Introducción
+## Introducción
 
-* Objetivo: agrupar un conjunto de ejemplos en grupos denominados *clústers*.
-
-* Ejemplos del mismo clúster más parecidos entre sí que ejemplos de diferentes clústers.
+* Objetivo: agrupar un conjunto de ejemplos en grupos denominados *clústers*. Ejemplos del mismo clúster más parecidos entre sí que ejemplos de diferentes clústers.
 
 --
 
-* Otro objetivo: ordenar clusters en jerarquías naturales.
-
-* En cada nivel de la jerarquía, objetos en el mismo grupo más similares que objetos en grupos distintos.
+* Otro objetivo: ordenar clusters en jerarquías naturales. En cada nivel de la jerarquía, objetos en el mismo grupo más similares que objetos en grupos distintos.
 
 --
 
@@ -57,8 +48,11 @@ class: middle, center, inverse
 
 --
 
-* Fundamental: escoger medida de distancia (disimilaridad).
-* Esto depende del problema concreto (similar a elección de coste en aprendizaje supervisado).
+* Ejemplo típico en banca:
+
+<center>
+![:scale 50%](./img/Clust1.gif)
+</center>
 
 ---
 
@@ -82,9 +76,13 @@ La mayoría de algoritmos para clustering requieren la siguiente representación
 
 * La mayoría de algoritmos asume una matriz simétrica (si no lo es, usar ( $\mathbf{D}+\mathbf{D}^\intercal)/2$ ).
 
+--
+
+* **Fundamental**: escoger medida de distancia (disimilaridad).
+
 * Las disimilaridades no son distancias en el sentido estricto, pues no verifican la desigualdad triangular $d_{ii'} \leq d_{ik} + d_{ki'}$.
 
-* A continuación veremos como obtener medidas de disimilaridad de una forma estructurada.
+* Esto depende del problema concreto (similar a elección de coste en aprendizaje supervisado).
 
 ---
 
