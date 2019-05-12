@@ -1,0 +1,42 @@
+---
+title: "Modelos Gráficos Probabilísticos (PGMs)"
+subtitle: "Curso de aprendizaje automático para el INE"
+author: "Víctor Gallego y Roi Naveiro"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+    
+---
+
+class: middle, center, inverse
+
+# Introducción
+
+---
+
+class: middle, center, inverse
+
+# Algoritmo suma-producto
+
+---
+
+class: middle, center, inverse
+
+# Algoritmo max-suma
+
+---
+
+
+
+
+
+
+
+
