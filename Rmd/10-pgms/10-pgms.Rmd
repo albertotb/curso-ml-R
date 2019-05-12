@@ -21,6 +21,89 @@ class: middle, center, inverse
 
 ---
 
+## Representar gráficamente distribuciones de probabilidad. Ventajas
+
+* Forma simple de visualizar la estructura de modelos probabilísticos.
+
+* Diseño y motivación de nuevos modelos.
+
+* Facilita comprender propiedades de los modelos, como la independencia condicional.
+
+* Cálculos complejos pueden ser expresados en términos de manipulaciones gráficas sencillas.
+
+
+<center>
+![:scale 50%](./img/nbbnet.png)
+</center>
+
+
+---
+
+class: middle, center, inverse
+
+# Redes Bayesianas
+
+---
+## Introducción
+
+* Podemos representar cualquier distribución de probabilidad utilizando un **grafo acíclico dirigido** (DAG).
+
+* Cada nodo es una variable aleatoria de la distribución.
+
+* Arcos entre nodos representan dependencias condicionales.
+
+* Dado un DAG, la distribución de probabilidad conjunta es
+
+\begin{equation}
+p(x) = \prod_{k=1}^K p(x_k \vert \text{pa}_k)
+\end{equation}
+
+---
+
+## Introducción
+
+* **Ejercicio**: Factoriza y representa gráficamente la distribución $p(a,b,c)$.
+
+* **Ejercicio**: ¿A qué distribución corresponde este DAG?
+
+<center>
+![:scale 50%](./img/pgm1.png)
+</center>
+
+
+---
+
+## Notación
+
+* Para expresar multiplicidad de variables aleatorias se utiliza la siguiente notación
+
+
+<center>
+![:scale 50%](./img/plate1.png)
+![:scale 50%](./img/plate2.png)
+</center>
+
+---
+
+## Notación
+
+* Los parámetros deterministas se representan usando círculos sólidos.
+
+* Las variables observadas se colorean.
+
+<center>
+![:scale 50%](./img/full1.png)
+</center>
+
+* **Ejercicio**: ¿Qué modelo representa esta Red Bayesiana?
+---
+
+class: middle, center, inverse
+
+# Markov Random Fields
+
+---
+
 class: middle, center, inverse
 
 # Algoritmo suma-producto
