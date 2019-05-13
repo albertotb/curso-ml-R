@@ -32,10 +32,6 @@ class: middle, center, inverse
 * Cálculos complejos pueden ser expresados en términos de manipulaciones gráficas sencillas.
 
 
-<center>
-![:scale 50%](./img/nbbnet.png)
-</center>
-
 
 ---
 
@@ -96,8 +92,107 @@ p(x) = \prod_{k=1}^K p(x_k \vert \text{pa}_k)
 </center>
 
 * **Ejercicio**: ¿Qué modelo representa esta Red Bayesiana?
+
 ---
 
+## Independencia Condicional
+
+* Decimos que $a$ y $b$ son condicionalmente independientes dado $c$ si $p(a \vert b,c) = p(a \vert c)$ o $p(a,b \vert c) = p(a \vert c) p(b \vert c)$.
+
+* Los PGMs permiten identificar las propiedades de independencia condicional de la distribución conjunto de forma automática.
+
+---
+
+## Ejemplo 1
+
+* Nodo *tail-to-tail*
+* Si se condiciona en $c$ este nodo bloquea el camino entre $a$ y $b$, y se cumple independencia condicional.
+<center>
+![:scale 40%](./img/ci1.png)
+</center>
+
+<center>
+![:scale 40%](./img/ci2.png)
+</center>
+
+---
+
+## Ejemplo 2
+
+* Nodo *head-to-tail*
+* Si se condiciona en $c$ este nodo bloquea el camino entre $a$ y $b$, y se cumple independencia condicional.
+<center>
+![:scale 40%](./img/ci3.png)
+</center>
+
+<center>
+![:scale 40%](./img/ci4.png)
+</center>
+
+
+---
+
+## Ejemplo 3
+
+* Nodo *head-to-head*
+* Si se $c$ **no se observa** bloquea el camino entre $a$ y $b$ y estas son independientes.
+* Si se $c$ **se observa** el camino se desbloquea: $a$ y $b$ y son dependientes.
+<center>
+![:scale 35%](./img/ci5.png)
+</center>
+
+<center>
+![:scale 35%](./img/ci6.png)
+</center>
+
+---
+## D-separación
+
+* Consideremos un DAG general y sean $A$, $B$ y $C$ conjuntos de nodos diferentes.
+
+* Queremos determinar si $A$ y $B$ son condicionalmente independientes dado $C$.
+
+* Consideremos todas las trayectorias entre $A$ y $B$. Diremos que alguna de estas está bloqueada si:
+  * Las flechas del camino encuentran un nodo *head-to-tail* o *tail-to-tail* y este está en $C$.
+  
+  * Las flechas del camino encuentran un nodo *head-to-head* y ni el nodo ni sus descendientes están en $C$.
+
+* Si todos los caminos entre $A$ y $B$ están bloqueados, entonces $A$ y $B$ están $d$-separados por $C$ y son condicionalmente independientes dado $C$.
+
+---
+## D-separación
+* Determinar si $a$ y $b$ son condicionalmente independientes dados los nodos observados en cada caso.
+
+<center>
+![:scale 100%](./img/ejci.png)
+</center>
+
+---
+## D-separación
+* Dibuja la red bayesiana de un modelo de Naive-Bayes
+
+* Estudia la independencia condicional entre $t_n$ y $\hat{t}$.
+
+<center>
+![:scale 50%](./img/ci_ex.png)
+</center>
+
+---
+## D-separación
+
+* A efectos de $D$-separación, los parámetros se comportan como variables aleatorias observadas.
+
+* Como nunca tienen padres son siempre nodos *tail-to-tail* y bloquean todas las trayectorias en las que intervienen.
+
+* El conjunto de distribuciones que pueden ser expresadas en términos de la factorización implicada por un DAG, se denomina $\mathcal{DF}$.
+
+* $\mathcal{DF}$ coincide con todas las distribuciones que cumplen las propiedades de independencia condicional del DAG.
+
+* Se denomina *Markov Blanket* de una variable $x_i$ al conjunto de padres, hijos y co-padres de $x_i$.
+
+* Demostrar que para una distribución arbitraria $p(x_1, \dots, x_D)$, $p(x_i \vert x_{\lbrace j \neq i \rbrace})$ depende únicamente de las variables del *Markov Blanket* de $x_i$.
+
+---
 class: middle, center, inverse
 
 # Markov Random Fields
