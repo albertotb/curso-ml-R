@@ -12,6 +12,11 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       beforeInit: "macros.js"
+---
+
+
+
+
     
 ---
 
@@ -101,6 +106,24 @@ p(x) = \prod_{k=1}^K p(x_k \vert \text{pa}_k)
 class: middle, center, inverse
 
 # Markov Random Fields
+
+---
+
+# Modelos gráficos no dirigidos
+
+* También conocidos como **redes de Markov**.
+
+* Los enlaces ahora **no son dirigidos**.
+
+--
+
+* **Ventaja**: la propiedad de independencia se puede verificar mucho más fácilmente:
+
+  * **d-separación**: $A  \bigCI B | C$ sii todos los caminos entre $A$ y $B$ están bloqueados por nodos de $C$. 
+  
+  * Corolario: no hay fenómeno de **explaining away**.
+
+
 
 ---
 
