@@ -4,7 +4,7 @@
     <title>Modelos Gráficos Probabilísticos (PGMs)</title>
     <meta charset="utf-8" />
     <meta name="author" content="Víctor Gallego y Roi Naveiro" />
-    <meta name="date" content="2019-05-13" />
+    <meta name="date" content="2019-05-15" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Modelos Gráficos Probabilísticos (PGMs)
 ## Curso de aprendizaje automático para el INE
 ### Víctor Gallego y Roi Naveiro
-### 2019-05-13
+### 2019-05-15
 
 ---
 
@@ -206,15 +206,207 @@ class: middle, center, inverse
 
 class: middle, center, inverse
 
+# Inferencia Exacta en Modelos Gráficos
+
+---
+class: middle, center, inverse
+
 # Algoritmo suma-producto
 
+--- 
+## Introducción
+
+* Usando el marco de grafos de factores, derivaremos un algoritmo eficiente de **inferencia exacta** aplicable a grafos con estructura de árbol.
+
+* Nos centraremos en evaluar marginales locales sobre nodos o conjuntos de nodos.
+
+* Por sencillez, supondremos que todas las variables son discretas (la extensión a caso contínuo es trivial).
+
+* Asumiremos que el grafo original es un **árbol no dirigido**, un **árbol dirigido** o un **poli-árbol**.
+
+* En estos casos, el grafo de factores tiene estructura de árbol.
+
+---
+## Objetivos
+
+* Primero de todo convertimos el grafo original en un grafo de factores.
+
+* El objetivo es explotar la estructura del grafo para:
+
+  1. Obtener un algoritmo eficiente de inferencia exacta para encontrar las marginales.
+  
+  2. En el caso de computar muchas marrginales, *compartir* los cálculos de manera eficiente.
+  
+---
+## Algoritmo suma-producto (1)
+
+* Empezamos por encontrar `\(p(x)\)` para un nodo en concreto.
+
+`\begin{equation}
+p(x) = \sum_{\textbf{x} / x} p(\textbf{x} ) = \sum_{\textbf{x} / x} \prod_{s} f_s(x_s)
+\end{equation}`
+
+* La estructura de árbol permite dividir los factores en la conjunto en grupos, cada uno asociado con un factor vecino de `\(x\)`.
+
+---
+## Algoritmo suma-producto (2)
+
+* Llamamos a `\(\text{ne}(x)\)` al conjunto de nodos factor vecinos de `\(x\)`.
+
+* `\(X_s\)`: todas las variables **en el subárbol** conectado a `\(x\)` via un nodo factor `\(f_s\)`.
+
+* `\(F_s(x, X_s)\)` el producto de **todos los factores** del grupo asociado a `\(f_s\)`.
+
+* Entonces:
+
+`\begin{equation}
+p(\textbf{x} ) = \prod_{s \in \text{ne}(x) } F_s(x, X_s)
+\end{equation}`
+
+&lt;center&gt;
+![:scale 40%](./img/sp1.png)
+&lt;/center&gt;
+
+---
+## Algoritmo suma-producto (3)
+
+* Sustituyendo, cambiando orden suma producto y definiendo **mensajes** entre `\(f_s\)` y x
+
+`\begin{equation}
+p(x) = \prod_{s \in \text{ne}(x) } \left[ \sum_{X_s} F_s(x, X_s) \right] := \prod_{s \in \text{ne}(x) } \mu_{f_s \rightarrow x} (x)
+\end{equation}`
+
+* Necesitamos evaluar los mensajes. Vemos que cada factor `\(F_s(x, X_s)\)` es a su vez un grafo de factores y puede ser factorizado.
+
+---
+## Algoritmo suma-producto (4)
+
+* Denotamos las variables asociadas a `\(f_s\)` (a parte de `\(x\)`) como `\(x_1, \dots, x_M\)`.
+
+`\begin{equation}
+F_s(x, X_s) = f_s(x, x_1, \dots, x_M) G_1(x_1, X_{s1}) \dots G_M(x_M, X_{sM})
+\end{equation}`
+
+&lt;center&gt;
+![:scale 40%](./img/sp2.png)
+&lt;/center&gt;
+
+---
+## Algoritmo suma-producto (5)
+
+* Substituyendo y llamando `\(\text{ne}(f_s)\)` al conjunto de nodos variable vecinos de `\(f_s\)`.
+
+`\begin{eqnarray}
+\mu_{f_s \rightarrow x} (x) &amp;=&amp; \sum_{X_s} F_s(x, X_s) \\
+&amp;=&amp; \sum_{x1,\dots,x_M} f_s(x, x_1, \dots, x_M) \prod_{m \in \text{ne}(f_s) / x} \left[ \sum_{X_{sm}} G_{m} (x_m, X_{sm})\right] \\
+&amp;=&amp; \sum_{x1,\dots,x_M} f_s(x, x_1, \dots, x_M) \prod_{m \in \text{ne}(f_s) / x} \left[\mu_{x_m \rightarrow f_s} (x_m) \right]
+\end{eqnarray}`
+ 
+* Existen dos tipos de mensajes: variable-factor y factor-variable.
+
+* Evaluar mensaje de nodo factor a nodo variable requiere evaluar el **producto de mensajes recibidos** por el nodo factor, **multiplicar factor asociado** a este nodo y **marginalizar en variables asociadas a mensajes recibidos**.
+
+---
+## Algoritmo suma-producto (6)
+
+* Para cerrar círculo, evaluamos los mensajes variable-factor.
+
+&lt;center&gt;
+![:scale 40%](./img/sp3.png)
+&lt;/center&gt;
+
+* Vemos que `\(G_m(x_m, X_{sm})\)` admite la factorización
+
+`\begin{equation}
+\prod_{l \in \text{ne}(x_m)/f_s } F_l(x_m, X_{ml}) 
+\end{equation}`
+
+---
+## Algoritmo suma-producto (6)
+
+* Con esto
+
+`\begin{eqnarray}
+\mu_{x_m \rightarrow f_s} (x_m) &amp;=&amp; \prod_{l \in \text{ne}(x_m)/f_s } \left[ \sum_{X_{ml}} F_l (x_m, X_{ml})\right] \\
+&amp;=&amp; \prod_{l \in \text{ne}(x_m)/f_s } \mu_{f_l \rightarrow x_m} (x_m)
+\end{eqnarray}`
+
+* Para evaluar mensajes mandados por variable nodo a variable factor, calcular producto de todos los mensajes que llegan a la variable nodo.
+
+---
+## Algoritmo suma-producto (7)
+
+* Cada mensaje puede ser calculado recursivamente en términos de otros mensajes.
+
+* ¿Cómo empezar la recursión?
+
+* Vemos `\(x\)` como el nodo raíz, y nos vamos a loas nodos hoja.
+
+
+&lt;center&gt;
+![:scale 70%](./img/sp4.png)
+&lt;/center&gt;
+
+
+---
+## Algoritmo suma-producto (8)
+
+* Para calcular todas las marginales de forma eficiente:
+  
+  1. Escoger nodo arbitrario como raíz.
+  
+  2. Calcular y propagar mensajes de las hojas hasta la raíz, guardando todos los mensajes recibidos en cada nodo.
+  
+  3. Calcular y propagar mensajes de la raíz hasta las hojas, guardando todos los mensajes recibidos en cada nodo.
+  
+  4. Calcular el producto de mensajes recibidos en cada nodo y normalizar si es necesario.
+  
+---
+## Algoritmo suma-producto (9)
+
+* **Ejercicio** :  Demostrar que las marginales sobre variables asociadas a un factor se pueden escribir como
+
+`\begin{equation}
+p(\boldsymbol{x_s}) = f_s(\boldsymbol{x_s}) \prod_{m \in \text{ne}(f_s)} \mu_{x_m \rightarrow f_s} (x_m)
+\end{equation}`
+
+---
+## Algoritmo suma-producto (10)
+
+* Cuando hay variables observadas, particionamos `\(\textbf{x}\)` en variables observadas `\(\textbf{v}\)` y ocultas `\(\textbf{h}\)`.
+
+* Sean `\(\boldsymbol{\hat{v}}\)` los valores observados. Redefinimos la conjunta como
+
+`\begin{equation}
+p(\boldsymbol{x}) \prod_i I(v_i, \hat{v}_i)
+\end{equation}`
+
+* Que no es más que la versión sin normalizar de `\(p(\boldsymbol{h} \vert \boldsymbol{v} = \boldsymbol{\hat{v}})\)`.
+
+* Con el agoritmo suma-producto podemos calcular las versiones sin normalizar de
+
+`\begin{equation}
+p(h_i \vert \boldsymbol{v} = \boldsymbol{\hat{v}})
+\end{equation}`
+
+* Que es barato de normalizar.
 ---
 
 class: middle, center, inverse
 
 # Algoritmo max-suma
 
+
 ---
+## Inferencia en grafos generales
+
+* El algoritmo *junction tree* generaliza el marco visto a grafos arbitrarios (con ciclos), pero no es eficiente en general.
+
+* Otra alternativa es usar métodos aproximados.
+
+* *Loopy belief propagation* propone usar el algoritmo suma producto aunque no se haya ciclos.
+
+* La información fluye indefinidamente por los ciclos. En algunos casos se converge (no garantizado!).
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
