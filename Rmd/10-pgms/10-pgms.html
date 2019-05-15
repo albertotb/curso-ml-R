@@ -234,6 +234,213 @@ class: middle, center, inverse
 
 ---
 
+## Resumen
+
+* **Inferencia**: algunos de los nodos del modelo estarán fijados a ciertos valores conocidos (observados), y deseamos calcular la distribución posterior sobre (subconjuntos de) el resto de nodos (no observados).
+
+* Aprovecharemos la estructura gráfica del modelo para desarrollar algoritmos que eviten la explosión exponencial del número de configuraciones posibles del modelo.
+
+* Caso más sencillo: supongamos que `\(p(x, y) = p(y|x)p(x)\)`, con el Teorema de Bayes
+
+`\begin{equation}
+p(x|y) = \frac{p(y|x)p(x)}{p(y)}
+\end{equation}`
+
+* Ahora el modelo se interpreta como `\(p(y)p(x|y)\)`. Ejemplo: MoG.
+
+&lt;center&gt;
+![:scale 50%](./img/inf1.png)
+&lt;/center&gt;
+
+
+
+---
+
+## Inferencia en una cadena
+
+* Consideremos una cadena de nodos
+
+
+`\begin{equation}
+p(x) = \frac{1}{Z} \psi_{1,2}(x_1, x_2)  \psi_{2,3}(x_3, x_3) \cdots \psi_{N-1,N}(x_{N-1}, x_N)
+\end{equation}`
+
+* Echemos cuentas: supongamos que cada nodo es una VA discreta ($K$ clases), y cada potencial viene especificado como una tabla de tamaño `\(K \times K\)`: la conjunta tiene `\((N-1)K^2\)` parámetros.
+
+* Queremos obtener la **distribución marginal sobre `\(x_n\)`** (sumando todos los demás nodos):
+
+`\begin{equation}
+p(x_n) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_{n-1}}  \sum_{x_{n+1}} \cdots  \sum_{x_{N}} p(x)
+\end{equation}`
+
+* La complejidad es `\(\mathcal{O}(K^N)\)` !! Es **intratable** para `\(N\)` moderados.
+
+
+---
+
+## Inferencia en una cadena (2)
+
+* ¿Podemos hacerlo mejor? La clave consiste en utilizar la propiedad distributiva
+
+`\begin{equation}
+ab + ac = a(b+c)
+\end{equation}`
+
+* Podemos obtener ecuaciones recursivas para **transmitir mensajes**
+
+`\begin{align}
+p(x_n) &amp;= \left[  \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \sum_{x_1} \psi_{x_1, x_2} (x_1, x_2) \right] \cdots \right] \\
+&amp;\left[  \sum_{x_{n+1}} \psi_{n,n+1}(x_{n}, x_{n+1}) \cdots \left[  \sum_{x_{N}} \psi_{N-1,N}(x_{N-1}, x_N) \right] \cdots \right]
+\end{align}`
+
+* Esto es,
+
+`\begin{align}
+p(x_n) = \frac{1}{Z} \mu_{\alpha}(x_n) \mu_{\beta}(x_n)
+\end{align}`
+
+---
+
+## Inferencia en una cadena (3)
+
+`\begin{align}
+p(x) &amp;= \left[  \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \sum_{x_1} \psi_{x_1, x_2} (x_1, x_2) \right] \cdots \right] \\
+&amp;\left[  \sum_{x_{n+1}} \psi_{n,n+1}(x_{n}, x_{n+1}) \cdots \left[  \sum_{x_{N}} \psi_{N-1,N}(x_{N-1}, x_N) \right] \cdots \right]
+\end{align}`
+
+* Ahora, el coste computacional es el de `\(N-1\)` sumas, sobre variables con `\(K\)` categorías.
+
+* Cada suma local es la de una tabla de tamaño `\(K \times K\)`.
+
+* Por tanto, la nueva complejidad es `\(\mathcal{O}(NK^2)\)`, esto es, lineal en `\(N\)` !!
+
+--
+
+* Si el grafo fuera completo (todos los nodos tienen arcos a todos los restantes) no hubiéramos podido hacer lo anterior: volvemos al coste exponencial.
+
+
+---
+
+## Paso de mensajes (1)
+
+* Intepretación más común: paso de mensajes entre los nodos del grafo.
+
+* La marginal se descompone en un producto de dos factores y la constante de normalización:
+
+`\begin{equation}
+p(x_n) = \frac{1}{Z} \mu_{\alpha}(x_n) \mu_{\beta}(x_n)\qquad Z = \sum_{x_n}  \mu_{\alpha}(x_n) \mu_{\beta}(x_n)
+\end{equation}`
+
+* `\(\mu_\alpha(x_n)\)` es un mensaje propagado hacia adelante en la cadena desde `\(x_{n-1}\)` hasta `\(x_n\)`.
+
+* `\(\mu_\beta(x_n)\)` es un mensaje propagado hacia atrás en la cadena desde `\(x_{n+1}\)` hasta `\(x_n\)`.
+
+* Cada mensaje contiene un conjunto de `\(K\)` valores (uno para cada elección de `\(x_n\)`), por lo que el producto de dos mensajes representa una multiplicación componente a componente de los correspondientes elementos.
+
+---
+
+## Paso de mensajes (2)
+
+* El mensaje hacia adelante puede ser evaluado recursivamente
+
+`\begin{equation}
+\mu_\alpha(x_n) = \sum_{x_{n-1}} \psi_{x_{n-1}, x_n} (x_{n-1}, x_n) \left[ \sum_{x_{n-2}} \ldots \right] =\sum_{x_{n-1}} \psi_{x_{n-1}, x_n} (x_{n-1}, x_n)  \mu_\alpha(x_{n-1}) 
+\end{equation}`
+
+* Por tanto, primero evaluamos
+
+`\begin{equation}
+\mu_\alpha(x_2) = \sum_{x_1} \psi_{1,2}(x_1, x_2)
+\end{equation}`
+
+* El mensaje saliente se obtiene multiplicando el mensaje entrante por el potencial local y sumando en la variable del nodo.
+
+* Los mensajes hacia atrás también tienen la misma estructura recursiva.
+
+* Este tipo de grafos se denominan **cadenas de Markov** y las ecuaciones de paso de mensajes correspondientes son un ejemplo de las **ecuaciones de Chapman-Kolmogorov** para procesos de Markov.
+
+---
+
+## Inferencia en una cadena
+
+* Para calcular distribuciones marginales:
+
+  * Calcular y guardar todos los mensajes hacia adelante `\(\mu_\alpha(x_n)\)`.
+  * Calcular y guardar todos los mensajes hacia atrás `\(\mu_\beta(x_n)\)`.
+  * Calcular la constante de normalización `\(Z\)`.
+  * Calcular `\(p(x_n) = \frac{1}{Z} \mu_{\alpha}(x_n) \mu_{\beta}(x_n)\)`.
+  
+* **Ejercicio**: la marginal para pares de nodos adyacentes es
+
+`\begin{equation}
+p(x_{n-1}, x_n) = \frac{1}{Z} \mu_{\alpha}(x_{n-1}) \psi_{n-1,n}(x_{n-1},x_n) \mu_{\beta}(x_n)
+\end{equation}`
+
+* Componentes básicas para hacer inferencia en sistemas dinámicos lineales y modelos ocultos de Markov (HMM).
+
+
+---
+
+## Inferencia en árboles
+
+* El esquema propuesto de paso de mensajes generaliza fácilmente a cualquier grafo **individualmente conectado** (singly connected): a lo sumo un único camino entre cualquier par de nodos.
+
+* Cada nodo envía por cada enlace el producto de los mensajes que ha recibido desde los otros enlaces.
+
+* Ejemplo: árbol no dirigido, árbol dirigido y poliárbol.
+
+&lt;center&gt;
+![:scale 100%](./img/trees.png)
+&lt;/center&gt;
+
+---
+
+## Grafos de factores
+
+* También representamos los **factores como nodos especiales**.
+
+* Ejemplo: `\(p(x) = f_a(x_1, x_2) f_b(x_1, x_2) f_c(x_2, x_3) f_d(x_3)\)`
+
+
+&lt;center&gt;
+![:scale 50%](./img/fg.png)
+&lt;/center&gt;
+
+* En general, `\(p(x) = \prod_s f_s (X_s)\)`.
+
+* Cada potencial tiene su propio nodo de factor, conectado a todos los términos del potencial.
+
+* Los grafos de factores son **bipartitos**: podemos dividir entre nodos de variables y nodos de factores `\(\rightarrow\)` estructura para implementar paso de mensajes genérico.
+
+---
+
+## Grafos de factores para modelos no dirigidos
+
+* Un grafo no dirigido puede ser convertido a un grafo de factores.
+
+* Además, factorizaciones adicionales son posibles de representar(los **grafos de factores son más expresivos**)
+
+&lt;center&gt;
+![:scale 90%](./img/fg_undir.png)
+&lt;/center&gt;
+
+
+---
+
+## Grafos de factores para modelos dirigidos
+
+* Los grafos dirigidos son un caso especial en que los factores representan **distribuciones locales condicionadas**.
+
+* Un modelo individualmente conectado generará un grafo de factores individualmente conectado: preserva la sencillez de la inferencia en estos casos (esto no ocurre si pasamos de dirigidos a no dirigidos).
+
+&lt;center&gt;
+![:scale 90%](./img/fg_dir.png)
+&lt;/center&gt;
+
+
+
+---
+
 class: middle, center, inverse
 
 # Algoritmo suma-producto
@@ -532,7 +739,7 @@ p(x) =  \prod_{f_s \in ne(x)} \left[ \sum_{X_s} F_s(x, X_s)   \right]
 
   * `\(+,\times\)`: marginalización.
   * `\(\max, +\)`: MAP.
-  * `\(\sim, +\)`: forward-filter, backward sample (para obtener muestras del posterior).
+  * `\(\sim, +\)`: forward-filter, backward-sample (para obtener muestras del posterior).
   * ...
   
 * Es lo que recientemente se ha denominado como **semiring dynamic programming**.
