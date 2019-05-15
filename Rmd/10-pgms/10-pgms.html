@@ -422,8 +422,128 @@ class: middle, center, inverse
 
 # Algoritmo max-suma
 
+---
+
+## Algoritmo max-suma (1)
+
+* El algoritmo suma-producto nos permitía calcular marginales de forma eficiente.
+
+* En muchas ocasiones, también nos interesará calcular una **configuración de variables `\(x\)` que maximice la probabilidad del modelo**.
+
+* Solución: usaremos el algoritmo **max-suma**.
+
+* Objetivo: encontrar un algoritmo eficiente para
+  
+  1. Calcular `\(x_{max}\)` tal que maximize `\(p(x)\)`.
+  
+  2. Calcular `\(p(x_{max})\)`.
+  
+--
+  
+* En general, **maximizar marginales `\(\neq\)` máximo conjunto**:
+
+&lt;center&gt;
+![:scale 50%](./img/max_sum1.png)
+&lt;/center&gt;
+
 
 ---
+
+
+## Algoritmo max-suma. Inferencia en cadena
+
+Volvamos al caso de inferencia en una cadena...
+
+* La clave vuelve a ser **intercambiar las operaciones**.
+
+`\begin{align}
+p(x_{max}) &amp;= \max_x p(x) = \max_{x_1} \ldots \max_{x_N} p(x) = \\
+&amp;= \frac{1}{Z} \max_{x_1} \ldots \max_{x_N} \left[  \psi_{1,2} (x_1, x_2) \cdots \psi_{N-1,N} (x_{N-1}, x_N)  \right] = \\
+&amp;= \frac{1}{Z} \max_{x_1} \left[  \max_{x_1} \left[  \psi_{1,2} (x_1, x_2) \left[ \cdots \max_{x_N} \psi_{N-1,N} (x_{N-1}, x_N)  \right] \right] \right]
+\end{align}`
+
+* Al igual que con las marginales, intercambiar los operadores max y producto resulta en un algoritmo mucho más eficiente, dejando de tener coste exponencial.
+
+* Puede ser interpretado en términos de un **paso de mensajes** desde `\(x_N\)` hasta `\(x_1\)`.
+
+---
+
+
+## Algoritmo max-suma. Generalización a árboles
+
+* Al igual que suma-producto, puede aplicarse en grafos de factores con estructura de árbol
+
+`\begin{equation}
+\max_x p(x) = \max_{x_n} \prod_{f_s \in ne(x_n)} \max_{X_s} f_s(x_n, X_s)
+\end{equation}`
+
+* Frente al original:
+
+
+`\begin{equation}
+p(x) =  \prod_{f_s \in ne(x)} \left[ \sum_{X_s} F_s(x, X_s)   \right]
+\end{equation}`
+
+* max-producto `\(\rightarrow\)` max-suma
+
+  1. Por razones numéricas, es más estable trabajar en espacio logarítmico:
+    \begin{equation}
+    \log (\max_x p(x)) = \max_x \log p(x)
+    \end{equation}
+  2. Y usamos la propiedad distributiva para los intercambios de operadores:
+  
+    \begin{equation}
+    \max \lbrace a+b, a+c \rbrace = a + \max \lbrace b, c \rbrace
+    \end{equation}
+---
+
+## Algoritmo max-suma
+
+* Ya es directo pasar del algoritmo suma-producto al max-suma: basta cambiar los operadores:
+
+  * `\(+ \rightarrow \max\)`,
+  * `\(\times \rightarrow +\)` (de logaritmos)
+  
+* **Inicialización** (los elementos neutros para ambos operadores):
+
+  * `\(\mu_{f\rightarrow x}(x) = 0\)`
+  * `\(\mu_{x\rightarrow f}(x) = \log f(x)\)`
+  
+* **Caso recursivo**:
+
+`\begin{equation}
+\mu_{f \rightarrow x} = \max_{x_1, \ldots, x_M} \left[ \log f(x, x_1, \ldots, x_M) + \sum_{m \in ne(f_s)\ x} \mu_{x_m \rightarrow f} (x_m) \right]
+\end{equation}`
+
+`\begin{equation}
+\mu_{x\rightarrow f} (x) = \sum_{l \in ne(x) \ f} \mu_{f_l \rightarrow x} (x)
+\end{equation}`
+
+---
+
+## Ejercicio
+
+
+---
+
+## Generalizaciones de suma-producto
+
+* Consideramos un (semi-)anillo con dos operaciones:
+
+  * `\(+,\times\)`: marginalización.
+  * `\(\max, +\)`: MAP.
+  * `\(\sim, +\)`: forward-filter, backward sample (para obtener muestras del posterior).
+  * ...
+  
+* Es lo que recientemente se ha denominado como **semiring dynamic programming**.
+
+* Permite encontrar de forma natural algoritmos eficientes en más contextos aparte de PGMs.
+
+* Por ejemplo: Belle, de Raedt, *Semiring Programming: A Framework for Search, Inference and Learning* (2016).
+
+---
+
+
 ## Inferencia en grafos generales
 
 * El algoritmo *junction tree* generaliza el marco visto a grafos arbitrarios (con ciclos), pero no es eficiente en general.
