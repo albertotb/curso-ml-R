@@ -1,0 +1,87 @@
+---
+title: "Redes Bayesianas"
+author: Victor Gallego y Roi Naveiro
+date: "17/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(gRain)
+```
+
+En este ejercicio, construiremos una red Bayesiana sencilla para comprendender mejor el *fenómeno "explaining away*.
+
+Consideremos las tres variables binarias. $F$ indica el estado del tanque de gasolina de un coche, y puede tomar valores "Lleno" o "Vacío". $B$ indica el estado de la batería del mismo coche. Toma valores "Cargada" o "Descargada". Por último, $G$ indica la lectura de un medidor eléctrico sobre el estado del tanque y toma valores "Lleno" o "Vacío". 
+
+Tenemos que $P(G,B,F) = P(B)P(F)P(G | B,F)$ y por tanto la red bayesiana que modeliza el problema tiene la forma B --> G <-- F.
+
+Las probabilidades a priori son $P(B=1) = P(F=1) = 0.9$.
+
+Las condicionales son:
+
+\begin{eqnarray}
+P(G=1 | B = 1, F = 1) &=& 0.8 \\
+P(G=1 | B = 1, F = 0) &=& 0.2 \\
+P(G=1 | B = 0, F = 1) &=& 0.2 \\
+P(G=1 | B = 0, F = 0) &=& 0.1 \\
+\end{eqnarray}
+
+
+## Construcción de la red.
+
+Construye la Red Bayesiana correspondiente usando la librería gRain y represéntala gráficamente.
+
+En este artículo explican bastante bien la librería gRain:
+https://cran.r-project.org/web/packages/gRain/vignettes/gRain-intro.pdf
+
+```{r}
+## CÓDIGO
+```
+
+
+## Haciendo preguntas al modelo sin observaciones
+
+Obtén las marginales en cada nodo cuando no existen observaciones.
+
+```{r}
+## CÓDIGO
+```
+
+Obtén la conjunta de F y B. ¿Son independientes?
+
+```{r}
+## CÓDIGO
+```
+
+## Haciendo preguntas al modelo con observaciones
+
+Supón que observamos que el indicador está en el estado vacío. ¿Cómo cambia la probablidad de que el tanque esté realmente vacío?
+
+```{r}
+## CÓDIGO
+```
+
+Ahora borra esta evidencia.
+
+```{r}
+## CÓDIGO
+```
+
+
+Ahora supongamos que además observamos que la batería está descargada.
+
+```{r}
+## CÓDIGO
+```
+
+
+
+
+
