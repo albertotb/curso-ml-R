@@ -236,7 +236,7 @@ s &lt;- c(&quot;I&quot;, &quot;S&quot;)
 
 # Definimos la matriz de transiciones A, representando las probabilidades de que el casino cambie de dado
 # A es de tamaño 2 x 2
-A &lt;- t(matrix(data = log(c(0.95, 0.05, 0.1, 0.9)), nrow = 2, ncol = 2, dimnames = list(c(&quot;I&quot;, &quot;S&quot;), c(&quot;I&quot;, &quot;S&quot;))))
+A &lt;- matrix(data = log(c(0.95, 0.1, 0.05, 0.9)), nrow = 2, ncol = 2, dimnames = list(c(&quot;I&quot;, &quot;S&quot;), c(&quot;I&quot;, &quot;S&quot;)))
 
 # Definimos la matriz de emisiones B, indicando las probabilidades de sacar cada cara de cada dado
 # B es de tamaño 6 x 2
