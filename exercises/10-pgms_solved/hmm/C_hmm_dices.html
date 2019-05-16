@@ -259,7 +259,7 @@ V_{1,k} = p(x_1 | z_1 = k) p( z_1 = k)
 V_{t,k} = \max_l p(x_t | z_t = k) A_{l,k} V_{t-1,l}
 \]</span></p>
 <p>donde <span class="math inline">\(V_{t,k} = \max_{x_1, \ldots x_t, z_1, \ldots, z_t} p(x_1, \ldots, x_t, z_1, \ldots, z_t)\)</span>, con <span class="math inline">\(z_t = k\)</span>.</p>
-<p><strong>Implementa</strong> las siguientes ecuaciones recursivas, completando el caso recursivo. Nota: además de ir calculando <span class="math inline">\(V_t\)</span> en cada iteración, también necesitaremos ir guardando el valor <span class="math inline">\(z^*_t\)</span> en cada iteración en la matriz Ptr.</p>
+<p><strong>Implementa</strong> las siguientes ecuaciones recursivas, completando el caso recursivo. Nota: además de ir calculando <span class="math inline">\(V_t\)</span> en cada iteración, también necesitaremos ir guardando el valor <span class="math inline">\(z^*_t\)</span> en cada iteración en la matriz <span class="math inline">\(Ptr\)</span>.</p>
 <pre class="r"><code>V &lt;- matrix( nrow = length(observaciones), ncol = 2)
 Ptr &lt;- matrix( nrow = length(observaciones), ncol = 2)
 

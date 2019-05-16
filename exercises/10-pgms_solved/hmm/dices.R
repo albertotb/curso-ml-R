@@ -23,21 +23,6 @@ observaciones<-c(6,6,4,1,5,3,2,1,6,1,6,2,1,1,5,2,3,4,6,5,3,2,1,4,3,5,6,6,3,4,2,6
                    1,5,5,4,3,5,1,3,4,5,1,2,3,6,6,6,2,6,6,4,6,4,6,5,6,6,1,2,4,6,4,2,6,5,6,2,6,5,1,5,2,1,1,1,6,6,6,6,6,
                    4,6,3,3,4,6)
 
-#####
-
-probs  <- data.frame()
-estados <- data.frame()
-
-# we start by calculating the probability of being in particular state given the first symbol and initial matrix
-# notice a change in log space - every multiplication is converted to summation
-probs  <- rbind(probs, unlist(lapply(s, function(k) {
-  pi[k, 1] + B[observaciones[1], k]
-})))
-
-estados <- rbind(estados, s)
-
-colnames(probs)  <- c("I", "T")
-colnames(estados) <- c("I", "T")
 
 ###
 
