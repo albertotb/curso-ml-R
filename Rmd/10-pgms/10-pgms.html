@@ -21,11 +21,6 @@ class: center, middle, inverse, title-slide
 
 
 
-
-
-    
----
-
 class: middle, center, inverse
 
 # Introducción
@@ -545,7 +540,7 @@ class: middle, center, inverse
 p(x) = \sum_{\textbf{x} / x} p(\textbf{x} ) = \sum_{\textbf{x} / x} \prod_{s} f_s(x_s)
 \end{equation}`
 
-* La estructura de árbol permite dividir los factores en la conjunto en grupos, cada uno asociado con un factor vecino de `\(x\)`.
+* La estructura de árbol permite dividir los factores en la distribución conjunta en grupos, cada uno asociado con un factor vecino de `\(x\)`.
 
 ---
 ## Algoritmo suma-producto (2)
@@ -819,7 +814,7 @@ p(x) =  \prod_{f_s \in ne(x)} \left[ \sum_{X_s} F_s(x, X_s)   \right]
 
 * Otra alternativa es usar métodos aproximados.
 
-* *Loopy belief propagation* propone usar el algoritmo suma producto aunque no se haya ciclos.
+* *Loopy belief propagation* propone usar el algoritmo suma producto aunque haya ciclos.
 
 * La información fluye indefinidamente por los ciclos. En algunos casos se converge (no garantizado!).
     </textarea>
