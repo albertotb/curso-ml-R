@@ -93,7 +93,7 @@ $$
 V_{t,k} = \max_l p(x_t | z_t = k) A_{l,k} V_{t-1,l}
 $$
 
-donde $V_{t,k} = \max_{x_1, \ldots x_t, z_1, \ldots, z_t} p(x_1, \ldots, x_t, z_1, \ldots, z_t)$, con $z_t = k$.
+donde $V_{t,k} = \max_{z_1, \ldots, z_{t-1}} p(x_1, \ldots, x_t, z_1, \ldots, z_t)$, con $z_t = k$.
 
 
 **Implementa** las siguientes ecuaciones recursivas, completando el caso recursivo. Nota: además de ir calculando $V_t$ en cada iteración, también necesitaremos ir guardando el valor $z^*_t$ en cada iteración en la matriz $Ptr$.
