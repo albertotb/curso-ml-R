@@ -204,7 +204,7 @@ class: middle, center, inverse
 
 ---
 
-# Modelos gráficos no dirigidos
+## Modelos gráficos no dirigidos
 
 * También conocidos como **redes de Markov**.
 
@@ -217,6 +217,72 @@ class: middle, center, inverse
   * **d-separación**: $A  \perp B | C$ sii todos los caminos entre $A$ y $B$ están bloqueados por nodos de $C$. 
   
   * Corolario: no hay fenómeno de **explaining away**.
+  
+* Markov blanket: todos los nodos adyacentes.
+  
+
+<center>
+![:scale 70%](./img/mrf1.png)
+</center>
+
+---
+
+## Propiedades de factorización
+
+* Consideremos dos nodos $x_i$ y $x_j$ que no estén conectados por arco. 
+
+* Como no hay camino directo, dado el resto de nodos, todos los caminos están bloqueados.
+
+* Por tanto, $p(x_i, x_j| x_{\setminus {i,j}}) = p(x_i| x_{\setminus {i,j}})p(x_j| x_{\setminus {i,j}})$.
+
+
+--
+
+Es conveniente introducir el concepto de **clique**:
+
+* **Clique**: subgrafo donde cada par de nodos está conectado por **un** enlace.
+
+* **Clique maximal**: clique al cual no es posible añadir más nodos sin que pierda la propiedad de ser clique.
+
+<center>
+![:scale 30%](./img/clique.png)
+</center>
+
+---
+
+## Distribución conjunta
+
+* Para un clique $C$ y conjunto de variables contenidas en él, $x_C$, tenemos que
+
+\begin{equation}
+p(x) = \frac{1}{Z} \prod_{C}  \Psi_C(x_C),\qquad Z = \sum_x \prod_{C}  \Psi_C(x_C)
+\end{equation}
+
+* Hay que tomar
+
+\begin{equation}
+\Psi_C(x_C) = \exp \lbrace - E(x_C) \rbrace
+\end{equation}
+
+* donde $E(x)$ es la llamada **función de energía**.
+
+* Con $M$ variables que tomen $K$ valores, la complejidad puede ser $\mathcal{O}(K^M)$.
+
+---
+
+## De dirigido a no dirigido
+
+* Para pasar de un grafo dirigido a uno no dirigido, basta añadir nuevos enlaces entre todos los pares de parientes de cualquier nodo.
+
+* Este proceso se conoce como **moralización**, y el grafo resultante, **grafo moral**.
+
+<center>
+![:scale 70%](./img/moral.png)
+</center>
+
+* Ir de una representación en grafo dirigido a uno no dirigido descarta algunas propiedades de independencia condicional del grafo.
+
+
 
 
 
@@ -719,10 +785,6 @@ p(x) =  \prod_{f_s \in ne(x)} \left[ \sum_{X_s} F_s(x, X_s)   \right]
 \begin{equation}
 \mu_{x\rightarrow f} (x) = \sum_{l \in ne(x) \ f} \mu_{f_l \rightarrow x} (x)
 \end{equation}
-
----
-
-## Ejercicio
 
 
 ---
