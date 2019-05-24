@@ -234,7 +234,7 @@ class: middle, center, inverse
 
 * Como no hay camino directo, dado el resto de nodos, todos los caminos están bloqueados.
 
-* Por tanto, `\(p(x_i, x_j| x_{\setminus {i,j}}) = p(x_i| x_{\setminus {i,j}})p(x_j| x_{\setminus {i,j}})\)`.
+* Por tanto, `\(p(x_i, x_j| x_{\setminus \lbrace i,j \rbrace}) = p(x_i| x_{\setminus  \lbrace i,j \rbrace})p(x_j| x_{\setminus  \lbrace i,j \rbrace})\)`.
 
 
 --
@@ -323,7 +323,7 @@ p(x|y) = \frac{p(y|x)p(x)}{p(y)}
 
 
 `\begin{equation}
-p(x) = \frac{1}{Z} \psi_{1,2}(x_1, x_2)  \psi_{2,3}(x_3, x_3) \cdots \psi_{N-1,N}(x_{N-1}, x_N)
+p(x) = \frac{1}{Z} \psi_{1,2}(x_1, x_2)  \psi_{2,3}(x_2, x_3) \cdots \psi_{N-1,N}(x_{N-1}, x_N)
 \end{equation}`
 
 * Echemos cuentas: supongamos que cada nodo es una VA discreta ($K$ clases), y cada potencial viene especificado como una tabla de tamaño `\(K \times K\)`: la conjunta tiene `\((N-1)K^2\)` parámetros.
@@ -350,7 +350,7 @@ ab + ac = a(b+c)
 * Podemos obtener ecuaciones recursivas para **transmitir mensajes**
 
 `\begin{align}
-p(x_n) &amp;= \left[  \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \sum_{x_1} \psi_{x_1, x_2} (x_1, x_2) \right] \cdots \right] \\
+p(x_n) &amp;= \frac{1}{Z} \left[  \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \sum_{x_1} \psi_{x_1, x_2} (x_1, x_2) \right] \cdots \right] \\
 &amp;\left[  \sum_{x_{n+1}} \psi_{n,n+1}(x_{n}, x_{n+1}) \cdots \left[  \sum_{x_{N}} \psi_{N-1,N}(x_{N-1}, x_N) \right] \cdots \right]
 \end{align}`
 
@@ -360,12 +360,18 @@ p(x_n) &amp;= \left[  \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \s
 p(x_n) = \frac{1}{Z} \mu_{\alpha}(x_n) \mu_{\beta}(x_n)
 \end{align}`
 
+&lt;center&gt;
+![:scale 70%](./img/chain.png)
+&lt;/center&gt;
+
 ---
 
 ## Inferencia en una cadena (3)
 
+
+
 `\begin{align}
-p(x) &amp;= \left[  \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \sum_{x_1} \psi_{x_1, x_2} (x_1, x_2) \right] \cdots \right] \\
+p(x) &amp;= \left[  \frac{1}{Z} \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \sum_{x_1} \psi_{x_1, x_2} (x_1, x_2) \right] \cdots \right] \\
 &amp;\left[  \sum_{x_{n+1}} \psi_{n,n+1}(x_{n}, x_{n+1}) \cdots \left[  \sum_{x_{N}} \psi_{N-1,N}(x_{N-1}, x_N) \right] \cdots \right]
 \end{align}`
 
@@ -383,6 +389,10 @@ p(x) &amp;= \left[  \sum_{x_{n-1}} \psi_{n-1,n}(x_{n-1}, x_n) \cdots \left[ \sum
 ---
 
 ## Paso de mensajes (1)
+
+&lt;center&gt;
+![:scale 70%](./img/chain.png)
+&lt;/center&gt;
 
 * Intepretación más común: paso de mensajes entre los nodos del grafo.
 
