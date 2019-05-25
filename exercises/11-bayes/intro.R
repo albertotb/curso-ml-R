@@ -41,9 +41,17 @@ mu <- la$mu
 
 
 # Algoritmos de inferencia alternativos: VI
-s8 <- stan_model(file = '8schools.stan')  # vb no soporta leer el modelo desde fichero directamente
-fit_vb <- vb(s8, data = schools_dat)
+# vb no soporta leer el modelo desde fichero directamente
+s8 <- stan_model(file = '8schools.stan')  
+fit_vb <- vb(
+  s8, 
+  data = schools_dat,     # data list
+  algorithm = "meanfield", # type of VI
+  output_samples = 2000   # samples from the posterior
+  )
 
 print(fit_vb)
 plot(fit)
 pairs(fit, pars = c("mu", "tau"))
+
+
