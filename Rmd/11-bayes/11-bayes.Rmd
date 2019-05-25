@@ -12,6 +12,16 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       beforeInit: "macros.js"
+
+---
+
+## Introducción
+
+```{r}
+a = rnorm(1000)
+hist(a)
+```
+
 ---
 
 
