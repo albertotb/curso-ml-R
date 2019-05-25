@@ -20,22 +20,172 @@ class: center, middle, inverse, title-slide
 ---
 
 
-## Introducción
+## Ventajas del enfoque Bayesiano de regresión y clasificación
 
+* Previene el **overfitting**
 
-```r
-a = rnorm(1000)
-hist(a)
-```
+* Aporta métodos automáticos para determinar la complejidad de los modelos, basados en datos.
 
-![](11-bayes_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
-
+* ...
 ---
 
 
 class: middle, center, inverse
 
 # Regresión Bayesiana
+
+---
+
+## Modelo de Regresión
+
+* Objetivo: predecir uno o más targets **contínuos** `\(t\)` a partir de un vector D-dimensional de inputs `\(x\)`.
+
+* Modelo de ruido normal, `\(t = y(x,w) + \epsilon\)`
+
+`\begin{equation}
+p(t \vert x, w, \beta) = \mathcal{N}(t \vert y(x,w), \beta^{-1})
+\end{equation}`
+
+* Donde `\(y(x,w) = \sum_{j=0}^{M-1} w_j \phi_j(x) = w^\top \phi(x)\)`.
+
+--
+
+* Si tenemos datos `\(x_1, \dots, x_N\)`, `\(t_1, \dots, t_N\)` y asumimos que son muestras iid de `\(p(t \vert x, w, \beta)\)`, la verosimilitud es
+
+`\begin{equation}
+p(\boldsymbol{t} \vert X, w)\prod_{n=1}^N \mathcal{N}(t_n \vert w^\top \phi(x_n), \beta^{-1})
+\end{equation}`
+
+* Donde `\(\boldsymbol{t}\)` es el vector de los `\(N\)` targets y `\(X\)` la matriz de datos.
+
+* Maximizando la log-verosimilitud con respecto a `\(w\)` obtenemos la solución de mínimos cuadrados.
+
+---
+
+## Enfoque Bayesiano (1)
+
+* Tratamos los parámetros desconocidos como variables aleatorias.
+
+* Empezaremos asumiendo que conocemos la precisión `\(\beta\)`.
+
+* Ponemos distribuciones a priori sobre los pesos `\(w\)`.
+
+* Como la verosimilitud es la exponencial de una función cuadrática de w, el prior conjugado es normal
+
+`\begin{equation}
+p(w) = \mathcal{N}(w \vert m_0, S_0)
+\end{equation}`
+
+---
+## Enfoque Bayesiano (2)
+
+* Podemos calcular la distribución a posteriori
+
+`\begin{equation}
+p(w \vert \boldsymbol{t}, X) \propto p(t \vert X, w)p(w)
+\end{equation}`
+
+* Gracias a la conjugación, la distribución a posteriori será también Gaussiana. 
+
+`\begin{equation}
+p(w \vert \boldsymbol{t}, X) = \mathcal{N}(w \vert m_N, S_N)
+\end{equation}`
+
+* Donde
+
+`\begin{eqnarray*}
+m_n &amp;=&amp; S_N(S_0^{-1} m_0 + \beta \Phi^\top \boldsymbol{t}) \\
+S_N^{-1} &amp;=&amp; S_0^{-1} + \beta \Phi^\top \Phi
+\end{eqnarray*}`
+
+* `\(\Phi\)` es la matriz de diseño. La final i-ésima es el vector `\([\phi_0(x_i), \dots, \phi_{M-1}(x_i)]\)`.
+
+--
+
+* **Ojo**: no siempre podremos calcular analíticamente la distribución a posteriori...
+---
+## Enfoque Bayesiano (3)
+
+* **Ejercicio**: demostrar que si consideramos una distribución a priori infinitamente ancha, `\((S_0 = \alpha^{-1} I, \alpha \rightarrow 0)\)`, la media (moda) de la distribución a posteriori converge a la solución de máxima verosimilitud dada por
+
+`\begin{equation}
+w_{ML} = (\Phi^\top \Phi)^{-1} \Phi^\top \boldsymbol{t}
+\end{equation}`
+
+---
+
+## Enfoque Bayesiano (4)
+
+* Consideremos el caso de distribución a priori isotrópica de media 0.
+
+`\begin{equation}
+p(w \vert \alpha) = \mathcal{N}(w \vert 0, \alpha^{-1} I)
+\end{equation}`
+
+--
+
+&lt;center&gt;
+![:scale 70%](./img/reg1.png)
+&lt;/center&gt;
+
+---
+
+## Enfoque Bayesiano (4)
+
+* **Ejercicio:** demostrar que maximizar el log-posterior con respecto a `\(w\)`, equivale a encontrar el estimador de máxima verosimilitud de los pesos del problema de regresión con regularización `\(L2\)`. 
+
+--
+
+* En el caso bajo consideración, podemos escribir el log-posterior como la suma del log-prior y la log-verosimilitud.
+
+`\begin{equation}
+-\frac{\beta}{2} \sum_{n=1}^N \left \lbrace t_n - w^\top \phi(x_n)\right \rbrace^2 - \frac{\alpha}{2} w^\top w + \text{cte}
+\end{equation}`
+
+* Maximizar este posterior es equivalente a encontrar la solución de regresión ridge con parámetro de regularización `\(\alpha/\beta\)`.
+
+---
+
+## Enfoque Bayesiano (5)
+
+* En la práctica, estamos interesados en hacer predicciones del target `\(t\)` asociado a un nuevo input `\(x\)`.
+
+* Esto requiere evaluar la **distribución predictiva a posteriori**
+
+`\begin{equation}
+p(t \vert \boldsymbol{t},\alpha, \beta) = \int p(t \vert w \beta)p(w \vert \boldsymbol(t), \alpha, \beta) dw
+\end{equation}`
+
+--
+
+* Es fácil probrar que `\(p(t \vert \boldsymbol{t},\alpha, \beta) = \mathcal{N}(t \vert m_N^\top \phi(x), \sigma_N^2(x))\)`, con
+
+`\begin{equation}
+\sigma_N^2(x) = \frac{1}{\beta} + \phi(x)^\top S_N \phi(x)
+\end{equation}`
+
+* Dos fuentes de incertidumbre: la asociada al modelo y la asociada al desconocimiento de los `\(w\)` (en el límite de muchos datos esta última es cero).
+
+--
+
+* **Ojo**: la distribución predictiva a posteriori no siempre puede calcularse analíticamente...
+
+---
+
+## Enfoque Bayesiano (6)
+
+* En todos los casos hemos asumido conocido el valor de la precisión `\(\beta\)`.
+
+* Si fuese desconocido, deberíamos poner un prior sobre `\(w, \beta\)`.
+
+* Eligiendo una distribución Gaussiana-Gamma, se mantiene la conjugación.
+
+* En este caso la distribución predictiva es una t de Student.
+
+* Si también queremos asignar un prior al parámetro `\(\alpha\)` (hiperprior), debemos recurrir a técnicas de inferencia aproximada.
+---
+
+## Comparación de modelos Bayesiana
 
 ---
 
