@@ -33,6 +33,8 @@ fit <- stan(file = '8schools.stan', data = schools_dat)
 print(fit)  # Como Rhat = 1, parece que ha convergido
 plot(fit)
 pairs(fit, pars = c("mu", "tau"))
+traceplot(fit, pars = c("mu", "tau"), inc_warmup = TRUE, nrow = 2)
+
 
 la <- extract(fit, permuted = TRUE) # para obtener las muestras
 mu <- la$mu 
