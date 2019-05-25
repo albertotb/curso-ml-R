@@ -43,11 +43,174 @@ class: middle, center, inverse
 
 ---
 
+
+## Repaso
+
+* **Inferencia**: algunos de los nodos del modelo estarán fijados a ciertos valores conocidos (observados), y deseamos calcular la distribución posterior sobre (subconjuntos de) el resto de nodos (no observados).
+
+
+* Caso más sencillo: supongamos que $p(x, y) = p(y|x)p(x)$, con el Teorema de Bayes
+
+\begin{equation}
+p(x|y) = \frac{p(y|x)p(x)}{p(y)}
+\end{equation}
+
+* Salvo en casos sencillos, la integral $p(y) = \int p(x,y) dx$ es **intratable**.
+
+--
+
+* Introduciremos hoy dos familias de técnicas para **aproximar** el posterior:
+
+  * **Basadas en muestreo**: Markov Chain Monte Carlo (MCMC).
+  
+  * **Basadas en optimización**: Inferencia Variacional (VI).
+
+---
+
 class: middle, center, inverse
 
 # Markov Chain Monte Carlo
 
 ---
+
+## Repaso de Monte Carlo
+
+* El objetivo de los métodos Monte Carlo es el de calcular **esperanzas** con respecto a cierta distribución $p(z)$
+
+\begin{equation}
+\mathbb{E} \left[ f(z) \right] = \int_{\mathcal{Z}} f(z)p(z)dz
+\end{equation}
+
+* **Idea**: obtenemos una **muestra finita** $z^{(l)}, l=1,\ldots,L$ de $p(z)$, por lo que podemos aproximar mediante
+
+\begin{equation}
+\mathbb{E} \left[ f(z) \right] \approx \frac{1}{L} \sum_{l=1}^L f(z^{(l)})
+\end{equation}
+
+* ¿Qué hacer cuando no podemos muestrear directamente de $p(z)$?
+
+--
+
+  * Muestreo por rechazo (**rejection sampling**): no es muy general.
+  
+  * Muestreo por importancia (**importance sampling**): solo para calcular integrales, no permite obtener muestras directamente: con lo que si queremos cambiar la $f(z)$, hay que repetir todo desde 0 (costoso).
+  
+  * **Markov Chain Monte Carlo (MCMC)**: general y obtiene muestras directamente.
+
+---
+
+## MCMC: fundamentos
+
+* **Objetivo**: obtener muestras de $p(z)$.
+
+* **Asumimos**: sabemos evaluar $p(z)$ salvo constante de proporcionalidad.
+
+  * Es decir, basta con saber evaluar $\tilde{p}(z) = Z p(z)$.
+  
+* **Idea**: generar muestras de una cadena de Markov cuya distribución invariante (límite) sea $p(z)$.
+
+--
+
+* **Esquema general**:
+
+  1. A partir de la muestra actual $z^{(\tau)}$, generar una muestra *candidata* mediane una distribución (**proposal**),  $z^* \sim q(z | z^{(\tau)})$.
+  
+  2. Aceptamos la candidate mediante algún criterio.
+  
+  3. Si es aceptada, $z^{(\tau + 1)} = z^*$. Si no, $z^{(\tau + 1)} = z^{(\tau)}$, e iteramos.
+  
+  * Las muestras $z^{(1)}, z^{(2)}, \ldots$ forman una cadena de Markov.
+
+---
+
+## Algoritmo de Metropolis
+
+* El proposal tiene que ser simétrico: $q(z_A|z_B) = q(z_B | z_A)$.
+
+* Aceptamos la muestra con probabilidad
+
+\begin{equation}
+A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*)}{\tilde{p}(z^{(\tau)})})
+\end{equation}
+
+--
+
+* Típicamente, $q(z | z^{(\tau)}) \sim \mathcal{N}(z | z^{(\tau)}, \sigma)$ (Random Walk Metropolis)
+
+* Visualización interactiva en https://chi-feng.github.io/mcmc-demo/app.html#RandomWalkMH,banana.
+
+
+---
+
+## ¿Por qué funciona Metropolis?
+
+
+---
+
+### Algoritmo de Metropolis-Hastings
+
+* Generalización que permite el uso de **cualquier proposal**.
+
+* Ahora aceptaremos una muestra con probabilidad:
+
+\begin{equation}
+A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*) q(z^{(\tau)} | z^*)  }{\tilde{p}(z^{(\tau)}) q(z^* | z^{(\tau)}) })
+\end{equation}
+
+### Efecto de hiperparámetros
+
+* Si el proposal es $q(z | z^{(\tau)}) \sim \mathcal{N}(z | z^{(\tau)}, \rho)$, valores **bajos** de $\rho$ hacen que la tasa de aceptación sea alta, pero explore muy lentamente. Valores **altos** de $\rho$ provocan que se explore más regiones del espacio, a costa de aumentar las muestras rechazadas.
+
+
+<center>
+![:scale 30%](./img/mcmc1.png)
+</center>
+
+
+
+---
+
+## Convergencia
+
+* Rhat
+
+* Muestra efectiva
+
+* Disminuyendo correlaciones
+
+---
+
+## Gibbs sampling
+
+* Caso especial de Metropolis-Hastings, utilizado cuando
+  
+  * El objetivo es multidimensional: $p(z) = p(z_1, \ldots, z_M)$.
+  
+  * Se conocen las marginales condicionadas $p(z_i | z_{\setminus i})$.
+
+
+---
+
+## Hamiltonian Monte Carlo (HMC)
+
+* ¿Podemos mejorar el camino aleatorio de la cadena? 
+
+* Además de aliviar el problema del tamaño del paso en Metropolis-Hastings.
+
+--
+
+* También conocido como Hybrid Monte Carlo, HMC es adecuado para espacios continuos:
+
+  * Permite dar grandes saltos en el espacio.
+  
+  * Baja tasa de muestras rechazadas.
+  
+  * Necesita evaluar el gradiente de la logprobabilidad respecto a $z$.
+
+
+
+---
+
 
 class: middle, center, inverse
 
@@ -57,14 +220,18 @@ class: middle, center, inverse
 
 ## Stan como PPL
 
+* Lenguajes de **programación probabilística**.
+
 * Separación entre **modelo** e **inferencia**.
+
+
 ---
 
 ## Flujo de trabajo con un PPL
 
 1. Escribir el **modelo probabilístico** (priores + verosimilitudes).
 
-2. Ejecutar el **motor de inferencia** (MCMC, VI, ...).
+2. Ejecutar el **motor de inferencia** (MCMC, VI, MAP, ...).
 
 3. Diagnosticar la **convergencia**.
 
@@ -74,14 +241,48 @@ class: middle, center, inverse
 
 ## Modelos en Stan
 
+* Se escriben en un mini-lenguaje (DSL) simple (no en R) para que posteriormente puedan ser compilados a C.
+
+* Especificamos **parámetros** y **variables latentes**.
+
+* Pantallazo de ejemplo:
+
+
+
 
 ---
 
 ## Motores de inferencia en Stan
 
+* HMC/NUTS
+
+<center>
+![:scale 70%](./img/stan_nuts.png)
+</center>
+
+
+* VI (**V**ariational **B**ayes, siguiente capítulo)
+
+<center>
+![:scale 60%](./img/stan_vb.png)
+</center>
+
 ---
 
 ## Diagnósticos en Stan
+
+<center>
+![:scale 100%](./img/stan_diag.png)
+</center>
+
+
+* También visualizaciones:
+
+  * plot(fit)
+  
+  * pairs(fit, pars = c("mu", "tau"))
+  
+  * traceplot(fit, pars = c("mu", "tau"), inc_warmup = TRUE, nrow = 2)
 
 
 ---
