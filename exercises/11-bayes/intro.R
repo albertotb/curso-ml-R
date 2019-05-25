@@ -35,6 +35,9 @@ plot(fit)
 pairs(fit, pars = c("mu", "tau"))
 traceplot(fit, pars = c("mu", "tau"), inc_warmup = TRUE, nrow = 2)
 
+# Intervalos de probabilidad (95%)
+print(fit, "theta[1]", probs = c(0.025, 0.975))
+
 
 la <- extract(fit, permuted = TRUE) # para obtener las muestras
 mu <- la$mu 
