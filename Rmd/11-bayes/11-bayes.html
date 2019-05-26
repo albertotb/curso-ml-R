@@ -890,6 +890,18 @@ ELBO(q) &amp;=&amp;  \mathbb{E}[\log p(X,Z)] - \mathbb{E}[\log q(Z)] \\
 * Para calcular esta estimación, no es necesario evaluar todos los datos.
 
 * &lt;a href="https://arxiv.org/pdf/1601.00670.pdf"&gt;Variational Inference: A Review for Statisticians. &lt;/a&gt;
+
+---
+
+## Automatic Differentiation Variational Inference
+
+* Otra posibilidad es **ADVI**.
+
+* Aproxima usando MC tanto el ELBO como su derivada para una forma paramétrica particular de la familia variacional.
+
+* Requiere que sea sencillo muestrear de `\(q(Z)\)`.
+
+* Es la que usa STAN.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
