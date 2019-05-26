@@ -1,0 +1,121 @@
+---
+title: "Regresión de Poisson Bayesiana"
+author: "Victor Gallego y Roi Naveiro"
+date: "20/05/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+**Cargamos los paquetes**
+```{r, comment=NA}
+library(ggplot2)
+library(tidyr)
+library(gridExtra)
+library(rstanarm)
+library(rstan)
+library(bayesplot)
+theme_set(theme_minimal())
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+```
+
+En este cuaderno realizaremos un análisis de series temporales mediante regresión de Poisson para los datos de muertes en accidentes de tráfico anuales en Finlandia.
+
+# Datos
+
+1. Lee los datos desde el fichero trafficdeaths.csv y explóralos
+
+```{r}
+deaths <- read.csv("trafficdeaths.csv", header = TRUE)
+head(deaths)
+```
+
+2. Represéntalos gráficamente en función del año
+
+```{r}
+ggplot() +
+  geom_point(aes(year, deaths), data = deaths, size = 1) +
+  labs(y = 'Traffic deaths', x= "Year") +
+  guides(linetype = F)
+```
+
+
+# Modelo de Poisson para regresión
+
+El número de muertes son valores enteros postivos (contador), luego asumiremos que estas observaciones se distribuyen mediante una Poisson. 
+
+Asumiremos que la tasa de muertes cambia de forma proporcional (y homogénea) en el tiempo.
+
+3. Describe matemáticamente el modelo
+
+
+
+Para ello, usa la función stan_glm, especificando la familia de observación adecuada y 5000 muestras para cada una de 4 cadenas.
+
+```{r, comment=NA, results='hide'}
+fit_lin <- stan_glm(deaths ~ year, data = as.data.frame(deaths), family="poisson",
+ 	            refresh=1000, iter=5000, chains=4, seed=583829)
+```
+
+¿Ha convergido el algoritmo MCMC?
+
+```{r, comment=NA}
+summary(fit_lin, probs=c(0.1, 0.5, 0.9))
+```
+
+
+4. Ahora realizaremos algunas predicciones (mediana e intervalos 5-95%), usando 5000 muestras MC.
+
+
+```{r}
+x_predict <- seq(1993,2023)
+N_predict <- length(x_predict)
+y_predict <- posterior_predict(fit_lin, newdata=data.frame(year=x_predict), draws = 5000)
+```
+
+```{r }
+mu <- apply(t(y_predict), 1, quantile, c(0.05, 0.5, 0.95)) %>%
+  t() %>% data.frame(x = x_predict, .) %>% gather(pct, y, -x)
+pfit <- ggplot() +
+  geom_point(aes(year, deaths), data = deaths, size = 1) +
+  geom_line(aes(x, y, linetype = pct), data = mu, color = 'red') +
+  scale_linetype_manual(values = c(2,1,2)) +
+  labs(x = 'Year', y = 'Traffic deaths') +
+  guides(linetype = F)
+(pfit)
+```
+
+5. Ahora realizaremos un ajuste del mismo modelo mediante inferencia variacional.
+
+```{r, comment=NA, results='hide'}
+fit_vb <- stan_glm(deaths ~ year, data = as.data.frame(deaths), family="poisson",
+ 	            algorithm='meanfield', seed=583829)
+```
+
+
+
+```{r}
+x_predict <- seq(1993,2023)
+N_predict <- length(x_predict)
+y_predict <- posterior_predict(fit_vb, newdata=data.frame(year=x_predict), draws = 1000)
+```
+
+```{r }
+mu <- apply(t(y_predict), 1, quantile, c(0.05, 0.5, 0.95)) %>%
+  t() %>% data.frame(x = x_predict, .) %>% gather(pct, y, -x)
+pfit <- ggplot() +
+  geom_point(aes(year, deaths), data = deaths, size = 1) +
+  geom_line(aes(x, y, linetype = pct), data = mu, color = 'red') +
+  scale_linetype_manual(values = c(2,1,2)) +
+  labs(x = 'Year', y = 'Traffic deaths') +
+  guides(linetype = F)
+(pfit)
+```
+
+
