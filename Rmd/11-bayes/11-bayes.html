@@ -26,7 +26,8 @@ class: center, middle, inverse, title-slide
 
 * Aporta métodos automáticos para determinar la complejidad de los modelos, basados en datos.
 
-* ...
+* Permite **cuantificar la incertidumbre**, es decir, no solo nos da una predicción puntual, si no que podemos obtener un intervalo predictivo para saber cómo de confiado está el modelo.
+
 ---
 
 
@@ -431,6 +432,8 @@ A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*)}{\tilde{p}(z^{(\tau)})})
 A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*) q(z^{(\tau)} | z^*)  }{\tilde{p}(z^{(\tau)}) q(z^* | z^{(\tau)}) })
 \end{equation}`
 
+--
+
 ### Efecto de hiperparámetros
 
 * Si el proposal es `\(q(z | z^{(\tau)}) \sim \mathcal{N}(z | z^{(\tau)}, \rho)\)`, valores **bajos** de `\(\rho\)` hacen que la tasa de aceptación sea alta, pero explore muy lentamente. Valores **altos** de `\(\rho\)` provocan que se explore más regiones del espacio, a costa de aumentar las muestras rechazadas.
@@ -444,23 +447,53 @@ A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*) q(z^{(\tau)} | z^*)  }{\tilde
 
 ---
 
-## Convergencia
-
-* Rhat
-
-* Muestra efectiva
-
-* Disminuyendo correlaciones
-
----
-
-## Gibbs sampling
+## Gibbs sampling (1)
 
 * Caso especial de Metropolis-Hastings, utilizado cuando
   
   * El objetivo es multidimensional: `\(p(z) = p(z_1, \ldots, z_M)\)`.
   
   * Se conocen las marginales condicionadas `\(p(z_i | z_{\setminus i})\)`.
+  
+  
+* **Esquema general**: iremos iterando muestras de cada una de las distribuciones condicionales anteriores.
+
+
+---
+
+## Gibbs sampling (2)
+
+* **Ejemplo**: supongamos que la distribución objetivo es `\(p(z) = p(z_1, z_2, z_3)\)`.
+
+* En la iteración `\(i\)`, hemos obtenido por muestreo valores `\(z_1^{(i)}, z_2^{(i)}, z_3^{(i)}\)`.
+
+* Obtenemos nuevas muestras `\(z_1^{(i+1)}, z_2^{(i+1)}, z_3^{(i+1)}\)` mediante:
+
+  * `\(z_1^{(i+1)} \sim p(z_1 | z_2^{(i)}, z_3^{(i)})\)`.
+  
+  * `\(z_2^{(i+1)} \sim p(z_1 | z_1^{(i+1)}, z_3^{(i)})\)`.
+  
+  * `\(z_3^{(i+1)} \sim p(z_1 | z_1^{(i+1)}, z_2^{(i+1)})\)`.
+  
+  
+--
+
+* Si en lugar de muestrea tomamos la moda de cada condicional, obtenemos el algoritmo de **modas condicionadas iteradas (ICM)**.
+
+---
+
+## Gibbs sampling (3)
+
+* **Ejemplo** :  &lt;span style="color:red"&gt;Gaussiana bidimensional&lt;/span&gt;, e &lt;span style="color:blue"&gt;iteraciones del Gibbs sampler&lt;/span&gt;
+
+&lt;center&gt;
+![:scale 50%](./img/gibbs.png)
+&lt;/center&gt;
+
+--
+
+* **Problema**: avance **lento** si hay muchas correlaciones entre variables.
+
 
 
 ---
@@ -469,19 +502,117 @@ A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*) q(z^{(\tau)} | z^*)  }{\tilde
 
 * ¿Podemos mejorar el camino aleatorio de la cadena? 
 
-* Además de aliviar el problema del tamaño del paso en Metropolis-Hastings.
+* ¿Además de aliviar el problema del tamaño del paso en Metropolis-Hastings?
 
 --
 
-* También conocido como Hybrid Monte Carlo, HMC es adecuado para espacios continuos:
+* **Intuición**: hasta ahora solo hemos utilizado `\(p(z)\)` (o condicionales suyas). ¿Por qué no utilizar también la información del gradiente `\(\nabla \log p(z)\)`?
+
+* También conocido como Hybrid Monte Carlo, HMC es adecuado para **espacios continuos**:
 
   * Permite dar grandes saltos en el espacio.
   
   * Baja tasa de muestras rechazadas.
   
   * Necesita evaluar el gradiente de la logprobabilidad respecto a `\(z\)`.
+  
+  * **Se espera que la mejor exploración (mayor muestra efectiva) compense el coste computacional de evaluar el gradiente**.
 
 
+---
+
+## Hamiltonian Monte Carlo (2)
+
+* El objetivo es obtener muestras de `\(p(z) = \frac{1}{Z} \exp \lbrace -E(z) \rbrace\)`.
+
+* `\(E(z)\)` se interpreta como **energía potencial** en el estado `\(z\)`.
+
+* ¿Qué ocurre si sólo imponemos la siguiente dinámica (**descenso por el gradiente**)?
+
+`\begin{equation}
+z^{(t+1)} = z^{(t)} - \eta \nabla_z E(z^{(t)})
+\end{equation}`
+
+
+--
+
+* Nos quedariamos en el MAP. No basta solo con eso, hay que añadir estocasticidad para que explore toda la región `\(p(z)\)`
+
+* Para ello, añadimos un término de **energía cinética**, añadiendo **variables auxiliares de momento** `\(r\)`.
+
+`\begin{equation}
+p(z) = \frac{1}{Z} \exp \lbrace -E(z) - K(r) \rbrace = \frac{1}{Z} \exp \lbrace -H(z,r)  \rbrace
+\end{equation}`
+
+* donde `\(K(r) = \frac{1}{2} r^\intercal r\)` (ruido Gaussiano).
+
+---
+
+## Hamiltonian Monte Carlo (3)
+
+* La dinámica del Hamiltoniano preserva la cantidad `\(H(z,r)\)` a lo largo de las trayectorias, luego también dejará invariante la distribución `\(p(z,r)\)`.
+
+`\begin{align}
+\frac{dz}{dt} &amp;= +\nabla_r H \\
+\frac{dr}{dt} &amp;= -\nabla_z H
+\end{align}`
+
+* Es delicado discretizar numéricamente la anterior ODE, hay que tener en cuenta errores numéricos:
+
+* Se corrigen aceptando bajo probabilidad 
+
+`\begin{equation}
+\min (1, \exp \lbrace H(z,r) - H(z^*, r^*) \rbrace)
+\end{equation}`
+
+* Conviene ir remuestreando el momeno `\(r\)` cada pocas iteraciones.
+
+* Ejemplo de visualización: https://chi-feng.github.io/mcmc-demo/app.html#HamiltonianMC,donut
+
+
+* Versión adaptativa (tamaño del paso) mucho más eficiente: **No U-Turn Sampler** https://arxiv.org/abs/1111.4246
+
+
+---
+
+## Convergencia (1)
+
+&lt;center&gt;
+![:scale 70%](./img/mcmc_chains.png)
+&lt;/center&gt;
+
+* Conviene utilizar varias cadenas partiendo de condiciones iniciales aleatorias:
+
+  * Izquierda: 50 iteraciones.
+  
+  * Centro: 1000 iteraciones.
+  
+  * Derecha: muestras tras descartar la primera mitad de cada cadena (**burn-in**).
+  
+  * También se puede tomar 1 muestra cada `\(n &gt; 1\)` iteraciones para reducir autocorrelaciones (**thining**).
+
+
+---
+
+## Convergencia (2)
+
+Algunos test para diagnosticar la convergencia y el rendimiento son:
+
+* Estadístico `\(\hat{R}\)` (Potencial Scale Reduction)
+
+  * Sumariza correlaciones intra-cadena y entre cadenas, para una variable del modelo.
+  
+  * `\(\hat{R} &gt;&gt; 1\)`: no hay convergencia.
+  
+  * `\(\hat{R} \approx 1\)`: no la garantiza.
+
+* Tamaño de muestra efectiva `\(N_{eff}\)`:
+
+  * Corrige el número total de muestras para tener en cuenta la autocorrelación.
+  
+  * Caso peor: `\(z^{(1)} = z^{(2)} = \ldots = z^{(N)}\)`, `\(N_{eff} = 1\)`.
+  
+  * La precisión de la estimación será proporcional a `\(\frac{1}{\sqrt{N_{eff}}}\)`.
 
 ---
 
