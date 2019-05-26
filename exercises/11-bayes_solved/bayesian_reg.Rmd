@@ -87,7 +87,7 @@ samples <- bay_reg %>%
 
 
 ```{r}
-ggplot(data=sampels, aes(samples$log_brainwt)) + 
+ggplot(data=samples, aes(samples$log_brainwt)) + 
   geom_histogram(aes(y =..density..), 
                  col="red", 
                  fill="green", 
