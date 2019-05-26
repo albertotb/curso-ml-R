@@ -195,6 +195,98 @@ class: middle, center, inverse
 
 ---
 
+## Regresión Logística Bayesiana (1)
+
+* Más complicado que el caso de regresión debido a la no-linealidad de la sigmoide.
+
+* Debemos utilizar algún tipo de aproximación del posterior: **aproximación de Laplace**.
+
+--
+
+  * Queremos aproximar cierta distribución `\(p(z)  = \frac{1}{Z} f(z)\)`.
+  
+  * Aproximamos mediante una Normal `\(q(z)\)` centrada en la moda de `\(p(z)\)`: buscamos `\(z_0\)` tal que `\(\nabla_z f(z) |_{z=z_0} = 0\)`.
+  
+  * Desarrollamos en Taylor hasta orden 2 en `\(z_0\)`: `\(\log f(z) \approx \log f(z_0) - \frac{1}{2} A (z - z_0)^2\)`, donde `\(A = - \nabla_z \nabla_z \log f(z) |_{z=z_0}\)`.
+  
+  * Tomando exponenciales `\(f(z) \approx f(z_0) \exp \lbrace -\frac{A}{2} (z - z_0)^2 \rbrace\)`
+  
+  * Normalizando, `\(q(z) = ( \frac{A}{2\pi})^{1/2} \exp \lbrace -\frac{A}{2} (z - z_0)^2 \rbrace\)` resultando una Normal.
+
+---
+
+## Ejemplo de Aproximación de Laplace
+
+
+&lt;center&gt;
+![:scale 50%](./img/laplace.png)
+&lt;/center&gt;
+
+* **Problemas** de la aproximación:
+
+  * Solo se puede aplicar directamente a **variables reales** (si no, hay que reparametrizar).
+  
+  * Falla al describir propiedades globales de la distribución aproximada.
+
+---
+
+## Regresión Logística Bayesiana (2)
+
+* Particularizándolo al caso de regresión logística,
+
+* El prior es Gaussiano: `\(p(w) = \mathcal{N}(w| m_0, S_0)\)`.
+
+* Para el posterior, `\(p(w|t) \propto p(w) p(t|w)\)`, y tomando logaritmos queda
+
+`\begin{equation}
+\log p(w|t) = - \frac{1}{2}(w - m_0)^\intercal S_0^{-1} (w - m_0) + \sum_{n=1}^N \lbrace t_n \log y_n + (1 - t_n)\log(1 - y_n) \rbrace + C
+\end{equation}`
+
+* donde `\(y_n = \sigma (w^\intercal \phi_n)\)`
+
+--
+
+* Para usar Laplace, obtenemos el punto `\(w_{MAP}\)`, que será la media de la Gaussiana.
+
+* La precisión será `\(S_N = - \nabla \nabla \log p(w|t) = S_0^{-1} + \sum_{n=1}^N y_n (1 - y_n) \phi_n \phi_n^\intercal\)`
+
+* Con lo que `\(p(w|t) \approx q(w) = \mathcal{N}(w | w_{MAP}, S_N)\)`.
+
+---
+
+## Distribución predictiva
+
+* Dado un nuevo input `\(\phi = \phi(x)\)`, queremos predecir su clase:
+
+`\begin{equation}
+p(C_1 | \phi, t) = \int p(C_1 | \phi, w) p(w | t) dw \approx \int \sigma (w^\intercal \phi) q(w) dw
+\end{equation}`
+
+--
+
+* Esta integral no es analítica, luego tenemos dos opciones:
+
+* **Aproximación por MC**: `\(p(C_1 | \phi, t) \approx \frac{1}{K} \sum_{k=1}^K p(C_1 | \phi, w^{(k)}), \qquad w^{(k)} \sim q(w)\)`.
+
+--
+  
+* **Aproximación analítica**: en lugar de sigmoide usamos la función probit, ya que `\(\sigma(a) \approx \Phi(\lambda a)\)` y su convolución respecto a la Gaussiana es analítica (otra probit)
+  
+`\begin{equation}
+\int \Phi (\lambda a) \mathcal{N}(a | \mu, \sigma) da = \Phi \left( \frac{\mu}{(\lambda^{-2} + \sigma^2)^{1/2}}  \right) 
+\end{equation}`
+
+  * Tras unos ajustes, queda que
+  
+`\begin{equation}
+p(C_1 | \phi, t) \approx \sigma (\kappa ( \sigma^2) \mu)
+\end{equation}`
+
+  * donde `\(\mu = w_{MAP}^\intercal \phi\)`, `\(\sigma = \phi^\intercal S_N \phi\)` y `\(\kappa(\sigma^2) = (1 + \pi \sigma^2 / 8)^{-1/2}\)`.
+
+
+---
+
 class: middle, center, inverse
 
 # Inferencia Aproximada
@@ -402,9 +494,18 @@ class: middle, center, inverse
 
 ## Stan como PPL
 
-* Lenguajes de **programación probabilística**.
+* Lenguajes de **programación probabilística** (PPL): extensión de un lenguaje de programación normal con nuevas operaciones como **sample** ( `\(\sim\)` ) y **condicionar**.
 
-* Separación entre **modelo** e **inferencia**.
+* Separación entre **modelo** e **inferencia**, permitiendo automatizar el siguiente ciclo (propuesto por Box):
+
+&lt;center&gt;
+![:scale 50%](./img/box.png)
+&lt;/center&gt;
+
+* Mucho desarollo en los últimos años, aunque todavía experimentales
+
+* En R, el más popular y estable es **rStan**: https://mc-stan.org/users/interfaces/rstan
+
 
 
 ---
@@ -427,9 +528,9 @@ class: middle, center, inverse
 
 * Especificamos **parámetros** y **variables latentes**.
 
-* Pantallazo de ejemplo:
-
-
+&lt;center&gt;
+![:scale 50%](./img/stan_model.png)
+&lt;/center&gt;
 
 
 ---
