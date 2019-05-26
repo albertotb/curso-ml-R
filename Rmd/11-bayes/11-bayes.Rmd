@@ -36,20 +36,20 @@ class: middle, center, inverse
 
 * Objetivo: predecir uno o más targets **contínuos** $t$ a partir de un vector D-dimensional de inputs $x$.
 
-* Modelo de ruido normal, $t = y(x,w) + \epsilon$
+* Modelo de ruido normal, $t = y(x,w) + \epsilon$, donde $y(x,w) = \sum_{j=0}^{M-1} w_j \phi_j(x) = w^\top \phi(x)$.
 
 \begin{equation}
 p(t \vert x, w, \beta) = \mathcal{N}(t \vert y(x,w), \beta^{-1})
 \end{equation}
 
-* Donde $y(x,w) = \sum_{j=0}^{M-1} w_j \phi_j(x) = w^\top \phi(x)$.
+
 
 --
 
 * Si tenemos datos $x_1, \dots, x_N$, $t_1, \dots, t_N$ y asumimos que son muestras iid de $p(t \vert x, w, \beta)$, la verosimilitud es
 
 \begin{equation}
-p(\boldsymbol{t} \vert X, w)\prod_{n=1}^N \mathcal{N}(t_n \vert w^\top \phi(x_n), \beta^{-1})
+p(\boldsymbol{t} \vert X, w) = \prod_{n=1}^N \mathcal{N}(t_n \vert w^\top \phi(x_n), \beta^{-1})
 \end{equation}
 
 * Donde $\boldsymbol{t}$ es el vector de los $N$ targets y $X$ la matriz de datos.
@@ -149,7 +149,7 @@ p(w \vert \alpha) = \mathcal{N}(w \vert 0, \alpha^{-1} I)
 * Esto requiere evaluar la **distribución predictiva a posteriori**
 
 \begin{equation}
-p(t \vert \boldsymbol{t},\alpha, \beta) = \int p(t \vert w \beta)p(w \vert \boldsymbol(t), \alpha, \beta) dw
+p(t \vert \boldsymbol{t},\alpha, \beta) = \int p(t \vert w, \beta)p(w \vert \boldsymbol{t}, \alpha, \beta) dw
 \end{equation}
 
 --
@@ -872,6 +872,8 @@ ELBO(q) &=&  \mathbb{E}[\log p(X,Z)] - \mathbb{E}[\log q(Z)] \\
 * Requiere que sea sencillo muestrear de $q(Z)$.
 
 * Es la que usa STAN.
+
+* <a href="https://arxiv.org/pdf/1603.00788.pdf">Automatic Differentiation Variational Inference. </a> 
 
 
 
