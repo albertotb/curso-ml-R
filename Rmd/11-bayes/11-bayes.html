@@ -393,7 +393,56 @@ A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*)}{\tilde{p}(z^{(\tau)})})
 
 ## ¿Por qué funciona Metropolis?
 
-* **Ejercicio**
+* Un proceso estocástico `\(z^{(1)}, z^{(2)}, \ldots\)` es una **cadena de Markov** si verifica
+
+`\begin{equation}
+p(z^{(m+1)} | z^{(m)}, z^{(m-1)}, \ldots z^{(1)}) = p(z^{(m+1)} | z^{(m)})
+\end{equation}`
+
+* Una cadena de Markov homogénea viene especificada por la distribución inicial y las **probabilidades de transición** ( `\(T\)`  no cambia con `\(m\)` ):
+
+`\begin{equation}
+T(z^{(m)}, z^{(m+1)}) =  p(z^{(m+1)} | z^{(m)})
+\end{equation}`
+
+* Una distribución `\(p^*(z)\)` queda invariante bajo la cadena si
+
+`\begin{equation}
+p^*(z) = \sum_{z'} T(z', z) p^*(z')
+\end{equation}`
+
+--
+
+* Una condición suficiente para que `\(p^*(z)\)` sea invariante es **eligiendo** `\(T\)` de forma que satisfaga la condición de **balance detallado**
+
+`\begin{equation}
+p^*(z)T(z, z') = T(z', z)p^*(z')
+\end{equation}`
+
+
+
+---
+
+
+## ¿Por qué funciona Metropolis?
+
+* Ahora bien, tomamos ( `\(z\)` es la última muestra y `\(z'\)` es la muestra propuesta )
+
+`\begin{equation}
+T(z, z') = p(z' | z)  =  A(z', z) q(z' | z)
+\end{equation}`
+
+* por lo que de imponer la condición, queda que
+
+`\begin{equation}
+\frac{A(z', z)}{A(z, z')} = \frac{p(z')}{p(z)} \frac{q(z|z')}{q(z'|z)}
+\end{equation}`
+
+donde el último factor desaparece (pues era **simétrico**), y una tasa de aceptación que satisface lo anterior es
+
+`\begin{equation}
+A(z',z) = \min (1, \frac{p(z')}{p(z)})
+\end{equation}`
 
 ---
 
@@ -404,7 +453,7 @@ A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*)}{\tilde{p}(z^{(\tau)})})
 * Ahora aceptaremos una muestra con probabilidad:
 
 `\begin{equation}
-A(z^*, z^{(\tau)}) = \min (1, \frac{\tilde{p}(z^*) q(z^{(\tau)} | z^*)  }{\tilde{p}(z^{(\tau)}) q(z^* | z^{(\tau)}) })
+A(z^*, z^{(\tau)}) = \min (1, \frac{p(z^*) q(z^{(\tau)} | z^*)  }{p(z^{(\tau)}) q(z^* | z^{(\tau)}) })
 \end{equation}`
 
 --
