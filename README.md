@@ -15,7 +15,7 @@
     * Análisis de conglomerados: cuantización vectorial (10/05, 4 horas) [[slides]](./Rmd/08-clustering/08-clustering.html)
     * DLMs (16/05, 4 horas) [[slides]](./slides/09-dlms.pdf)
     * Modelos gráficos probabilísticos (17/05, 4 horas) [[slides]](./Rmd/10-pgms/10-pgms.html)
-    * Algoritmos bayesianos para clasificación y regresión (27/05, 4 horas)
+    * Algoritmos bayesianos para clasificación y regresión (27/05, 4 horas) [[slides]](./Rmd/11-bayes/11-bayes.html)
 
  3. Aprendizaje profundo
     * Introducción (30/05, 2 horas)
