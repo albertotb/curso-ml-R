@@ -1,0 +1,239 @@
+---
+title: "Regresión Bayesiana. Modelo conjugado"
+author: "Victor Gallego y Roi Naveiro"
+date: "20/05/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+**Cargamos los paquetes**
+```{r, comment=NA, warning=FALSE}
+library(ggplot2)
+```
+
+Este ejercicio pretende arrojar algo de intuición sobre la regresión Bayesiana.
+
+# El modelo
+
+Trabajaremos con una sola covariable para poder visualizar gráficamente los resultados. Además, asumiremos la precisión conocida. En concreto
+
+$$
+p(y \vert w,x) = \mathcal{N} (w_0 + w_1x, \sigma^2)
+$$
+
+Donde los valores reales de los parámetros son $w_0 = -0.3$, $w_1 = 0.5$ y $\sigma = 0.2$. Además, muestrearemos $x$ de una uniforme entre -1 y 1.
+
+Escribe dos funciones, ```make.X``` y ```make.Y``` que generen los datos.
+
+```{r}
+make.X <- function(n) {
+  runif(n,-1,1)
+}
+
+w0 <- -0.3 # valores reales de los pesos
+w1 <-  0.5
+
+sigma <- 0.2
+beta  <- 1/sigma^2  # precision
+
+make.Y <- function(xs) {
+  w0 + w1*xs + rnorm(length(xs),0,sigma)
+}
+```
+
+
+# Cálculo del posterior
+
+Gracias a la conjugación, la distribución a posteriori será también Gaussiana. 
+
+\begin{equation}
+p(w \vert \boldsymbol{t}, X) = \mathcal{N}(w \vert m_N, S_N)
+\end{equation}
+
+Donde
+
+\begin{eqnarray*}
+m_N &=& S_N(S_0^{-1} m_0 + \beta \Phi^\top \boldsymbol{t}) \\
+S_N^{-1} &=& S_0^{-1} + \beta \Phi^\top \Phi
+\end{eqnarray*}
+
+La información se puede actualizar secuencialmente, a medida que llegan datos. Escribe una función que, dados unos nuevos datos $X,Y$, y un prior parametrizado por $m_{old}$, $S_{old}$, calcule el posterior. Utiliza la función identidad como base
+
+```{r}
+compute_posterior <- function(X, Y, m_old, S_old, phi= c(one, id)) {
+  # crea la matriz de diseño
+  Phi <- as.matrix(X)  
+  Phi = cbind(rep(1, length(Phi)), Phi)
+
+  S_new <- solve(solve(S_old) + beta * t(Phi) %*% Phi)
+  m_new <- S_new %*% (solve(S_old) %*% m_old + beta * t(Phi) %*% Y)
+
+  list(m=m_new, S=S_new) 
+}
+```
+
+
+# Usando un prior concreto
+
+Vamos a empezar con un prior de media 0, y con matriz de covarianza diagonal
+
+```{r}
+alpha <- 2.0
+m_0 <- c(0,0)        
+S_0 <- alpha*diag(2) 
+```
+
+Ahora, construye 3 puntos y actualiza el posterior
+
+```{r}
+X <- make.X(3) # 3 puntos
+Y <- make.Y(X)
+
+posterior_1 <- compute_posterior(X, Y, m_0, S_0)
+posterior_1$m
+```
+
+Representa gráficamente los puntos obtenidos y la recta de regresión dada por la media de la distribución a posteriori
+
+```{r}
+plot(X, Y, pch=19, col="black")
+abline(posterior_1$m, col="red", lwd=2)
+```
+
+Utilizando la siguiente función, representa secuencialmente la distribución a posteriori, a medida que vas añadiendo más puntos.
+```{r}
+library(mvtnorm)
+library(ggplot2)
+draw_bivariate <- function(m, S, lims=c(-1.5,1.5)) {
+    
+  data.grid <- expand.grid(s.1 = seq(lims[1], lims[2], length.out=200), s.2 = seq(lims[1], lims[2], length.out=200))
+  #
+  q.samp <- cbind(data.grid, prob = mvtnorm::dmvnorm(data.grid, mean = m, 
+  sigma = S))
+  #
+  ggplot() + 
+    geom_contour(data=q.samp,aes(x=s.1,y=s.2,z=prob)) + xlim(lims[1], lims[2]) + ylim(lims[1], lims[2]) + geom_hline(yintercept=w1, linetype="dashed", color = "red") + geom_vline(xintercept=w0, linetype="dashed", color = "red") + xlab("w0") + ylab("w1")
+}
+
+```
+
+
+Primero el prior
+
+```{r}
+draw_bivariate(m_0, S_0, lims=c(-3,3))
+```
+
+Ahora después de haber añadido 10 puntos
+
+```{r}
+draw_bivariate(posterior_1$m, posterior_1$S)
+```
+
+Añade otros 10 puntos y representa de nuevo el posterior.
+
+```{r}
+X_new <- make.X(10) 
+Y_new <- make.Y(X_new)
+
+posterior_2 <- compute_posterior(X_new,  Y_new, posterior_1$m, posterior_1$S)
+posterior_2$m
+```
+
+```{r}
+draw_bivariate(posterior_2$m, posterior_2$S)
+```
+
+# Distribución predictiva
+
+En general, estamos interesados en la distribución predictiva. En este caso, esta distribución tiene forma analítica cerrada: es fácil probrar que $p(t \vert \boldsymbol{t},\alpha, \beta) = \mathcal{N}(t \vert m_N^\top \phi(x), \sigma_N^2(x))$, con
+
+\begin{equation}
+\sigma_N^2(x) = \frac{1}{\beta} + \phi(x)^\top S_N \phi(x)
+\end{equation}
+
+Escribe una función que, dada una nueva observación y los parámetros del posterior, devuelva los media de la distribución preditiva y el intervalo del 95% de probabilidad.
+
+```{r}
+get_predictive_vals <- function(x, m_N, S_N) {
+  phi <- as.matrix(x)  
+  phi = t( cbind(rep(1, length(phi)), phi) )
+  mean_pred <- t(m_N) %*% phi
+  sd_pred  <- sqrt(1/beta + t(phi) %*% S_N %*% phi)
+  
+  c(mean_pred, mean_pred-2*sd_pred, mean_pred+2*sd_pred)
+}
+
+```
+
+Utilizaremos esta función auxiliar para representar los resultados gráficamente.
+
+```{r}
+draw_predictive <- function(xs, m_N, S_N, phi) {
+  vs <- rep(NA, length(xs))
+  ys <- data.frame(means=vs, p2.5=vs, p97.5=vs)  
+  
+  for (i in 1:length(xs)) { 
+    ys[i,] <- get_predictive_vals(xs[i],m_N, S_N)
+  }
+  
+  
+  lines(xs, ys[,1], col="red", lwd=2)
+  lines(xs, ys[,2], col="red", lty="dashed")
+  lines(xs, ys[,3], col="red", lty="dashed")
+}
+```
+
+
+
+Veamos algún ejemplo concreto. En este bloque tendrás que:
+
+1. Definir el prior isotrópico centrado en cero, con $\alpha = 2$.
+2. Crear 2 puntos $(X,Y)$ con el modelo que utilizamos.
+3. Calcular la distribuciión a posteriori.
+4. Calcular media e intervalo del 95% de probabilidad de la predictiva en una red de 50 valores de x entre -1 y 1.
+```{r}
+X <- make.X(2) # Crea 2 puntos
+Y <- make.Y(X)
+
+alpha <- 2.0
+m_0 <- c(0,0)        
+S_0 <- alpha*diag(2) 
+
+posterior_1 <- compute_posterior(X, Y, m_0, S_0)
+m_N <- posterior_1$m
+S_N <- posterior_1$S
+
+plot(X, Y, pch=20, ylim=c(-1.5,1), xlim=c(-1,1), ylab="y", xlab="x")
+xs <- seq(-1,1,len=50)
+draw_predictive(xs, m_N, S_N)
+```
+
+¿Qué sucede con la varianza en puntos alejados de los puntos conocidos?
+
+Por último añade 10 puntos, actualiza el posterior y representa de nuevo la predictiva. ¿Añadiendo más puntos seríamos capaces de reducir infinitamente los intervalos de probabilidad?
+
+```{r}
+X_new <- make.X(10)
+Y_new <- make.Y(X_new)
+
+posterior_2 <- compute_posterior(X_new, Y_new, posterior_1$m, posterior_1$S)
+m_N <- posterior_2$m
+S_N <- posterior_2$S
+
+xs <- seq(-10,10,len=500)
+plot(c(X,X_new), c(Y,Y_new), pch=20, ylim=c(-2,2), xlim=c(-10,10), ylab="y", xlab="x")
+draw_predictive(xs, m_N, S_N)
+```
+
+
+
+
+
+

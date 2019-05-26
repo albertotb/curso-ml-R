@@ -29,20 +29,30 @@ library(tidyr)
 Explora los datos, en particular las variables *brainwt* (peso del cerebro), *bodywt* (peso corporal) y *sleep_total* (horas de sueño diarias).
 
 ```{r}
-## CÓDIGO
+msleep %>% 
+  select(name, sleep_total, brainwt, bodywt) %>% 
+    arrange(desc(brainwt / bodywt))
 ```
 
 Elimina las especies con valores ausentes en la variable brainwt. Transforma las variables brainwt, bodywt y sleep_total usando log10.
 
 ```{r}
-## CÓDIGO
+msleep <- msleep %>% 
+  filter(!is.na(brainwt)) %>% 
+  mutate(log_brainwt = log10(brainwt), 
+         log_bodywt = log10(bodywt), 
+         log_sleep_total = log10(sleep_total))
 ```
 
 
 Representa gráficamente la masa cerebral (en escala logarítmica) frente a las horas de sueño diarias.
 
 ```{r}
-## CÓDIGO
+ggplot(msleep) + 
+  aes(x = brainwt, y = sleep_total) + 
+  geom_point(color = "grey40") +
+  scale_x_log10(breaks = c(.001, .01, .1, 1)) + 
+    labs(x = "Masa Cerebral (kg)", y = "Tiempo de sueño diario (horas)")
 ```
 
 ## Modelo de regresión Bayesiana
@@ -50,12 +60,17 @@ Representa gráficamente la masa cerebral (en escala logarítmica) frente a las 
 
 Ajusta el modelo de regresión bayesiana con variable respuesta: **logaritmo de horas de sueño**, y covariable **logaritmo de peso cerebral** utilizando stan_glm.
 ```{r}
-bay_reg <- ## CÓDIGO
+bay_reg <- stan_glm(
+  log_sleep_total ~ log_brainwt, 
+  family = gaussian(), 
+  data = msleep, 
+  prior = normal(0, 3),
+  prior_intercept = normal(0, 3))
 ```
 
 Explora la salida del modelo. ¿Se cumple la condición de convergencia implicada por el estadístico Gelman-Rubin?
 ```{r}
-## CÓDIGO
+summary(bay_reg, probs=c(0.1, 0.5, 0.9))
 ```
 
 ## Análisis de los resultados 
@@ -65,7 +80,9 @@ Pinta el histograma de la distribución a posteriori empírica de los parámetro
 ¿Es el coeficiente del peso cerebral significativamente menor que 1?
 
 ```{r}
-samples <- ## CÓDIGO
+samples <- bay_reg %>% 
+  as_data_frame %>% 
+  rename(intercept = `(Intercept)`)
 ```
 
 
@@ -95,7 +112,15 @@ new_data <- data_frame(
 
 Muestrea de la distribución a posteriori utilizando la función *posterior_predict*
 ```{r}
-pred_post = ## CÓDIGO
+pred_post = posterior_predict(bay_reg, newdata = new_data)
+
+df_pred = data.frame(t(apply(t(pred_post), 1, quantile, probs = c(0.025, 0.5, 0.995), na.rm = TRUE)))
+
+names(df_pred)<-c("lower","median","upper")
+
+df_pred$log_brainwt = new_data$log_brainwt
+
+head(df_pred)
 ```
 
 Representa gráficamente
