@@ -288,6 +288,30 @@ class: middle, center, inverse
 
 ---
 
+## Introducción
+
+* Un tarea central de la estadística Bayesiana es encontrar la distribución a posteriori $p(Z \vert X)$, así como valores esperados respecto a esta distribución.
+
+* $Z$ son variables latentes y $X$ variables observadas.
+
+* En muchos modelos, esta tarea es **inviable**:
+
+  1. **Variables contínuas**: las integrales resultantes no tienen solución analítica. La alta dimensionalidad del espacio no permite el uso de muchas técnicas numéricas.
+  
+  2. **Variables discretas**: marginalizar requiere sumar sobre todas las posibles combinaciones de variables ocultas, que pueden crecer exponencialmente.
+
+---
+## Introducción
+
+* En estos casos debemos recurrir a **inferencia aproximada**
+
+* Dos clases de inferencia aproximada.
+
+  1. Técnicas **estocásticas** (MCMC). Asintóticamente **exactas**. La aproximación viene de no tener tiempo computacional infinito. **Costosas computacionalmente.**
+  
+  2. Técnicas **deterministas** (VI). Aproximaciones analíticas a la distribución a posteriori. **Nunca** son exactas. **Eficientes**.
+
+---
 
 ## Repaso
 
@@ -546,6 +570,190 @@ class: middle, center, inverse
 # Inferencia Variacional
 
 ---
+## Introducción
+
+* VI convierte la inferencia en un problema de optimización.
+
+* Busca aproximaciones **analíticas** a la distribución a posteriori.
+
+* Basado en *cálculo de variaciones*. 
+
+* Optimización de funcionales: encontrar funciones que maximicen o minimicen el funcional.
+
+* En principio, el cálculo de variaciones es exacto. La aproximación nace de restringir el espacio de búsqueda de funciones. 
+
+* En el caso de VI, restringiremos el espacio donde buscaremos la distribución a posteriori.
+
+---
+## Inferencia Variacional (1)
+
+* Sea un modelo Bayesiano en el que todas las variables desconocidas tienen distribuciones a priori.
+
+* Denotamos con $Z$ al conjunto de estas variables y de las variables latentes.
+
+* $X$ es el conjunto de variables observadas.
+
+* El modelo probabilístico define $p(X, Z)$.
+
+* **Objetivo**: encontrar $p(Z \vert X)$, lo que requiere encontrar
+
+\begin{equation}
+p(X) = \int p(X, Z) dZ
+\end{equation}
+
+--
+
+* Idea
+
+\begin{equation}
+\arg \min_{q(Z)} KL(q(Z) \Vert p(Z \vert X))
+\end{equation}
+
+* $q(Z) = p(Z \vert X)$, no ganamos nada...
+---
+
+## Inferencia Variacional (2)
+
+* Alternativa: restringir espacio de búsqueda a familia de distribuciones $\mathcal{Q}$
+
+\begin{equation}
+\arg\min_{q(Z) \in \mathcal{Q}} KL(q(Z) \Vert p(Z \vert X))
+\end{equation}
+
+* $\mathcal{Q}$ ha de ser **suficientemente flexible** para ofrecer buenas aproximaciones, y al mismo tiempo **suficientemente simple** para ser tratable computacionalmente.
+
+---
+
+## Inferencia Variacional (3)
+
+* Sabemos que
+
+\begin{eqnarray}
+KL[q(Z) \Vert p(Z \vert X)] &=& - \int q(Z) \log \left[ \frac{p(Z \vert X)}{q(Z)}\right] dZ
+\end{eqnarray}
+
+* Que podemos escribir como
+
+\begin{eqnarray}
+KL[q(Z) \Vert p(Z \vert X)] = \mathbb{E}[\log q(Z)] - \mathbb{E}[\log p(X,Z)] + \log p(X)
+\end{eqnarray}
+
+* Evaluar la función objetivo requiere calcular $p(X)$!!
+
+--
+
+* Minimizar la $KL$ es equivalente a maximizar
+
+\begin{eqnarray}
+ELBO(q) =  \mathbb{E}[\log p(X,Z)] - \mathbb{E}[\log q(Z)]
+\end{eqnarray}
+
+---
+
+## Inferencia Variacional (4)
+
+* Podemos escribir
+
+\begin{eqnarray}
+ELBO(q) =  \mathbb{E}[\log p(X\vert Z)] - KL[q(Z) \Vert p(Z)]
+\end{eqnarray}
+
+* Maximizar el ELBO favorece a densidades que ponen masa en configuraciones que explican los datos (primer término), y al mismo tiempo a densidades cercanas a la distribución a priori (segundo término).
+
+* Además
+
+\begin{eqnarray}
+\log p(X) =  KL[q(Z) \Vert p(Z \vert X)] + ELBO(q) 
+\end{eqnarray}
+
+* Con lo que $\log p(X) \geq ELBO(q)$.
+
+* Esto explica que se haya usado $ELBO$ para selección de modelos (como aproximador de la verosimilutud marginal).
+
+
+---
+
+## Aproximación de campo medio
+
+* Es una forma de restringir el espacio de búsqueda
+
+* Consiste en particionar los elementos de $Z$ en grupos disjuntos $Z_i$ con $i = 1, \dots, M$, y asumir
+
+\begin{equation}
+q(Z) = \prod_{i=1}^M q_i(Z_i)
+\end{equation}
+
+* Suele subestimar la varianza a posteriori...
+
+
+<center>
+![:scale 50%](./img/VI.png)
+</center>
+
+---
+
+## Aproximación de campo medio. CAVI
+
+* Algoritmo para maximizar ELBO bajo la aproximación de campo medio.
+
+* Coordinate Ascent Variational Inference: actualiza cada factor de la densidad, manteniendo el resto de factores constante.
+
+* Converge a óptimo local.
+
+* Si fijamos todas las variables latentes menos $Z_j$, entonces el $q_j(Z_j)$ óptimo es
+
+\begin{equation}
+q^*_j(Z_j) \propto \exp \left[ \mathbb{E}_{-j} \log p(Z_j \vert Z_{-j}, X) \right]
+\end{equation}
+
+* Que es lo mismo que
+
+\begin{equation}
+q^*_j(Z_j) \propto \exp \left[ \mathbb{E}_{-j} \log p(Z_j , Z_{-j}, X) \right]
+\end{equation}
+
+---
+
+## CAVI: Algoritmo
+
+1. Inicializar los factors $q_i(Z_i)$
+2. Actualizar cada factor utilizando
+\begin{equation}
+q^*_j(Z_j) \propto \exp \left[ \mathbb{E}_{-j} \log p(Z_j \vert Z_{-j}, X) \right]
+\end{equation}
+
+3. Repetir paso 2 hasta convergencia.
+
+* Nota: cuando se da la **conjugación condicional**, entonces las condicionales completas de cada variable $p(Z_j \vert Z_{-j}, X)$ se pueden escribir de forma analítica y la regla de actualización es muy sencilla.
+
+---
+
+## CAVI: Demostración
+
+* Podemos escribir el ELBO como
+
+\begin{eqnarray}
+ELBO(q) &=&  \mathbb{E}[\log p(X,Z)] - \mathbb{E}[\log q(Z)] \\
+&=& \mathbb{E}_j \left[ \mathbb{E}_{-j} \left[ \log p(Z_j, Z_{-j}, X) \right] \right] -\mathbb{E}_j \left[\log q_j(Z_j) \right] + \text{cte}
+\end{eqnarray}
+
+* Vemos que esta expresión es, salvo constante, menos la divergencia KL entre $q_j(Z_j)$ y $q^*_j(Z_j)$.
+
+* Por tanto, maximizaremos el ELBO, escogiendo $q_j(Z_j) = q^*_j(Z_j)$.
+
+---
+
+## Inferencia Variacional Estocástica
+
+* CAVI no escala a datos masivos, pues en cada iteración requiere evaluar todo el dataset.
+
+* Alternativa: optimización estocástica del ELBO basada en el gradiente.
+
+* Requiere calcular una estimación ruidosa (insesgada) del gradiente del ELBO.
+
+* Para calcular esta estimación, no es necesario evaluar todos los datos.
+
+* <a href="https://arxiv.org/pdf/1601.00670.pdf">Variational Inference: A Review for Statisticians. </a>
 
 
 
