@@ -95,7 +95,7 @@ p(w \vert \boldsymbol{t}, X) = \mathcal{N}(w \vert m_N, S_N)
 * Donde
 
 `\begin{eqnarray*}
-m_n &amp;=&amp; S_N(S_0^{-1} m_0 + \beta \Phi^\top \boldsymbol{t}) \\
+m_N &amp;=&amp; S_N(S_0^{-1} m_0 + \beta \Phi^\top \boldsymbol{t}) \\
 S_N^{-1} &amp;=&amp; S_0^{-1} + \beta \Phi^\top \Phi
 \end{eqnarray*}`
 
@@ -184,9 +184,6 @@ p(t \vert \boldsymbol{t},\alpha, \beta) = \int p(t \vert w \beta)p(w \vert \bold
 * En este caso la distribución predictiva es una t de Student.
 
 * Si también queremos asignar un prior al parámetro `\(\alpha\)` (hiperprior), debemos recurrir a técnicas de inferencia aproximada.
----
-
-## Comparación de modelos Bayesiana
 
 ---
 
