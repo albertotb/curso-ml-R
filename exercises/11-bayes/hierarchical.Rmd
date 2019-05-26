@@ -1,0 +1,119 @@
+---
+title: "Modelos jerárquicos"
+author: "Victor Gallego, Roi Naveiro"
+date: "26/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Instalación de Stan
+
+```{r}
+# Instalando en Windows:
+# install.packages("rstan", repos = "https://cloud.r-project.org/", dependencies = TRUE)
+
+# Instalando en Linux:
+# sudo add-apt-repository -y "ppa:marutter/rrutter"
+# sudo add-apt-repository -y "ppa:marutter/c2d4u"
+# sudo apt-get update
+# sudo apt-get install r-cran-rstan
+# packageurl <- "http://cran.r-project.org/src/contrib/Archive/StanHeaders/StanHeaders_2.17.2.tar.gz"
+# install.packages(packageurl, repos=NULL, type="source")
+```
+
+
+## Carga de librerías
+
+```{r}
+library(rstan)
+
+# En función de los avisos, activamos opciones:
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+```
+
+
+## Modelo de los Ocho Colegios (8 Schools)
+
+Ocho colegios se han sometido a un estudio en que se evaluará el impacto de un tratamiento concreto: coaching a los alumnos.
+
+El modelo es el siguiente
+
+\begin{align*}
+y_i &\sim \mathcal{N} (\theta_i, \sigma_i),\qquad i=1,...,8 \\
+\theta_i &= \mu + \tau \eta_i \\
+\eta_i &\sim \mathcal{N} (0, 1)
+\end{align*}
+
+donde $y_i$ es el efecto estimado del tratamiento en el colegio, $\sigma_i$ el error en desviación estándar de la estimación anterior.
+
+Las variables latentes son $\mu$: efecto global del tratamiento, $\tau$ desviación estándar global del tratamiento, y $\eta_i$ es una desviación local en cada colegio.
+
+1. Completa la parte model del fichero 8schools.stan indicando los parámetros adecuados sobre _
+
+Definimos los datos observados
+```{r }
+schools_dat <- list(J = 8, 
+                    y = c(28,  8, -3,  7, -1,  1, 18, 12),
+                    sigma = c(15, 10, 16, 11,  9, 11, 10, 18))
+```
+
+2. Ajusta el modelo usando la funcion stan, indicando el fichero .stan y  los datos anteriores
+
+```{r }
+# Ajustamos el modelo, primero lo compilará a C y luego hará la inferencia (por defecto)
+# con una variante de HMC, NUTS, ya que detecta que el modelo es diferenciable
+# Los parámetros del sampler son todos por defecto de momento, pero se pueden especificar como
+# argumentos adicionales
+fit <- stan(...)
+```
+
+3. Estudia la convergencia del MCMC viendo el estadístico Rhat
+
+```{r}
+
+...
+```
+
+4. ¿Qué colegio tiene mayor efecto del tratamiento (en promedio) $\theta_i$ )? 
+¿Hay alguno para el cual no sea significativo? (esto es, mean($\theta_i$) - sd($\theta_i$) < 0)
+
+
+5. Obtener las muestras para $\mu$ y representarlas en un histograma
+
+```{r }
+la <- rstan::extract(fit, permuted = TRUE) # para obtener las muestras
+
+
+
+```
+
+6. Calcular la probabilidad a posteriori de que el efecto sea mayor en el colegio 1 que en el 3
+
+```{r }
+
+
+```
+
+7. Ajustar el modelo mediante IV y comparar los resultados
+
+```{r }
+s8 <- stan_model(file = '8schools.stan')  
+fit_vb <- vb(
+  s8, 
+  data = schools_dat,     # data list
+  algorithm = ...
+  )
+
+print(fit_vb)
+plot(fit)
+pairs(fit, pars = c("mu", "tau"))
+
+```
+
+
+
+

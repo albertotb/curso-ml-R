@@ -6,7 +6,7 @@ output:
   html_document: default
   pdf_document: default
 ---
-
+  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, comment=NA}
 library(ggplot2)
 library(tidyr)
+library(dplyr)
 library(gridExtra)
 library(rstanarm)
 library(rstan)
@@ -60,7 +61,7 @@ Para ello, usa la función stan_glm, especificando la familia de observación ad
 
 ```{r, comment=NA, results='hide'}
 fit_lin <- stan_glm(deaths ~ year, data = as.data.frame(deaths), family="poisson",
- 	            refresh=1000, iter=5000, chains=4, seed=583829)
+                    refresh=1000, iter=5000, chains=4, seed=583829)
 ```
 
 ¿Ha convergido el algoritmo MCMC?
@@ -68,6 +69,24 @@ fit_lin <- stan_glm(deaths ~ year, data = as.data.frame(deaths), family="poisson
 ```{r, comment=NA}
 summary(fit_lin, probs=c(0.1, 0.5, 0.9))
 ```
+
+Representa un histograma de las muestras MCMC para el coeficiente del año.
+
+```{r}
+samples <- fit_lin %>% 
+  as_data_frame %>% 
+  rename(intercept = `(Intercept)`)
+```
+
+```{r}
+ggplot(data=samples, aes(samples$year)) + 
+  geom_histogram(aes(y =..density..), 
+                 col="red", 
+                 fill="green", 
+                 alpha=.2) + 
+  geom_density(col=2) + xlab("Coeficiente del año")
+```
+
 
 
 4. Ahora realizaremos algunas predicciones (mediana e intervalos 5-95%), usando 5000 muestras MC.
@@ -95,7 +114,7 @@ pfit <- ggplot() +
 
 ```{r, comment=NA, results='hide'}
 fit_vb <- stan_glm(deaths ~ year, data = as.data.frame(deaths), family="poisson",
- 	            algorithm='meanfield', seed=583829)
+                   algorithm='meanfield', seed=583829)
 ```
 
 
@@ -117,5 +136,4 @@ pfit <- ggplot() +
   guides(linetype = F)
 (pfit)
 ```
-
 
