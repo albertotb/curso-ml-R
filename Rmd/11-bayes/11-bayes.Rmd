@@ -15,7 +15,7 @@ output:
 
 ---
 
-## Ventajas del enfoque Bayesiano de regresión y clasificación
+## ¿Por qué usar el enfoque Bayesiano?
 
 * Previene el **overfitting**
 
@@ -308,29 +308,6 @@ class: middle, center, inverse
   1. Técnicas **estocásticas** (MCMC). Asintóticamente **exactas**. La aproximación viene de no tener tiempo computacional infinito. **Costosas computacionalmente.**
   
   2. Técnicas **deterministas** (VI). Aproximaciones analíticas a la distribución a posteriori. **Nunca** son exactas. **Eficientes**.
-
----
-
-## Repaso
-
-* **Inferencia**: algunos de los nodos del modelo estarán fijados a ciertos valores conocidos (observados), y deseamos calcular la distribución posterior sobre (subconjuntos de) el resto de nodos (no observados).
-
-
-* Caso más sencillo: supongamos que $p(x, y) = p(y|x)p(x)$, con el Teorema de Bayes
-
-\begin{equation}
-p(x|y) = \frac{p(y|x)p(x)}{p(y)}
-\end{equation}
-
-* Salvo en casos sencillos, la integral $p(y) = \int p(x,y) dx$ es **intratable**.
-
---
-
-* Introduciremos hoy dos familias de técnicas para **aproximar** el posterior:
-
-  * **Basadas en muestreo**: Markov Chain Monte Carlo (MCMC).
-  
-  * **Basadas en optimización**: Inferencia Variacional (VI).
 
 ---
 
@@ -890,7 +867,7 @@ ELBO(q) &=&  \mathbb{E}[\log p(X,Z)] - \mathbb{E}[\log q(Z)] \\
 
 * Otra posibilidad es **ADVI**.
 
-* Aproxima usando MC tanto el ELBO como su derivada para una forma paramétrica particular de la familia variacional.
+* Aproxima usando MC tanto el ELBO como su derivada para una forma paramétrica particular de la familia variacional (normal full-rank o mean field).
 
 * Requiere que sea sencillo muestrear de $q(Z)$.
 
