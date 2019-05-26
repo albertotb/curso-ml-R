@@ -1,0 +1,138 @@
+---
+title: "Regresión Bayesiana"
+author: Victor Gallego y Roi Naveiro
+date: "20/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(ggplot2)
+theme_set(theme_minimal())
+library(ggrepel)
+library(rstanarm)
+library(reshape2)
+library(tidyr)
+```
+
+
+
+## Exploración y preprocesado de datos
+
+Explora los datos, en particular las variables *brainwt* (peso del cerebro), *bodywt* (peso corporal) y *sleep_total* (horas de sueño diarias).
+
+```{r}
+msleep %>% 
+  select(name, sleep_total, brainwt, bodywt) %>% 
+    arrange(desc(brainwt / bodywt))
+```
+
+Elimina las especies con valores ausentes en la variable brainwt. Transforma las variables brainwt, bodywt y sleep_total usando log10.
+
+```{r}
+msleep <- msleep %>% 
+  filter(!is.na(brainwt)) %>% 
+  mutate(log_brainwt = log10(brainwt), 
+         log_bodywt = log10(bodywt), 
+         log_sleep_total = log10(sleep_total))
+```
+
+
+Representa gráficamente la masa cerebral (en escala logarítmica) frente a las horas de sueño diarias.
+
+```{r}
+ggplot(msleep) + 
+  aes(x = brainwt, y = sleep_total) + 
+  geom_point(color = "grey40") +
+  scale_x_log10(breaks = c(.001, .01, .1, 1)) + 
+    labs(x = "Masa Cerebral (kg)", y = "Tiempo de sueño diario (horas)")
+```
+
+## Modelo de regresión Bayesiana
+
+
+Ajusta el modelo de regresión bayesiana con variable respuesta: **logaritmo de horas de sueño**, y covariable **logaritmo de peso cerebral** utilizando stan_glm.
+```{r}
+bay_reg <- stan_glm(
+  log_sleep_total ~ log_brainwt, 
+  family = gaussian(), 
+  data = msleep, 
+  prior = normal(0, 3),
+  prior_intercept = normal(0, 3))
+```
+
+Explora la salida del modelo. ¿Se cumple la condición de convergencia implicada por el estadístico Gelman-Rubin?
+```{r}
+summary(bay_reg, probs=c(0.1, 0.5, 0.9))
+```
+
+## Análisis de los resultados 
+
+Pinta el histograma de la distribución a posteriori empírica de los parámetros sobre los que se ha hecho inferencia.
+
+¿Es el coeficiente del peso cerebral significativamente menor que 1?
+
+```{r}
+samples <- bay_reg %>% 
+  as_data_frame %>% 
+  rename(intercept = `(Intercept)`)
+```
+
+
+```{r}
+ggplot(data=samples, aes(samples$log_brainwt)) + 
+  geom_histogram(aes(y =..density..), 
+                 col="red", 
+                 fill="green", 
+                 alpha=.2) + 
+  geom_density(col=2) + xlab("Logaritmo del Peso Cerebral")
+```
+
+## Predicción
+
+Muestrea de la distribución predictiva a posteriori en una red de valores de peso cerebral. Representa las observaciones junto con la mediana y el intervalo del 95% de probabilidad de las muestras a posteriori.
+
+Primero construye una red de 80 valores de peso cerebral contenidos en el mismo intervalo que las medidas observadas de esta variable.
+
+```{r}
+x_rng <- range(msleep$log_brainwt) 
+x_steps <- seq(x_rng[1], x_rng[2], length.out = 80)
+new_data <- data_frame(
+  observation = seq_along(x_steps), 
+  log_brainwt = x_steps)
+```
+
+
+Muestrea de la distribución a posteriori utilizando la función *posterior_predict*
+```{r}
+pred_post = posterior_predict(bay_reg, newdata = new_data)
+
+df_pred = data.frame(t(apply(t(pred_post), 1, quantile, probs = c(0.025, 0.5, 0.995), na.rm = TRUE)))
+
+names(df_pred)<-c("lower","median","upper")
+
+df_pred$log_brainwt = new_data$log_brainwt
+
+head(df_pred)
+```
+
+Representa gráficamente
+
+```{r}
+ggplot(msleep) + 
+  aes(x = log_brainwt) + 
+  geom_ribbon(aes(ymin = lower, ymax = upper), data = df_pred, 
+              alpha = 0.4, fill = "grey60") + 
+  geom_line(aes(y = median), data = df_pred, colour = "#3366FF", size = 1) + 
+  geom_point(aes(y = log_sleep_total)) + 
+  scale_x_continuous(labels = function(x) 10 ^ x) +
+  labs(x = "Peso Cerebral (kg)", y = "Horas de Sueño Diario")
+```
+
