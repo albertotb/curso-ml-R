@@ -36,59 +36,17 @@ MathJax.Hub.Config({
 });
 </script>
 
----
-
-class: middle, inverse, center
-
-# Introducción
-
----
-
 ## Perceptron
 
- * Rosenblatt, 1958
+* Combinación lineal de las variables de entrada
 
- * Inspirado en las neuronas biológicas
+* No linealidad: función de activación (por ejemplo la función escalón)
 
- * Inspiración a su vez de las redes neuronales de los 80
-
- * Idea: minimizar la distancia de los puntos mal clasificados:
-
-    1. Si `\(y_i = 1\)`, `\(x_i^T w + b &lt; 0\)`
-
-    2. Si `\(y_i = -1\)`, `\(x_i^T w + b &gt; 0\)`
-
- * Definimos `\(D(b, w) = - \sum_{i \in M}{y_i(x_i^T w + b)}\)`
-
-    * Positiva
-
-    * Proporcional a la distancia de los puntos mal clasificados a la frontera
-
-
----
-
-class: middle, center
-
+.center[
 ![](./img/perceptron.png)
 
 [Fuente](https://towardsdatascience.com/perceptron-the-artificial-neuron-4d8c70d5cc8d)
-
----
-
-## Algoritmo
-
-* Descenso por gradiente estocástico
-
-* Gradiente de un ejemplo mal clasificado: `$$\partial_w D(w, b) = - y_i x_i, \quad \partial_b D(w, b) = - y_i$$`
-
-* Elegimos una observación `\(i\)` aleatoriamente:
-
-  1. Si está bien clasificada, i.e. `\(y_i(x_i^T w + b) &gt; 0\)`, no hacemos nada
-
-  2. Si está mal clasificada, i.e. `\(y_i(x_i^T w + b) \leq 0\)`, actualizamos `\(w\)` y `\(b\)`, `$$w  \leftarrow w + y_i x_i, \quad b  \leftarrow b + y_i$$`
-
-* Paramos cuando todas las observaciones están bien clasificadas
-
+]
 ---
 
 ## Ejemplo perceptron
@@ -98,37 +56,134 @@ class: middle, center
 
 ---
 
-## Problemas perceptron
+## Problema XOR
 
-* Si las clases son linealmente separables:
+* Observaciones no separables linealmente `\(\Rightarrow\)` perceptrón no encuentra solución
 
-  1. Converge a una solución
+.center[![](./img/xor.png)
 
-  2. Número de iteraciones finito
+[Fuente](https://www.freecodecamp.org/news/the-history-of-deep-learning-explored-through-6-code-snippets-d0a0e8545202/)
+]
+---
 
-* Pero:
+## Redes neuronales
 
-  1. Muchas soluciones posibles, dependen del punto inicial
+* Añadimos una capa intermedia (capa oculta)
 
-  2. Convergencia lenta
+.center[
+![:scale 45%](./img/Colored_neural_network.svg)
 
-  3. No converge si las clases no son linealmente separables
+[Fuente](https://en.wikipedia.org/wiki/Artificial_neural_network)
+]
 
 ---
 
-class: middle, center
+## RN como aproximación de funciones
 
-## Perceptron vs mínimos cuadrados
+Teorema de aproximación universal
 
-![:scale 90%](./img/toy.png)
+PERO: número de neuronas exponencialmente grande
 
 ---
 
-class: center
+## Aprender representaciones
 
-## ¿Qué solución escogemos?
+* Modelos como las SVMs generan una nueva representación de los datos de entrada en un espacio ampliado
 
-![:scale 90%](./img/Perceptron_cant_choose.svg)
+* Esperamos que en este nuevo espacio el problema de aprendizaje sea más sencillo
+
+* Esta nueva representación también se puede generar de forma manual (*feature engineering*)
+
+* Crear nuevas variables es, típicamente:
+
+  1. critico para obtener buen rendimiento
+  
+  2. muy dependiente del problema
+  
+* Ejemplo: extraer variables de datos no tabulares (audio, video, imágenes, texto)
+
+---
+
+class: center, middle
+
+![](./img/coordinate_change.png)
+
+---
+
+## RN vs otros modelos
+  
+* Automatizan la creación de nuevas variables
+
+* Esto simplifica la resolución de nuevos problemas:
+  
+  1. no necesario tanto conocimiento específico 
+  
+  2. proceso mucho menos costoso que crear nuevas variables a mano
+  
+* Además la creación de estas nuevas representaciones forma parte del aprendizaje
+
+  * específicas para la tarea a resolver `\(\Rightarrow\)` mejor rendimiento
+  
+---
+
+## ¿Por qué ahora?
+
+* Redes convolucionales y *backpropagation* son de 1989
+
+* Redes recurrentes como la LSTM de 1997
+
+* Desde 2010 varios avances han contribuido al exíto de las redes neuronales:
+
+  1. hardware
+  
+  2. datos
+  
+  3. avances algorítmicos
+  
+---
+
+## Hardware
+
+GPUs
+
+---
+
+## Datos
+
+Desarrollo exponencial de la capacidad de almacenamiento
+
+Internet: recolectar y distribuir conjuntos de datos de forma sencilla
+
+  1. Wikipedia (texto)
+  
+  2. Youtube (video)
+  
+  3. Flickr (imágenes)
+  
+---
+
+## Algoritmos
+
+
+---
+
+## Democratización
+
+* Antes: programar en GPUs `\(\Rightarrow\)` lenguajes específicos (CUDA) y C++
+
+* Desde 2010: multiples librerias (Torch, Theano, Caffe, Tensorflow) que
+
+  1. realizan diferenciación automática
+  
+  2. implementan tensores y operaciones con los mismos
+  
+  3. hacen uso de la GPU de forma transparente
+
+* Ahora: varias librerías de alto nivel que implementan capas de aprendizaje profundo:
+
+  1. **Keras**
+  
+  2. PyTorch
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
