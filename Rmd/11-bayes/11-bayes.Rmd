@@ -490,9 +490,9 @@ A(z^*, z^{(\tau)}) = \min (1, \frac{p(z^*) q(z^{(\tau)} | z^*)  }{p(z^{(\tau)}) 
 
   * $z_1^{(i+1)} \sim p(z_1 | z_2^{(i)}, z_3^{(i)})$.
   
-  * $z_2^{(i+1)} \sim p(z_1 | z_1^{(i+1)}, z_3^{(i)})$.
+  * $z_2^{(i+1)} \sim p(z_2 | z_1^{(i+1)}, z_3^{(i)})$.
   
-  * $z_3^{(i+1)} \sim p(z_1 | z_1^{(i+1)}, z_2^{(i+1)})$.
+  * $z_3^{(i+1)} \sim p(z_3 | z_1^{(i+1)}, z_2^{(i+1)})$.
   
   
 --
@@ -560,7 +560,7 @@ z^{(t+1)} = z^{(t)} - \eta \nabla_z E(z^{(t)})
 * Para ello, añadimos un término de **energía cinética**, añadiendo **variables auxiliares de momento** $r$.
 
 \begin{equation}
-p(z) = \frac{1}{Z} \exp \lbrace -E(z) - K(r) \rbrace = \frac{1}{Z} \exp \lbrace -H(z,r)  \rbrace
+p(z,r) = \frac{1}{Z} \exp \lbrace -E(z) - K(r) \rbrace = \frac{1}{Z} \exp \lbrace -H(z,r)  \rbrace
 \end{equation}
 
 * donde $K(r) = \frac{1}{2} r^\intercal r$ (ruido Gaussiano).
@@ -581,7 +581,7 @@ p(z) = \frac{1}{Z} \exp \lbrace -E(z) - K(r) \rbrace = \frac{1}{Z} \exp \lbrace 
 * Se corrigen aceptando bajo probabilidad 
 
 \begin{equation}
-\min (1, \exp \lbrace H(z,r) - H(z^*, r^*) \rbrace)
+\min (1, \exp \lbrace H(z,r) - H(z', r') \rbrace)
 \end{equation}
 
 * Conviene ir remuestreando el momeno $r$ cada pocas iteraciones.
