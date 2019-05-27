@@ -1,0 +1,113 @@
+---
+title: "Redes neuronales"
+subtitle: "Curso de aprendizaje automático para el INE"
+author: "Alberto Torres Barrán"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+    includes:
+      before_body: mathjax.html
+  keep_md: true
+---
+
+---
+
+class: middle, inverse, center
+
+# Introducción
+
+---
+
+## Perceptron
+
+ * Rosenblatt, 1958
+
+ * Inspirado en las neuronas biológicas
+
+ * Inspiración a su vez de las redes neuronales de los 80
+
+ * Idea: minimizar la distancia de los puntos mal clasificados:
+
+    1. Si $y_i = 1$, $x_i^T w + b < 0$
+
+    2. Si $y_i = -1$, $x_i^T w + b > 0$
+
+ * Definimos $D(b, w) = - \sum_{i \in M}{y_i(x_i^T w + b)}$
+
+    * Positiva
+
+    * Proporcional a la distancia de los puntos mal clasificados a la frontera
+
+
+---
+
+class: middle, center
+
+![](./img/perceptron.png)
+
+[Fuente](https://towardsdatascience.com/perceptron-the-artificial-neuron-4d8c70d5cc8d)
+
+---
+
+## Algoritmo
+
+* Descenso por gradiente estocástico
+
+* Gradiente de un ejemplo mal clasificado: $$\partial_w D(w, b) = - y_i x_i, \quad \partial_b D(w, b) = - y_i$$
+
+* Elegimos una observación $i$ aleatoriamente:
+
+  1. Si está bien clasificada, i.e. $y_i(x_i^T w + b) > 0$, no hacemos nada
+
+  2. Si está mal clasificada, i.e. $y_i(x_i^T w + b) \leq 0$, actualizamos $w$ y $b$, $$w  \leftarrow w + y_i x_i, \quad b  \leftarrow b + y_i$$
+
+* Paramos cuando todas las observaciones están bien clasificadas
+
+---
+
+## Ejemplo perceptron
+
+[
+![](https://raw.githubusercontent.com/miku/nntour/master/gifs/perceptron-pla-14-steps.gif)](https://github.com/miku/nntour)  
+
+---
+
+## Problemas perceptron
+
+* Si las clases son linealmente separables:
+
+  1. Converge a una solución
+
+  2. Número de iteraciones finito
+
+* Pero:
+
+  1. Muchas soluciones posibles, dependen del punto inicial
+
+  2. Convergencia lenta
+
+  3. No converge si las clases no son linealmente separables
+
+---
+
+class: middle, center
+
+## Perceptron vs mínimos cuadrados
+
+![:scale 90%](./img/toy.png)
+
+---
+
+class: center
+
+## ¿Qué solución escogemos?
+
+![:scale 90%](./img/Perceptron_cant_choose.svg)
+
