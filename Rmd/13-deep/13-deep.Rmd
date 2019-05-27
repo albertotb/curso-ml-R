@@ -1,0 +1,60 @@
+---
+title: "Aprendizaje profundo"
+subtitle: "Curso de aprendizaje automático para el INE"
+author: "Alberto Torres y Víctor Gallego"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+
+---
+
+
+
+class: middle, center, inverse
+
+# Introducción
+
+---
+
+
+## Deep Learning
+
+
+---
+
+## Diferenciación Automática
+
+
+---
+
+
+class: middle, center, inverse
+
+# Redes recurrentes
+
+---
+
+
+
+class: middle, center, inverse
+
+# Redes convolucionales
+
+---
+
+
+
+
+
+
+
+
+
+
