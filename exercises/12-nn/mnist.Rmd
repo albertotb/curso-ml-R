@@ -103,7 +103,7 @@ history <- model_lr %>% fit(
 )
 ```
 
-Parece que se estanca y no aprende gran cosa... ¿Se te ocurreo alguna solución?
+Parece que el aprendizaje es muy lento... ¿Se te ocurreo alguna solución?
 
 ```{r}
 # CÓDIGO
@@ -191,6 +191,12 @@ Definir la entropía cruzada como función de coste y rmsprop como optimizador.
 ```
 
 Entrena el modelo con 30 épocas. Fija el tamaño de batch a 128. Además, escoge utiliza el 20% del conjunto de entrenamiento para la validación.
+
+```{r}
+# CÓDIGO
+```
+
+Compara los optimizadores sgd y rmsprop. ¿Con cuál el aprendizaje es más rápido?
 
 ```{r}
 # CÓDIGO

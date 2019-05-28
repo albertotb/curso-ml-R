@@ -103,7 +103,7 @@ history <- model_lr %>% fit(
 )
 ```
 
-Parece que se estanca y no aprende gran cosa... ¿Se te ocurreo alguna solución?
+Parece que se estanca y no aprende gran cosa.  ¿Se te ocurreo alguna solución?
 
 ```{r}
 # rescale

@@ -3,7 +3,7 @@
   <head>
     <title>Redes neuronales</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Alberto Torres Barrán" />
+    <meta name="author" content="Alberto Torres Barrán y Roi Naveiro" />
     <meta name="date" content="2019-05-28" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
@@ -14,7 +14,7 @@ class: center, middle, inverse, title-slide
 
 # Redes neuronales
 ## Curso de aprendizaje automático para el INE
-### Alberto Torres Barrán
+### Alberto Torres Barrán y Roi Naveiro
 ### 2019-05-28
 
 ---
@@ -184,6 +184,45 @@ Internet: recolectar y distribuir conjuntos de datos de forma sencilla
   1. **Keras**
   
   2. PyTorch
+  
+---
+
+class: middle, center, inverse
+# Feed-forward Neural Networks
+
+---
+
+## Introducción
+
+* Hasta ahora hemos visto modelos de regresión y clasificación que recibían como input combinaciones lineales de *funciones base*.
+
+* Para que estos modelos resulten prácticos, debemos adaptar las funciones base a los datos.
+
+* Idea: 
+
+  1. Fijar el número de funciones base de antemano
+  
+  2. Darles forma paramétrica
+  
+  3. Aprender parámetros usando los datos.
+
+* **Aprender la representación**.
+
+* *Perceptrón multicapa* o *feed-forward neural network*.
+
+---
+
+## Perceptrón multicapa
+
+* ¿Cómo parametrizamos las funciones de base?
+
+* Hasta ahora
+
+`\begin{equation}
+y(x,w) = f \left( \sum_{j=1}^M w_j \phi_j(x) \right)
+\end{equation}`
+
+* Siendo `\(f\)` una **activación no lineal**.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

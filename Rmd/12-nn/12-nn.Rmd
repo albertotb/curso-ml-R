@@ -1,7 +1,7 @@
 ---
 title: "Redes neuronales"
 subtitle: "Curso de aprendizaje automático para el INE"
-author: "Alberto Torres Barrán"
+author: "Alberto Torres Barrán y Roi Naveiro"
 date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -15,6 +15,7 @@ output:
     includes:
       before_body: mathjax.html
   keep_md: true
+
 ---
 
 ## Perceptron
@@ -165,4 +166,44 @@ Internet: recolectar y distribuir conjuntos de datos de forma sencilla
   1. **Keras**
   
   2. PyTorch
+  
+---
+
+class: middle, center, inverse
+# Feed-forward Neural Networks
+
+---
+
+## Introducción
+
+* Hasta ahora hemos visto modelos de regresión y clasificación que recibían como input combinaciones lineales de *funciones base*.
+
+* Para que estos modelos resulten prácticos, debemos adaptar las funciones base a los datos.
+
+* Idea: 
+
+  1. Fijar el número de funciones base de antemano
+  
+  2. Darles forma paramétrica
+  
+  3. Aprender parámetros usando los datos.
+
+* **Aprender la representación**.
+
+* *Perceptrón multicapa* o *feed-forward neural network*.
+
+---
+
+## Perceptrón multicapa
+
+* ¿Cómo parametrizamos las funciones de base?
+
+* Hasta ahora
+
+\begin{equation}
+y(x,w) = f \left( \sum_{j=1}^M w_j \phi_j(x) \right)
+\end{equation}
+
+* Siendo $f$ una **activación no lineal**.
+
   
