@@ -194,7 +194,7 @@ class: middle, center, inverse
 
 ---
 
-## Perceptrón multicapa
+## Perceptrón multicapa (1)
 
 * ¿Cómo parametrizamos las funciones de base?
 
@@ -206,4 +206,92 @@ y(x,w) = f \left( \sum_{j=1}^M w_j \phi_j(x) \right)
 
 * Siendo $f$ una **activación no lineal**.
 
+* Objetivo: parametrizar $\phi_j(x)$ y aprender los parámetros.
+
+* Idea de las NN: parametrizar $\phi_j(x)$ de la misma manera que $y(x,w)$.
+
+---
+
+## Perceptrón multicapa (2)
+
+* MLP básico: 
+
+  1. Construír $M$ combinaciones lineales del input $x_1, \dots, x_D$:
+\begin{equation}
+a_j = \sum_{i=1}^D w_{ji}^{(1)} x_i + w_{j0}
+\end{equation}
   
+  2. Transformar cada activación $a_j$ usando una función de activación **no lineal** y **diferenciable**: $z_j = h(a_j)$.
+  
+  3. Repetir 1 y 2, tantas veces como **capas ocultas** queramos en la red.
+  
+  4. Por último, en la capa de salida, las activaciones se transforman con una función de activación adecuada para producir los outputs $y_k$.
+
+* Notación: $w_{ji}$ son *pesos*, $w_{j0}$ son *biases*, $a_j$ son *activaciones*.
+
+---
+
+## Perceptrón multicapa (3)
+
+* **Ejercicio**: ¿Por qué las activaciones tienen que ser funciones no lineales diferenciables?
+
+---
+
+## Perceptrón multicapa (4)
+  
+* La función de activación de la capa de salida, dependerá de la naturaleza de los datos.
+
+* Para problemas de regresión, la activación será la identidad $y_k = a_k$.
+
+* Para clasificación binaria (output es una probabilidad) la activación será la sigmoide $y_k = \sigma(a_k)$.
+
+* Para clasificación multiclase, usaremos la softmax.
+
+\begin{equation}
+\text{softmax}(a)_i = \frac{e^{a_i}}{\sum_k e^{a_k}}
+\end{equation}
+
+
+---
+
+## Perceptrón multicapa (6)
+
+* ¿Funciones de activación de capas intermedias?
+
+* Históricamente, la sigmoide.
+
+* Hoy en día, las más conocidas son la *REctifier Linear Unit (RELU)*, tangente hiperbólica y variantes.
+
+<center>
+![:scale 100%](./img/activation.png)
+</center>
+
+
+---
+
+## Perceptrón multicapa (7)
+
+* Componiendo lo visto, obtenemos una NN de dos capas (e.g. con salida binarias)
+
+\begin{equation}
+y(w,x) = \sigma \left( \sum_{j=0}^M w_{j}^{(2)} h \left( \sum_{i=0}^D w_{ji}^{(1)} x_i\right) \right)
+\end{equation}
+
+* El proceso de evaluar esta función se denomina *forward propagation*.
+.center[
+![:scale 60%](./img/neuron.svg)
+
+[Fuente](https://victorzhou.com/blog/intro-to-neural-networks/)
+]
+
+---
+
+## Perceptrón multicapa (8)
+
+* Gráficamente...
+
+<center>
+![:scale 100%](./img/nn.jpg)
+</center>
+
+
