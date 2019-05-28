@@ -50,12 +50,12 @@ show_digit(x_train[6,,])
 
 ## Preprocesado de los datos
 
-Antes del entrenamiento, es necesario aplanar los datos.
+Antes del entrenamiento, es necesario aplanar los datos. Cada imágen ha de ser una fila.
 
 ```{r}
 # remodelado
-dim(x_train) <- c(nrow(x_train), 784)
-dim(x_test) <- c(nrow(x_test), 784)
+dim(x_train) <- # CÓDIGO
+dim(x_test) <- # CÓDIGO
 ```
 
 
@@ -74,7 +74,7 @@ Define un modelo de regresión logística con 10 outputs.
 ```{r}
 model_lr <- keras_model_sequential() 
 model_lr %>% 
-  layer_dense(units = 10, input_shape = c(784), activation = "softmax")
+  layer_dense(units = _, input_shape = c(_), activation = _)
 ```
 
 ¿Cuántos parámetros entrenables tiene?, ¿por qué?
@@ -98,20 +98,18 @@ Entrena el modelo con 30 épocas. Fija el tamaño de batch a 128. Además, escog
 ```{r}
 history <- model_lr %>% fit(
   x_train, y_train, 
-  epochs = 30, batch_size = 128, 
-  validation_split = 0.2
+  epochs = _, batch_size = _, 
+  validation_split = _
 )
 ```
 
 Parece que se estanca y no aprende gran cosa... ¿Se te ocurreo alguna solución?
 
 ```{r}
-# rescale
-x_train <- x_train / 255
-x_test <- x_test / 255
+# CÓDIGO
 ```
 
-Una vez reescalamos...
+Una vez con la solución, reentrena el modelo.
 
 ```{r}
 history <- model_lr %>% fit(
@@ -130,9 +128,9 @@ Definir una arquitectura de red que mapee el input a una capa densa con 256 unid
 ```{r}
 model_l2 <- keras_model_sequential() 
 model_l2 %>% 
-  layer_dense(units = 256, activation = "relu", input_shape = c(784), kernel_regularizer = regularizer_l2(l = 0.001) ) %>% 
-  layer_dense(units = 128, activation = "relu", kernel_regularizer = regularizer_l2(l = 0.001) ) %>%
-  layer_dense(units = 10, activation = "softmax")
+  layer_dense(units = _, activation = _, input_shape = c(_), kernel_regularizer = _ ) %>% 
+  layer_dense(units = _, activation = _, kernel_regularizer = _ ) %>%
+  layer_dense(units = _, activation = _)
 ```
 
 Resumen del modelo
@@ -168,9 +166,13 @@ history <- model_l2 %>% fit(
 plot(history)
 ```
 
+Evalua el modelo en el conjunto de test.
+
 ```{r}
 model_l2 %>% evaluate(x_test, y_test,verbose = 0)
 ```
+
+¿Detectas algún signo de overfitting?
 
 ## Definición y entrenamiento de la red Neuronal profunda con regularización dropout
 
@@ -179,36 +181,19 @@ Entrena la misma red que en el caso anterior. Esta vez, en lugar de utilizar reg
 ```{r}
 model <- keras_model_sequential() 
 model %>% 
-  layer_dense(units = 256, activation = "relu", input_shape = c(784)) %>% 
-  layer_dropout(rate = 0.4) %>% 
-  layer_dense(units = 128, activation = "relu") %>%
-  layer_dropout(rate = 0.3) %>%
-  layer_dense(units = 10, activation = "softmax")
+  # CÓDIGO
 ```
 
 Definir la entropía cruzada como función de coste y rmsprop como optimizador.
 
 ```{r}
-model %>% compile(
-  loss = "categorical_crossentropy",
-  optimizer = optimizer_rmsprop(),
-  metrics = c("accuracy")
-)
+# CÓDIGO
 ```
 
 Entrena el modelo con 30 épocas. Fija el tamaño de batch a 128. Además, escoge utiliza el 20% del conjunto de entrenamiento para la validación.
 
 ```{r}
-history <- model %>% fit(
-  x_train, y_train, 
-  epochs = 30, batch_size = 128, 
-  validation_split = 0.2
-)
-```
-
-
-```{r}
-plot(history)
+# CÓDIGO
 ```
 
 ## Evaluación y predicción en conjunto de test
@@ -216,10 +201,9 @@ plot(history)
 ¿Qué accuracy encuentras en el conjunto de test?
 
 ```{r}
-model %>% evaluate(x_test, y_test,verbose = 0)
+# CÓDIGO
 ```
 
-¿Detectas algún signo de overfitting?
 
 ## Guardar y leer modelos
 
@@ -242,17 +226,17 @@ new_model %>% predict_classes(x_test)
 Aquí podemos probar otros modelos de los vistos en clase. Como ejemplo usamos Random Forest. Primero pasaremos las matrices de train y test a dataframe
 
 ```{r}
-train = data.frame(x_train)
-train$y = as.factor(mnist$train$y)
+train = # CÓDIGO
+train$y = # CÓDIGO
 #
-test = data.frame(x_test)
-test$y = as.factor(mnist$test$y)
+test = # CÓDIGO
+test$y = # CÓDIGO
 ```
 
 Ahora entrenamos el modelo. Usaremos solo 1000 ejemplos de entrenamiento. La implementación de Random Forest de R no permite minibatches, con lo que usar todo el conjunto de entrenamiento sería muy costoso computacionalmente.
 
 ```{r}
-fit_rf = randomForest::randomForest(y ~ ., data = train[1:1000, ])
+fit_rf = randomForest::randomForest(# CÓDIGO)
 fit_rf$confusion
 test_pred = predict(fit_rf, test)
 mean(test_pred == test$y)
