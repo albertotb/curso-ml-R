@@ -1,0 +1,16 @@
+------
+title: "Solar"
+author: "Alberto Torres Barrán"
+date: "30/5/2019"
+output: pdf_document
+---
+
+```{r setup}
+library(feather)
+```
+
+
+```{r}
+df <- read_feather('../../data/oahu_min.feather')
+```
+
