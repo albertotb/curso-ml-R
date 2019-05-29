@@ -18,6 +18,13 @@ output:
 
 ---
 
+---
+class: middle, center, inverse
+
+# Introducción
+
+---
+
 ## Perceptron
 
 * Combinación lineal de las variables de entrada
@@ -60,11 +67,21 @@ output:
 
 ---
 
-## RN como aproximación de funciones
+## Teorema de aproximación universal
 
-Teorema de aproximación universal
+* Asumimos:
 
-PERO: número de neuronas exponencialmente grande
+  - red neuronal feed-forward
+  
+  - una capa oculta
+  
+  - número de neuronas finito
+  
+  - algunas funciones de activación (por ej. sigmoidea)
+  
+* Aproxima cualquier función continua con precisión arbitrarea
+
+* **Pero**:el número de neuronas necesario es exponencialmente grande
 
 ---
 
@@ -108,6 +125,32 @@ class: center, middle
   
 ---
 
+class: center, middle
+
+![](img/nn_vs_rest.png)
+  
+---
+
+## Ejemplo
+
+* Clasificar imágenes médicas en sano/enfermo
+
+* Antes: una parte importante del trabajo consistía en procesar las imágenes del microscopio para extraer características:
+
+  1. segmentar células
+  
+  2. identificar núcleo
+  
+  3. etc.
+  
+* Redes neuronales profundas extraen automáticamente características **útiles para la tarea de clasificar**
+
+.center[
+![](img/nn_vs_rest_ex.png)
+]
+
+---
+
 ## ¿Por qué ahora?
 
 * Redes convolucionales y *backpropagation* son de 1989
@@ -126,15 +169,29 @@ class: center, middle
 
 ## Hardware
 
-GPUs
+* Entre 1990 y 2010 las CPUs estándar incrementaron su velocidad un factor de 5000
+
+* Modelos de redes neuronales entrenables en un portátil estándar
+
+* No suficiente para modelos más complejos (recurrentes, convolucionales)
+
+* GPUs: unidades de procesamiento gráfico
+
+  1. procesadores más sencillos
+  
+  2. útiles para procesar grandes bloques de datos en paralelo
+  
+* Entrenar una red necesita muchas multiplicaciones de matrices
+
+* NVIDIA Titan X (aprox. 1000$) tiene 350 veces más potencia que un portátil moderno $\Rightarrow$ 6.6 trillones de operaciones en coma flotante/segundo
 
 ---
 
 ## Datos
 
-Desarrollo exponencial de la capacidad de almacenamiento
+* Desarrollo exponencial de la capacidad de almacenamiento
 
-Internet: recolectar y distribuir conjuntos de datos de forma sencilla
+* Internet: recolectar y distribuir conjuntos de datos de forma sencilla
 
   1. Wikipedia (texto)
   
@@ -142,11 +199,30 @@ Internet: recolectar y distribuir conjuntos de datos de forma sencilla
   
   3. Flickr (imágenes)
   
+* Competiciones de benchmark, por ej. ImageNet o Kaggle
+
 ---
 
 ## Algoritmos
 
+* Hasta 2010 no existían formas fiables de entrenar redes neuronales profundas (solo 1 o 2 capas)
 
+  1. se puede calcular el gradiente (*backpropagation*)
+
+  2. la señal del error se desvanece en las capas intermedias
+
+* Ciertos avances algorítmicos aliviaron el problema:
+
+  1. mejores funciones de activación
+  
+  2. mejor inicialización de los pesos
+
+  3. mejores algoritmos de optimización (variantes de SGD)
+  
+* Se pueden entrenar redes con 10 o más capas
+
+* Hoy en día otros avances permiten entrenar modelos con cientos de capas
+  
 ---
 
 ## Democratización
@@ -166,6 +242,46 @@ Internet: recolectar y distribuir conjuntos de datos de forma sencilla
   1. **Keras**
   
   2. PyTorch
+  
+---
+
+## Ejemplo Keras
+
+* Problema de regresión con 2 salidas
+
+* Arquitectura:
+
+.center[
+![](./img/Colored_neural_network.svg)
+]
+
+---
+
+```{r eval=FALSE}
+library(keras)
+
+model <- keras_model_sequential()
+
+# arquitectura
+model %>% 
+  layer_dense(units = 4, 
+              activation = 'sigmoid', 
+              input_shape = c(3)) %>% 
+  layer_dense(units = 2, 
+              activation = 'linear')
+
+# definir entrenamiento
+model %>% compile(loss = "mse", 
+                  optimizer = optimizer_sgd())
+
+# entrenamiento
+model %>% fit(X_train, y_train, 
+              epochs = 10, batch_size = 128, 
+              validation_size = 0.2)
+
+# error de test
+model %>% evaluate(X_test)
+```
   
 ---
 
