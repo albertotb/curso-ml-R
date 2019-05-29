@@ -310,7 +310,7 @@ model %>% evaluate(X_test)
 ---
 
 class: middle, center, inverse
-# Perceptrón muilticapa
+# Perceptrón multicapa
 
 ---
 
@@ -621,9 +621,12 @@ donde $G^t_{j,j} = \sum_{t'=0}^t (\nabla_w f_i(w^t)_j)^2$ (la suma de los gradie
 
 Adapta la tasa de aprendizaje dividiéndola por una media del cuadrado de los gradientes anteriores, que decae exponencialmente.
 
+* **Adam**, evolució de AdaGrad.
+
 * Muchos más...
 
-* Una revisión de los diferentes optimizadores puede encontrarse en <a href="http://ruder.io/optimizing-gradient-descent/index.html#rmsprop"> aquí /a>.
+* Una revisión de los diferentes optimizadores puede encontrarse en
+[aqui](http://ruder.io/optimizing-gradient-descent/index.html#rmsprop).
 
 ---
 class: middle, center, inverse
