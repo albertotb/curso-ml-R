@@ -1,6 +1,6 @@
 ---
 title: "Redes Neuronales para clasificación de dígitos"
-author: Victor Gallego y Roi Naveiro
+author: Alberto Torres y Roi Naveiro
 date: "30/05/2019"
 output:
   pdf_document: default
