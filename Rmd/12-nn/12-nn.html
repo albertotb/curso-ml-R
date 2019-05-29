@@ -459,7 +459,7 @@ y(w,x) = \sigma \left( \sum_{j=0}^M w_{j}^{(2)} h \left( \sum_{i=0}^D w_{ji}^{(1
 ---
 
 class: middle, center, inverse
-# Perceptrón muilticapa - Entrenamiento
+# Perceptrón multicapa - Entrenamiento
 
 
 ---
@@ -793,6 +793,42 @@ class: middle, center, inverse
 &lt;center&gt;
 ![:scale 90%](./img/dropout.png)
 &lt;/center&gt;
+
+---
+class: middle, center, inverse
+# Redes Neuronales Bayesianas
+
+---
+
+## ¿Por qué BNNs?
+
+* **Cuantifican la incertidumbre** en los pesos.
+
+* **Cuantifican la incertidumbre** en la salida de la red.
+
+* Permiten la selección directa de **hiperparámetros**, sin necesida de validación.
+
+* Previenen overfitting, y que la respuesta de la red es un "promedio" sobre muchas redes (cada una pesada con la distribución a posteriori).
+
+`\begin{equation}
+p(t \vert \mathcal{D}, x) = \int p(t \vert w, x) p(w \vert \mathcal{D}) dw
+\end{equation}`
+
+---
+
+## ¿Por qué no BNNs?
+
+* La dependencia **altamente no lineal** de la salida con los pesos, hace que la inferencia Bayesiana exact sea inviable.
+
+* Métodos MCMC no escalan bien.
+
+* Alternativas:
+
+  1. Versiones sofisticadas de MCMC, por ejemplo &lt;a href="https://www.ics.uci.edu/~welling/publications/papers/stoclangevin_v6.pdf"&gt;esto&lt;/a&gt;. 
+  
+  2. Inferencia variacional: aproximar el posterior por una gaussiana multivariante (mean-field o full rank).
+
+* Campo activo de investigación!
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
