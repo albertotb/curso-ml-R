@@ -15,17 +15,15 @@ output:
     includes:
       before_body: mathjax.html
   keep_md: true
-
 ---
 
 ---
 class: middle, center, inverse
 
 # Introducción
-
 ---
 
-## Perceptron
+## Perceptrón
 
 * Combinación lineal de las variables de entrada
 
