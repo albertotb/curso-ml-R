@@ -223,6 +223,32 @@ class: center, middle
   
 ---
 
+## Ventajas y desventajas
+
+Ventajas
+
+* Simplicidad: no es necesario crear nuevas variables a mano
+
+* Escalabilidad: 
+  
+  1. paralelizacion en GPUs
+  
+  2. uso de mini-baches
+
+* Versatilidad y reusabilidad:
+  
+  1. aprovechar representaciones aprendidas para otros problemas
+  
+  2. continuar el entrenamiento con nuevos datos
+  
+Desventajas
+
+* Coste computacional y hardware
+
+* Dificultad entrenamiento
+
+---
+
 ## Democratización
 
 * Antes: programar en GPUs $\Rightarrow$ lenguajes específicos (CUDA) y C++
