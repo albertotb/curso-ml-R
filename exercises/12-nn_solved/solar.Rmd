@@ -1,4 +1,4 @@
-------
+---
 title: "Solar"
 author: "Alberto Torres Barrán"
 date: "30/5/2019"
@@ -12,10 +12,11 @@ library(dplyr)
 library(keras)
 ```
 
+
 1. Leer el fichero `oahu_min.csv`. Contiene datos de múltiples piranómetros que miden la radiación solar en el aeropuerto de Hawaii, entre el 19/03/2010 y el 31/10/2011
 
 ```{r}
-df <- read_csv('oahu_min.csv', 
+df <- read_csv('../../data/oahu_min.csv', 
                locale = locale(tz = "Pacific/Honolulu"))
   
 ```
