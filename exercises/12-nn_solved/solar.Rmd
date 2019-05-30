@@ -1,0 +1,128 @@
+---
+title: "Solar"
+author: "Alberto Torres Barrán"
+date: "30/5/2019"
+output: pdf_document
+---
+
+```{r setup}
+library(lubridate)
+library(readr)
+library(dplyr)
+library(keras)
+```
+
+
+1. Leer el fichero `oahu_min.csv`. Contiene datos de múltiples piranómetros que miden la radiación solar en el aeropuerto de Hawaii, entre el 19/03/2010 y el 31/10/2011
+
+```{r}
+df <- read_csv('../../data/oahu_min.csv', 
+               locale = locale(tz = "Pacific/Honolulu"))
+  
+```
+
+2. Seleccionar las columnas `Datetime` y todas las que empiezan por "GH" (radiación "Global Horizontal") excepto "GH_AP3" (piranómetro defectuoso)
+
+```{r}
+df <- select(df, Datetime, starts_with("GH"), -GH_AP3)
+```
+
+3. Crear otro dataframe desplazado, es decir, donde la columna `Datatime` tome los valores `Datetime` + 1 minuto 
+
+```{r}
+df1 <- mutate(df, Datetime = Datetime + minutes(1))
+```
+
+4. Unir ambos dataframes usando como clave `Datetime`
+
+```{r}
+df2 <- inner_join(df, df1, by='Datetime', suffix=c("_t-1", "_t"))
+```
+
+5. Partir en entrenamiento, validación y test:
+
+  * Entrenamiento, hasta 2011-06-01
+  * Validación, de 2011-06-01 hasta 2011-09-01
+  * Test, a partir de 2011-09-01
+
+```{r}
+end_train <- as.Date("2011-06-01")
+end_val   <- as.Date("2011-09-01")
+
+train <- filter(df2, Datetime < end_train)
+val   <- filter(df2, Datetime > end_train, Datetime < end_val)
+test  <- filter(df2, Datetime > end_val)
+```
+
+6. Crear las matrices X e y, de la siguiente forma:
+
+  * X: todos los piranómetros en el tiempo t-1
+  * y: el piranómetro "GH_DH1" en el tiempo t
+
+```{r}
+X_train <- as.matrix(select(train, ends_with("t-1")))
+y_train <- as.matrix(select(train, GH_DH1_t))
+
+X_test <- as.matrix(select(test, ends_with("t-1")))
+y_test <- as.matrix(select(test, GH_DH1_t))
+
+X_val <- as.matrix(select(val, ends_with("t-1")))
+y_val <- as.matrix(select(val, GH_DH1_t))
+```
+
+7. Inicializar una red neuronal con 1 capa oculta, 128 unidades en la capa oculta, activaciones ReLU y regularización $l_2$ ($\lambda = 0.01$)
+
+```{r}
+# Initialize a sequential model
+model <-  keras_model_sequential()
+
+# Add layers to the model
+model %>% 
+    layer_dense(units = 128, activation = 'relu', input_shape = c(16),
+                kernel_regularizer = regularizer_l2(l = 0.01)) %>% 
+    layer_dense(units = 1, activation = 'linear',
+                kernel_regularizer = regularizer_l2(l = 0.01))
+```
+
+```{r}
+summary(model)
+```
+
+8. Entrenar la red durante 10 épocas usando como función de pérdida el MAE y el optimizador ADAM, con un tamaño de mini-batch de 128. ¿Cual es el error de entrenamiento y de validación final?
+
+```{r}
+model %>% compile(
+  loss = "mae",
+  optimizer = optimizer_adam()
+)
+```
+
+```{r warning=FALSE}
+history <- model %>% fit(
+  X_train, y_train, 
+  epochs = 10, batch_size = 128, 
+  validation_data = list(X_val, y_val),
+  verbose = 1
+)
+```
+
+9. Calcular el error en el conjunto de test
+
+```{r}
+evaluate(model, X_test, y_test)
+```
+
+10. (Opcional) Comparar el error de test con un modelo ElasticNet.
+
+```{r}
+library(glmnet)
+
+fit <- cv.glmnet(X_train, y_train)
+y_pred <- predict(fit, newx = X_val)
+mean(abs(y_pred - y_val))
+```
+
+```{r}
+y_pred <- predict(fit, newx = X_test)
+mean(abs(y_pred - y_test))
+```

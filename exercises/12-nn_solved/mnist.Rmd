@@ -1,0 +1,262 @@
+---
+title: "Redes Neuronales para clasificación de dígitos"
+author: Victor Gallego y Roi Naveiro
+date: "30/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Cargamos los paquetes necesarios
+```{r}
+library(randomForest)
+library(keras)
+```
+
+
+## Funciones auxiliares
+
+* show_digit: Hace una gráfica del dígito en cuestión.
+```{r, message=F}
+show_digit = function(img){
+  img = t( apply(img, 2, rev) )
+  image( img )
+}
+```
+
+
+## Lectura de Datos
+
+Carga los datos de train y test en memoria
+
+```{r}
+mnist <- dataset_mnist()
+x_train <- mnist$train$x
+y_train <- mnist$train$y
+x_test <- mnist$test$x
+y_test <- mnist$test$y
+```
+
+Visualiza algún ejemplo
+
+```{r}
+y_train[6]
+show_digit(x_train[6,,])
+```
+
+## Preprocesado de los datos
+
+Antes del entrenamiento, es necesario aplanar los datos.
+
+```{r}
+# remodelado
+dim(x_train) <- c(nrow(x_train), 784)
+dim(x_test) <- c(nrow(x_test), 784)
+```
+
+
+También es necesario pasar las etiquetas a la notación OHE.
+
+```{r}
+y_train <- to_categorical(y_train, 10)
+y_test <- to_categorical(y_test, 10)
+```
+
+
+## Definición y entrenamiento de un modelo de regresión logística regularizada
+
+Define un modelo de regresión logística con 10 outputs.
+
+```{r}
+model_lr <- keras_model_sequential() 
+model_lr %>% 
+  layer_dense(units = 10, input_shape = c(784), activation = "softmax")
+```
+
+¿Cuántos parámetros entrenables tiene?, ¿por qué?
+
+```{r}
+summary(model_lr)
+```
+
+Definir la entropía cruzada como función de coste y rmsprop como optimizador.
+
+```{r}
+model_lr %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_rmsprop(),
+  metrics = c("accuracy")
+)
+```
+
+Entrena el modelo con 30 épocas. Fija el tamaño de batch a 128. Además, escoge utiliza el 20% del conjunto de entrenamiento para la validación.
+
+```{r}
+history <- model_lr %>% fit(
+  x_train, y_train, 
+  epochs = 30, batch_size = 128, 
+  validation_split = 0.2
+)
+```
+
+Parece que se estanca y no aprende gran cosa.  ¿Se te ocurreo alguna solución?
+
+```{r}
+# rescale
+x_train <- x_train / 255
+x_test <- x_test / 255
+```
+
+Una vez reescalamos...
+
+```{r}
+history <- model_lr %>% fit(
+  x_train, y_train, 
+  epochs = 30, batch_size = 128, 
+  validation_split = 0.2
+)
+```
+
+Veamos cómo mejorarlo con una red profunda.
+
+## Definición y entrenamiento de la red Neuronal profunda con regularización L2
+
+Definir una arquitectura de red que mapee el input a una capa densa con 256 unidades ocultas con activación tipo relu. La salida de estas capas ha de ser mapeada a otra capa densa con 128 unidades, también con activación relu. Finalmente, esta capa mandará señal a la capa final con 10 unidades y activación softmax para así recuperar probabilidades. Incluye regularización L2 en las dos primeras capas, con parámetro 0.001.
+
+```{r}
+model_l2 <- keras_model_sequential() 
+model_l2 %>% 
+  layer_dense(units = 256, activation = "relu", input_shape = c(784), kernel_regularizer = regularizer_l2(l = 0.001) ) %>% 
+  layer_dense(units = 128, activation = "relu", kernel_regularizer = regularizer_l2(l = 0.001) ) %>%
+  layer_dense(units = 10, activation = "softmax")
+```
+
+Resumen del modelo
+
+```{r}
+summary(model_l2)
+```
+
+¿Cuál es el número total de parámetros entrenables en este caso?
+
+Definir la entropía cruzada como función de coste y rmsprop como optimizador.
+
+```{r}
+model_l2 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_rmsprop(),
+  metrics = c("accuracy")
+)
+```
+
+Entrena el modelo con 30 épocas. Fija el tamaño de batch a 128. Además, escoge utiliza el 20% del conjunto de entrenamiento para la validación.
+
+```{r}
+history <- model_l2 %>% fit(
+  x_train, y_train, 
+  epochs = 30, batch_size = 128, 
+  validation_split = 0.2
+)
+```
+
+
+```{r}
+plot(history)
+```
+
+```{r}
+model_l2 %>% evaluate(x_test, y_test,verbose = 0)
+```
+
+## Definición y entrenamiento de la red Neuronal profunda con regularización dropout
+
+Entrena la misma red que en el caso anterior. Esta vez, en lugar de utilizar regularización L2, utiliza dropout con proporción 0.4 en la primera capa y 0.3 en la segunda. 
+
+```{r}
+model <- keras_model_sequential() 
+model %>% 
+  layer_dense(units = 256, activation = "relu", input_shape = c(784)) %>% 
+  layer_dropout(rate = 0.4) %>% 
+  layer_dense(units = 128, activation = "relu") %>%
+  layer_dropout(rate = 0.3) %>%
+  layer_dense(units = 10, activation = "softmax")
+```
+
+Definir la entropía cruzada como función de coste y rmsprop como optimizador.
+
+```{r}
+model %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_rmsprop(),
+  metrics = c("accuracy")
+)
+```
+
+Entrena el modelo con 30 épocas. Fija el tamaño de batch a 128. Además, escoge utiliza el 20% del conjunto de entrenamiento para la validación.
+
+```{r}
+history <- model %>% fit(
+  x_train, y_train, 
+  epochs = 30, batch_size = 128, 
+  validation_split = 0.2
+)
+```
+
+
+```{r}
+plot(history)
+```
+
+## Evaluación y predicción en conjunto de test
+
+¿Qué accuracy encuentras en el conjunto de test?
+
+```{r}
+model %>% evaluate(x_test, y_test,verbose = 0)
+```
+
+¿Detectas algún signo de overfitting?
+
+## Guardar y leer modelos
+
+Guarda el modelo creado en un fichero llamado "mnist_weights.hdf5". Lee el modelo de nuevo y realiza predicciones sobre el conjunto de test.
+
+```{r}
+save_model_hdf5(model, filepath = "mnist_weights.hdf5", overwrite = TRUE,
+  include_optimizer = TRUE)
+
+new_model = load_model_hdf5("mnist_weights.hdf5", custom_objects = NULL, compile = TRUE)
+```
+
+
+```{r}
+new_model %>% predict_classes(x_test)
+```
+
+## Otros modelos
+
+Aquí podemos probar otros modelos de los vistos en clase. Como ejemplo usamos Random Forest. Primero pasaremos las matrices de train y test a dataframe
+
+```{r}
+train = data.frame(x_train)
+train$y = as.factor(mnist$train$y)
+#
+test = data.frame(x_test)
+test$y = as.factor(mnist$test$y)
+```
+
+Ahora entrenamos el modelo. Usaremos solo 1000 ejemplos de entrenamiento. La implementación de Random Forest de R no permite minibatches, con lo que usar todo el conjunto de entrenamiento sería muy costoso computacionalmente.
+
+```{r}
+fit_rf = randomForest::randomForest(y ~ ., data = train[1:1000, ])
+fit_rf$confusion
+test_pred = predict(fit_rf, test)
+mean(test_pred == test$y)
+table(predicted = test_pred, actual = test$y)
+```
+
+¿Cómo se comporta random forest respecto a las redes neuronales?
