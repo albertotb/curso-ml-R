@@ -4,7 +4,7 @@
     <title>Redes neuronales</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alberto Torres Barrán y Roi Naveiro" />
-    <meta name="date" content="2019-05-29" />
+    <meta name="date" content="2019-05-30" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Redes neuronales
 ## Curso de aprendizaje automático para el INE
 ### Alberto Torres Barrán y Roi Naveiro
-### 2019-05-29
+### 2019-05-30
 
 ---
 
@@ -414,7 +414,7 @@ a_j = \sum_{i=1}^D w_{ji}^{(1)} x_i + w_{j0}
 
 ---
 
-## Perceptrón multicapa (6)
+## Perceptrón multicapa (5)
 
 * ¿Funciones de activación de capas intermedias?
 
@@ -429,7 +429,7 @@ a_j = \sum_{i=1}^D w_{ji}^{(1)} x_i + w_{j0}
 
 ---
 
-## Perceptrón multicapa (7)
+## Perceptrón multicapa (6)
 
 * Componiendo lo visto, obtenemos una NN de dos capas (e.g. con salida binarias)
 
@@ -446,7 +446,7 @@ y(w,x) = \sigma \left( \sum_{j=0}^M w_{j}^{(2)} h \left( \sum_{i=0}^D w_{ji}^{(1
 
 ---
 
-## Perceptrón multicapa (8)
+## Perceptrón multicapa (7)
 
 * Gráficamente...
 
@@ -511,7 +511,7 @@ p(t \vert x,w) = y(x,w)^t \lbrace 1-y(x,w) \rbrace^{1-t}
 E(w) = - \sum_{n=1}^N \lbrace t_n \log y_n + (1-t_n) \log (1-y_n) \rbrace
 \end{equation}`
 
-* Para clasificación binaria **multiclase**, usamos una red con `\(K\)` outputs sigmoidales. 
+* Para clasificación binaria **multi-etiqueta**, usamos una red con `\(K\)` outputs sigmoidales. 
 
 * Asumiendo independencia condiciones de las etiquetas dado el input, el análisis es idéntico.
 
@@ -641,7 +641,7 @@ donde `\(G^t_{j,j} = \sum_{t'=0}^t (\nabla_w f_i(w^t)_j)^2\)` (la suma de los gr
 
 Adapta la tasa de aprendizaje dividiéndola por una media del cuadrado de los gradientes anteriores, que decae exponencialmente.
 
-* **Adam**, evolució de AdaGrad.
+* **Adam**, evolución de AdaGrad.
 
 * Muchos más...
 
@@ -657,7 +657,7 @@ class: middle, center, inverse
 
 * Técnica **eficiente** para evaluar `\(\nabla E(w)\)` aprovechando la estructura de perceptrones multicapa.
 
-* En mayoría de problemas `\(E(w) = \sum_n E_n{w}\)`, nos centramos en evaluar `\(\nabla E_n(w)\)`.
+* En mayoría de problemas `\(E(w) = \sum_n E_n (w)\)`, nos centramos en evaluar `\(\nabla E_n(w)\)`.
 
 * En un MLP, cada unidad calcula combinación lineal de sus inputs `\(z_i\)`, `\(a_j = \sum_i w_{ji}z_i\)`.
 
@@ -667,7 +667,7 @@ class: middle, center, inverse
 
 * Supongamos que para cada instancia the train, hemos calculado inputs y outputs de todas las neuronas (*forward propagation*).
 
-* Evaluamos la derivada de `\(E_n\)` respecto `\(w_ji\)`
+* Evaluamos la derivada de `\(E_n\)` respecto `\(w_{ji}\)`
 
 `\begin{equation}
 \frac{\partial E_n}{\partial w_{ji}} = \frac{\partial E_n}{\partial a_j} \frac{\partial a_j}{\partial w_{ji}} := \delta_j z_i 
@@ -748,7 +748,7 @@ class: middle, center, inverse
 
 ---
 class: middle, center, inverse
-# Perceptrón muilticapa. Regularización
+# Perceptrón multicapa. Regularización
 
 ---
 
@@ -808,7 +808,7 @@ class: middle, center, inverse
 
 * **Cuantifican la incertidumbre** en la salida de la red.
 
-* Permiten la selección directa de **hiperparámetros**, sin necesida de validación.
+* Permiten la selección directa de **hiperparámetros**, sin necesidad de validación.
 
 * Previenen overfitting, y que la respuesta de la red es un "promedio" sobre muchas redes (cada una pesada con la distribución a posteriori).
 
