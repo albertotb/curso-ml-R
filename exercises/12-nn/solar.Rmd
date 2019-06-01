@@ -1,0 +1,40 @@
+------
+title: "Solar"
+author: "Alberto Torres Barrán"
+date: "30/5/2019"
+output: pdf_document
+---
+
+```{r setup}
+library(lubridate)
+library(readr)
+library(dplyr)
+library(keras)
+```
+
+1. Leer el fichero `oahu_min.csv`. Contiene datos de múltiples piranómetros que miden la radiación solar en el aeropuerto de Hawaii, entre el 19/03/2010 y el 31/10/2011
+
+2. Seleccionar las columnas `Datetime` y todas las que empiezan por "GH" (radiación "Global Horizontal") excepto "GH_AP3" (piranómetro defectuoso)
+
+3. Crear otro dataframe desplazado, es decir, donde la columna `Datatime` tome los valores `Datetime` + 1 minuto 
+
+4. Unir ambos dataframes usando como clave `Datetime`
+
+5. Partir en entrenamiento, validación y test:
+
+  * Entrenamiento, hasta 2011-06-01
+  * Validación, de 2011-06-01 hasta 2011-09-01
+  * Test, a partir de 2011-09-01
+
+6. Crear las matrices X e y, de la siguiente forma:
+
+  * X: todos los piranómetros en el tiempo t-1
+  * y: el piranómetro "GH_DH1" en el tiempo t
+
+7. Inicializar una red neuronal con 1 capa oculta, 128 unidades en la capa oculta, activaciones ReLU y regularización $l_2$ ($\lambda = 0.01$)
+
+8. Entrenar la red durante 10 épocas usando como función de pérdida el MAE y el optimizador ADAM, con un tamaño de mini-batch de 128. ¿Cual es el error de entrenamiento y de validación final?
+
+9. Calcular el error en el conjunto de test
+
+10. (Opcional) Comparar el error de test con un modelo ElasticNet.

@@ -17,10 +17,10 @@
     * Modelos gráficos probabilísticos (17/05, 4 horas) [[slides]](./Rmd/10-pgms/10-pgms.html)
     * Algoritmos bayesianos para clasificación y regresión (27/05, 4 horas) [[slides]](./Rmd/11-bayes/11-bayes.html)
 
+
  3. Aprendizaje profundo
-    * Introducción (30/05, 2 horas)
-    * Redes neuronales (30/05 y 06/06, 4 horas)
-    * Introducción al aprendizaje profundo (06/06, 2 horas)
+    * Introducción a las redes neuronales (31/05, 4 horas) [[slides]](./Rmd/12-nn/12-nn.html)
+    * Introducción al aprendizaje profundo (06/06, 4 horas)
 
 ## Bibliografía
 
