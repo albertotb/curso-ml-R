@@ -4,7 +4,7 @@
     <title>Aprendizaje profundo</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alberto Torres y Víctor Gallego" />
-    <meta name="date" content="2019-05-27" />
+    <meta name="date" content="2019-06-03" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 # Aprendizaje profundo
 ## Curso de aprendizaje automático para el INE
 ### Alberto Torres y Víctor Gallego
-### 2019-05-27
+### 2019-06-03
 
 ---
 
@@ -42,9 +42,88 @@ class: middle, center, inverse
 
 class: middle, center, inverse
 
-# Redes recurrentes
+# Redes recurrentes (RNNs)
 
 ---
+
+## Intuición
+
+* Las redes neuronales recurrentes (*recurrent neural networks*, RNNs) surgen de la necesidad de **procesar secuencias** de datos (fundamentalmente textos).
+
+* Imagen
+
+
+---
+
+## Esquema original
+
+* Describir la de Elman
+
+
+---
+
+## Ejemplo
+
+
+---
+
+## Grafo computacional y backpropagación truncada
+
+
+
+---
+
+## Problema de la RNN original
+
+* Explosión y desvanecimiento de gradientes
+
+
+---
+
+## Gated Recurrent Unit (GRU)
+
+---
+
+## Long-Short Term Memory network (LSTM)
+
+
+
+---
+
+
+
+
+---
+
+## Resumen
+
+* Las RNNs permiten gran flexibilidad en el diseño de la arquitectura.
+
+* Las RNNs originales son simples pero no funcionan bien.
+
+* Más común: utilizar **LSTM** o **GRU** para "mejorar" el gradiente.
+
+* El flujo de gradiente hacia atrás puede explotar o desvanecerse en las RNNs: la **explosión** se controla acotando el gradiente (clipping). El **desvanecimiento** mediante conexiones aditivas (LSTM, GRU).
+
+* Las búsqueda de arquitecturas más simples es área de investigación actual.
+
+* Todavía hay escasos avances teóricos, se necesita más investigación.
+
+
+---
+
+
+class: middle, center, inverse
+
+# Aplicación de RNNs a Procesamiento de Lenguaje Natural y Predicción
+
+---
+
+## De n-gramas a word embeddings
+
+
+---
+
 
 
 
@@ -53,6 +132,24 @@ class: middle, center, inverse
 # Redes convolucionales
 
 ---
+
+
+
+class: middle, center, inverse
+
+# Recursos adicionales
+
+---
+
+## Enlaces de interés
+
+* https://reddit.com/r/LearnMachineLearning: nivel introductorio/medio.
+
+* https://reddit.com/r/machinelearning: discusiones sobre artículos y temas de actualidad.
+
+* https://medium.com/topic/machine-learning: artículos hacia audiencia general.
+
+* ???
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

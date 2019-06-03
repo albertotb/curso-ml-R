@@ -37,9 +37,88 @@ class: middle, center, inverse
 
 class: middle, center, inverse
 
-# Redes recurrentes
+# Redes recurrentes (RNNs)
 
 ---
+
+## Intuición
+
+* Las redes neuronales recurrentes (*recurrent neural networks*, RNNs) surgen de la necesidad de **procesar secuencias** de datos (fundamentalmente textos).
+
+* Imagen
+
+
+---
+
+## Esquema original
+
+* Describir la de Elman
+
+
+---
+
+## Ejemplo
+
+
+---
+
+## Grafo computacional y backpropagación truncada
+
+
+
+---
+
+## Problema de la RNN original
+
+* Explosión y desvanecimiento de gradientes
+
+
+---
+
+## Gated Recurrent Unit (GRU)
+
+---
+
+## Long-Short Term Memory network (LSTM)
+
+
+
+---
+
+
+
+
+---
+
+## Resumen
+
+* Las RNNs permiten gran flexibilidad en el diseño de la arquitectura.
+
+* Las RNNs originales son simples pero no funcionan bien.
+
+* Más común: utilizar **LSTM** o **GRU** para "mejorar" el gradiente.
+
+* El flujo de gradiente hacia atrás puede explotar o desvanecerse en las RNNs: la **explosión** se controla acotando el gradiente (clipping). El **desvanecimiento** mediante conexiones aditivas (LSTM, GRU).
+
+* Las búsqueda de arquitecturas más simples es área de investigación actual.
+
+* Todavía hay escasos avances teóricos, se necesita más investigación.
+
+
+---
+
+
+class: middle, center, inverse
+
+# Aplicación de RNNs a Procesamiento de Lenguaje Natural y Predicción
+
+---
+
+## De n-gramas a word embeddings
+
+
+---
+
 
 
 
@@ -51,9 +130,21 @@ class: middle, center, inverse
 
 
 
+class: middle, center, inverse
 
+# Recursos adicionales
 
+---
 
+## Enlaces de interés
+
+* https://reddit.com/r/LearnMachineLearning: nivel introductorio/medio.
+
+* https://reddit.com/r/machinelearning: discusiones sobre artículos y temas de actualidad.
+
+* https://medium.com/topic/machine-learning: artículos hacia audiencia general.
+
+* ???
 
 
 
