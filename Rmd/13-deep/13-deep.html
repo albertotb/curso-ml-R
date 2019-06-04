@@ -168,6 +168,8 @@ class: middle, center, inverse
 
 * Las redes neuronales recurrentes (*recurrent neural networks*, RNNs) surgen de la necesidad de **procesar secuencias** de datos (fundamentalmente textos).
 
+* ¿Qué hacemos cuando los inputs pueden tener diferentes longitudes?
+
 * Imagen
 
 
@@ -242,25 +244,130 @@ class: middle, center, inverse
 
 ---
 
-## De n-gramas a word embeddings
+## Cambio de paradigma
+
+* Pre 2000s: **simbólico, basado en reglas**
+
+  * Lenguaje entendido como conjunto de elementos y reglas para combinarlos.
+  * Gramáticas independientes de contexto (Chomsky).
+  * Más adecuado a lenguajes artificiales (de programación) que naturales (humanos).
+  
+&lt;center&gt;
+![:scale 30%](./img/nlp1.png)
+&lt;/center&gt;
+  
+* Después: **estadístico, basado en datos**
+
+  * Lenguaje entendido como probabilidades de secuencias de palabras.
+  * Cálculo de frecuencias de palabras, n-gramas, etc.
+  * Más adecuado a lenguajes naturales que artificiales.
+  * Combinación con modelos profundos: **estado del arte**.
+
+---
+
+## De n-gramas a word embeddings (1)
+
+* **Bag of words**: contamos la aparición (o frecuencia) de cada palabra: &lt;span style="color:blue"&gt;El atento alumno `\(\rightarrow\)` (El), (atento), (alumno)&lt;/span&gt;.
+
+* Representaríamos la frase como 
+
+$$
+\left(0 , \ldots, 1, 0, \ldots, 0, 1, 0, \ldots, 1, 0 \right) \in \lbrace 0, 1 \rbrace^{|V|}
+$$
+
+* donde `\(|V|\)` es el número de palabras de nuestro vocabulario `\(V\)`.
+
+* Problema: no tiene en cuenta el orden (y contexto) de las palabras. Solución (parcial):
+
+* **2-gramas**: contamos ahora pares consecutivos de palabras: &lt;span style="color:blue"&gt;(El, atento), (atento, alumno)&lt;/span&gt;.
+
+* Ahora la representación es sobre `\(\lbrace 0, 1 \rbrace^{|V|^2}\)`.
+
+--
+
+* **n-gramas**: explosión combinatoria...
+
+* Ha sido lo estándar hasta `\(\sim 2013\)`. ¿Podemos encontrar una representación más compacta?
 
 
 ---
 
-## word2vec
+## De n-gramas a word embeddings (2)
+
+
+* Cada palabra (representada mediante OHE) se mapea a un espacio continuo: `\(\lbrace 0, 1 \rbrace^{|V|} \rightarrow \mathbb{R}^m\)`.
+
+* Mediante una transformación lineal `\(z_i = E w_i\)` donde `\(E\)` es una matriz de tamaño `\(m \times |V|\)`. Típicamente `\(m = 300 &lt;&lt; |V|\)`.
+
+&lt;center&gt;
+![:scale 60%](./img/wordemb.png)
+&lt;/center&gt;
+
+* **Combaten la catástrofe de la dimensionalidad**, mediante una compresión de los datos, pasando de un espacio discreto a uno continuo.
+
+* Al proyectar a un espacio continuo, esperamos que palabras parecidas (sinónimos) se encuentren cerca (bajo la métrica euclidea).
+
+---
+
+
+## Álgebra lineal en el espacio de palabras (1)
+
+* **One-hot encoding**: no hay noción de vecindad entre palabras, cualquier palabra está igual de lejos que las demás.
+
+* **Word embeddings** (codificación densa): podemos usar la distancia euclídea (u otras) en `\(\mathbb{R}^m\)`.
+
+&lt;center&gt;
+![:scale 32%](./img/wordemb2.png)
+&lt;/center&gt;
+
+---
+
+## Álgebra lineal en el espacio de palabras (2)
+
+* Como estamos en un espacio vectorial ( `\(\mathbb{R}^m\)` ), podemos realizar operaciones con vectores (word embeddings).
+
+* Aprenden ciertas analogías entre palabras.
+
+&lt;center&gt;
+![:scale 60%](./img/wordemb3.png)
+&lt;/center&gt;
+
+---
+
+## word2vec (2013)
+
+* La pregunta del millón: **¿cómo obtener la matriz `\(E\)` de word embeddings?**
+
+--
+
+* Basado en la **hipótesis distribucional** del lenguaje (J. Firth 1957): el significado de una palabra puede inferirse a partir del contexto (palabras vecinas en las que aparece)
+
+* El modelo word2vec presenta dos variantes:
+
+  * **CBoW**: dado un contexto, predecir palabra central.
+  
+  * **Skip-gram**: dada la palabra central, predecir el contexto.
+
+&lt;center&gt;
+![:scale 60%](./img/wordemb4.jpg)
+&lt;/center&gt;
 
 
 ---
 
-## Álgebra lineal en el espacio de palabras
-
-
----
 
 ## Uso de embeddings preentrenados
 
+* Aunque los embeddings pueden inicializarse aleatoriamente (como los pesos de una red neuronal estándar) y aprenderse durante la tarea,
 
-* https://fasttext.cc/
+* Una técnica habitual es cargar unos **word embeddings preentrenados**, para ahorrar tiempo y datos.
+
+* Una vez ya tenemos los embeddings, se los acoplamos a cualquier modelo (regresión logística, red neuronal) y procedemos con el entrenamiento.
+
+
+* https://fasttext.cc/ mejora de word2vec (contiene información de prefijos y sufijos).
+
+* https://fasttext.cc/docs/en/crawl-vectors.html en castellano, entrenados sobre los artículos de la Wikipedia y CommonCrawl.
 
 
 ---
@@ -271,6 +378,14 @@ class: middle, center, inverse
 
 ## Generación de textos
 
+* https://openai.com/blog/better-language-models/
+
+* GPT-2 es un modelo de lengauje entrenado sobre un corpus de 40GB de datos (8 millones de páginas webs).
+
+* La versión grande del modelo consta de 1500 millones de parámetros.
+
+* Generación de historias online en https://talktotransformer.com/
+
 
 ---
 
@@ -280,6 +395,17 @@ class: middle, center, inverse
 ---
 
 ## Subtitulación de imágenes
+
+&lt;center&gt;
+![:scale 80%](./img/caption.png)
+&lt;/center&gt;
+
+* Explain Images with Multimodal Recurrent Neural Networks: https://arxiv.org/pdf/1410.1090.pdf
+
+* Show and Tell: A Neural Image Caption Generator: https://arxiv.org/pdf/1411.4555.pdf
+
+
+
 
 
 ---
