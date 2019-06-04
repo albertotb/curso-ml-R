@@ -24,15 +24,133 @@ class: middle, center, inverse
 ---
 
 
-## Deep Learning
+## Repaso de Deep Learning
+
+* Modelo principal: red profunda (**feed-forward**): composición de **proyecciones lineales** y **no-linealidades**
+
+\begin{align}
+h^{(i+1)} &= Wz^{(i)} + b   \\
+z^{(i+1)} &= \sigma (h^{(i+1)}) \\
+\end{align}
+
+* Al final: añadir coste apropiado para regresión o clasificación.
+
+* Las redes neuronales se conocen desde mediados del siglo XX, pero su fuerte resurgimiento no fue hasta esta década:
+
+  * Paralelización en tarjetas gráficas (**GPUs**).
+  
+  * Librerías de **diferenciación automática**.
+
+---
+
+## Diferenciación Automática (AD) (1)
+
+* ¿Cómo calcular el gradiente en una red profunda?
+
+--
+
+* **A mano**: no escala a nuevas arquitecturas, propenso a errores.
+
+* **Diferenciación numérica**: acumulación de errores y elevado coste computacional.
+
+\begin{equation}
+\frac{\partial E_n}{\partial w_{ji}} = \frac{E_n(w_{ji} + \epsilon) - E_n(w_{ji} - \epsilon)}{2 \epsilon} + O(\epsilon^2)
+\end{equation}
+
+* **Diferenciación simbólica**: manipulación exacta de expresiones (mediante tablas de derivadas), pero explosión en la cantidad de términos:
+
+<center>
+![:scale 50%](./img/ad1.png)
+</center>
+
+
+
 
 
 ---
 
-## Diferenciación Automática
+## Diferenciación Automática (AD) (2)
+
+* Surge la **diferenciación automática o algorítmica**: aplica diferenciación simbólica pero solo a expresiones simples, y al componerlas, actualiza los resultados numéricos parciales (que serán **exactos**)
+
+* Ejemplo para calcular la derivada de $y = f(x_1, x_2) = \log (x_1) + x_1 x_2 - \sin (x_2)$ en $(x_1, x_2) = (2, 5)$:
+
+<center>
+![:scale 100%](./img/ad2.png)
+</center>
+
 
 
 ---
+
+## Diferenciación Automática (AD) (3)
+
+* ¿Por qué **backpropagación**?
+
+* Ejemplo: considera una serie de funciones $f : \mathbb{R}^n \rightarrow \mathbb{R}^m$,  $g : \mathbb{R}^m \rightarrow \mathbb{R}^m$ y $h : \mathbb{R}^m \rightarrow \mathbb{R}$. Queremos obtener la derivada de su composición, $\frac{\partial (h \circ g \circ f)}{\partial x}$
+
+
+* Queda que 
+
+\begin{equation}
+\frac{\partial (h \circ g \circ f)}{\partial x} = \frac{\partial h}{\partial g} \frac{\partial g}{\partial f} \frac{\partial f}{\partial x}
+\end{equation}
+
+* Asociando $\frac{\partial h}{\partial g} ( \frac{\partial g}{\partial f} \frac{\partial f}{\partial x} )$, queda un producto matriz-matriz y otro producto vector-matriz.
+
+* Asociando $( \frac{\partial h}{\partial g} \frac{\partial g}{\partial f} )\frac{\partial f}{\partial x}$, ¡solo hay que hacer productos vector-matriz!: mucho más eficiente.
+
+--
+
+* En ML es habitual optimizar funciones de tipo $\mathbb{R}^d \rightarrow \mathbb{R}$, por tanto es más eficiente propagar los gradientes hacia atrás (**backpropagation**) que hacia adelante (**forward propagation**).
+
+
+---
+
+
+## Optimizando mediante SGD o Adam.
+
+* Una vez hemos calculado el gradiente en un punto mediante AD, las opciones actuales más populares son
+
+* **Descenso por el gradiente estocástico** (SGD): ya visto, estimación usando mini-batches.
+
+* **Adam** (2014: https://arxiv.org/abs/1412.6980) : corrige el gradiente estimando una ventana móvil de su media y de su varianza.
+
+
+<center>
+![:scale 80%](./img/adam.png)
+</center>
+
+
+---
+
+## Volviendo a Deep Learning
+
+
+* Ya tenemos todos los ingredientes:
+
+  * Datasets enormes.
+
+  * Redes neuronales como **aproximadores universales**.
+  
+  * Librerías para **diferenciación automática**: tensorflow, keras, pytorch...
+  
+  * Potentes CPUs o GPUs para **paralelizar a lo largo de cada ejemplo del mini-batch**.
+  
+* ¿Qué falta en muchas ocasiones?
+
+--
+
+  * Solo teóricamente las redes neuronales son totalmente expresivas.
+  
+  * Conviene añadir un **sesgo inductivo** (**inductive bias**) para ayudar al aprendizaje:
+  
+      * Imágenes, señales: invarianza a traslaciones, escala: **redes convolucionales**.
+    
+      * Texto, secuencias: sensibilidad al orden de los símbolos: **redes recurrentes**.
+
+---
+
 
 
 class: middle, center, inverse
@@ -75,6 +193,11 @@ class: middle, center, inverse
 
 ---
 
+## Conexiones residuales
+
+
+---
+
 ## Gated Recurrent Unit (GRU)
 
 ---
@@ -110,7 +233,7 @@ class: middle, center, inverse
 
 class: middle, center, inverse
 
-# Aplicación de RNNs a Procesamiento de Lenguaje Natural y Predicción
+# Aplicación de RNNs a Procesamiento de Lenguaje Natural
 
 ---
 
@@ -119,7 +242,42 @@ class: middle, center, inverse
 
 ---
 
+## word2vec
 
+
+---
+
+## Álgebra lineal en el espacio de palabras
+
+
+---
+
+## Uso de embeddings preentrenados
+
+
+* https://fasttext.cc/
+
+
+---
+
+## Clasificación de textos
+
+---
+
+## Generación de textos
+
+
+---
+
+## Traducción automática
+
+
+---
+
+## Subtitulación de imágenes
+
+
+---
 
 
 class: middle, center, inverse
