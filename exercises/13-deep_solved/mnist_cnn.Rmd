@@ -1,6 +1,6 @@
 ---
 title: "Redes Neuronales para clasificación de dígitos"
-author: Victor Gallego y Roi Naveiro
+author: Victor Gallego, Roi Naveiro y Alberto Torres
 date: "30/05/2019"
 output:
   pdf_document: default
@@ -69,9 +69,9 @@ y_test <- to_categorical(y_test, num_classes)
 
 ```
 
-## Definición y entrenamiento de un modelo de regresión logística regularizada
+## Definición y entrenamiento de un modelo convolucional profundo
 
-Define un modelo de regresión logística con 10 outputs.
+Define una red convolucional con dos capas convolucionales y max pooling.
 
 ```{r}
 model <- keras_model_sequential() %>%
