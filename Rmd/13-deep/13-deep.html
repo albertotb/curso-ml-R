@@ -294,7 +294,7 @@ class: middle, center, inverse
 
 * Tipo de red neuronal para datos con topología similar a una rejilla
 
-  1. 1D, series temporales
+  1. 1D, series temporales, audio
   
   2. 2D, imágenes, datos espaciales
   
@@ -368,6 +368,18 @@ class: middle, center, inverse
 
 `$$S(i, j) = (K * I)(i,\, j) = \sum_m \sum_n I(i+m,\, j+n) K(m,\, n)$$`
 
+* La convolución o filtro se aplica a toda la imágen con los mismos pesos
+
+* Se define con 4 parámetros:
+
+  * *stride* o paso de la convolución
+  
+  * tamaño del kernel, generalmente cuadrado
+  
+  * *depth*, número de filtros o convoluciones distintas a aplicar
+  
+  * *padding*
+
 ---
 
 ## Ejemplo
@@ -389,11 +401,11 @@ class: middle, center, inverse
   
   * detectar características locales (aristas, etc.)
 
-2. compartición de parámetros
+2. compartición de pesos
 
   * invariante frente a traslaciones
 
-  * reduce la cantidad de memoria necesaria para almacenar parámetros
+  * reduce la cantidad de memoria necesaria
 
 ---
 
@@ -508,11 +520,35 @@ Entrada `\(6 \times 6\)`
 
 ## Pooling
 
+* Capa de submuestreo no lineal
+
+* Previene sobreajuste, reduciendo número de parámetros
+
+* Ayuda con la invarianza frente a traslaciones
+
+* Útil cuando interesa conocer si una característica está o no, pero no su localización exacta `\(\Rightarrow\)` clasificación imágenes
+
+* Más habitual: **max pooling**
+
+--
+
+![:vspace 1]
+
+.center[
 ![](./img/Max_pooling.png)
+]
 
 ---
 
 ## Arquitectura típica
+
+* Parámetros: número de *feature maps*, tamaño del kernel, stride
+
+* Subsampling: max pooling
+
+* Antes de las capas *fully connected*, hay que aplanar (*flatten*) la salida
+
+![:vspace 5]
 
 ![](./img/Typical_cnn.png)
 
@@ -520,10 +556,51 @@ Entrada `\(6 \times 6\)`
 
 ## Visualizando activaciones
 
+.center[
+![:scale 30%](img/cat.png)
+
+![:scale 70%](img/first_layer_example.png)
+]
 
 ---
 
-## Redes convolucionales en Keras
+## Primeras capas
+
+![](img/first_layer.png)
+
+---
+
+## Últimas capas
+
+![](img/last_layer.png)
+
+---
+
+## CAM (class activation map)
+
+![](img/CAM.png)
+
+---
+
+## Ejemplo arquitectura: AlexNet
+
+![](img/alexnet.png)
+
+
+```r
+model &lt;- keras_model_sequential() %&gt;%
+  layer_conv_2d(filters = 96, 
+                kernel_size = c(11, 11), 
+                activation = 'relu',
+                input_shape = c(224, 224, 3), 
+                strides = c(4, 4), 
+                padding = 'valid') %&gt;% 
+  layer_max_pooling_2d(pool_size = c(2, 2), 
+                       strides = c(2, 2), 
+                       padding = 'valid') %&gt;%
+  ...
+```
+
 
 ---
 
