@@ -119,16 +119,248 @@ class: middle, center, inverse
 
 ---
 
-
-
-
 class: middle, center, inverse
 
 # Redes convolucionales
 
 ---
 
+## Introducción
 
+* Tipo de red neuronal para datos con topología similar a una rejilla
+
+  1. 1D, series temporales
+  
+  2. 2D, imágenes, datos espaciales
+  
+  3. 3D, video, datos espacio-temporales, meteorología
+  
+* Red convolucional: en al menos una capa se usan convoluciones en lugar de operaciones con matrices
+
+---
+
+## ImageNet
+
+* Más de 14 millones de imágenes anotadas a mano
+
+* Más de 20,000 categorias
+
+* Desde 2010, competición anual de clasificación automática (ILSVRC)
+
+  * únicamente 1000 categorias
+
+  * en 2011, el mejor error era de aprox. 25%
+
+  * en 2017, 29/38 equipos tenían un error menor del 5%
+
+---
+
+## Historia
+
+
+1. En 1990, [Lecun et al.](http://yann.lecun.com/exdb/publis/pdf/lecun-90c.pdf) usa una CNN para leer dígitos de códigos postales
+  
+  * una de las primeras aplicaciones reales de una red neuronal
+
+  * más del 90% de tasa de acierto
+  
+2. En 2012, [Krizhevsky et al.](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) usan una CNN para ganar la competición ILSVRC2012
+  
+  * tasa de acierto (top 5), 15.3%
+  
+  * segundo mejor modelo, 26.2%
+  
+3. A partir de 2012 múltiples arquitecturas más complejas siguen reduciendo el error: 
+
+  * 2014: VGG-16 (7.3%), GoogleNet (6.7%)
+  
+  * 2015: Microsoft ResNet (3.57%)
+
+---
+
+## Conexiones densas (*fully connected*)
+
+.center[
+![](./img/fullly_connected.png)
+]
+
+
+---
+
+## Conexiones *sparse* (*locally connected*)
+
+.center[
+![](./img/locally_connected.svg)
+]
+
+---
+
+## Convolución en 2D
+
+* $I$ es la matriz de entrada (2D)
+
+* $K$ es el kernel (2D)
+
+$$S(i, j) = (K * I)(i,\, j) = \sum_m \sum_n I(i+m,\, j+n) K(m,\, n)$$
+
+---
+
+## Ejemplo
+
+.center[
+![:scale 60%](./img/convolution.png)
+
+[Goodfellow et al. Deep Learning (2016)](https://www.deeplearningbook.org/)
+]
+
+
+---
+
+# Motivación
+
+1. conexiones dispersas
+
+  * explotar estructura espacial
+  
+  * detectar características locales (aristas, etc.)
+
+2. compartición de parámetros
+
+  * invariante frente a traslaciones
+
+  * reduce la cantidad de memoria necesaria para almacenar parámetros
+
+---
+
+## Ejemplo características locales
+
+![](img/edges.png)
+
+* Imagen de la derecha: restar a cada píxel su vecino por la izquierda
+
+* Esta operación se puede representar de forma muy eficiente con una convolución
+
+---
+
+## *Stride* (paso)
+
+.center[
+![:scale 90%](./img/Stride1.png)
+
+[Fuente](https://adeshpande3.github.io/A-Beginner%27s-Guide-To-Understanding-Convolutional-Neural-Networks-Part-2/)]
+
+---
+
+## Ejemplos
+
+.pull-left[
+
+* Entrada $4 \times 4$
+* Kernel $3 \times 3$
+* Stride 1
+* Salida $2 \times 2$
+
+![](./img/no_padding_no_strides.gif)
+]
+
+.pull-right[
+
+* Entrada $5 \times 5$
+* Kernel $3 \times 3$
+* Stride 2
+* Salida $2 \times 2$
+
+![](./img/no_padding_strides.gif)
+]
+
+---
+
+## Padding 
+
+* En ocasiones se añade un *padding* de 0 al borde de la imágen:
+
+  1. preservar el tamaño de la entrada
+  
+  2. cuando es necesario por la combinación de tamaño de entrada, tamaño de kernel y stride
+  
+* Ejemplo: entrada $5\times 5$, kernel $3 \times 3$ y *stride* 2
+
+.center[
+![](./img/numerical_padding_strides.gif)
+
+[Fuente](http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html)]
+
+---
+
+* Generalmente la salida tiene menor tamaño que la entrada
+
+* Aplicando padding podemos hacer que tenga el mismo o incluso mayor
+
+* Entrada $5 \times 5$, stride 1, kernel $3 \times 3$
+  
+.pull-left[
+![](img/same_padding_no_strides.gif)
+
+.center[
+Salida $5 \times 5$
+]
+]
+
+.pull-right[
+![](img/full_padding_no_strides.gif)
+.center[
+Salida $7 \times 7$
+]
+
+]
+
+---
+
+* A veces el padding es necesario para poder aplicar el kernel
+
+* Ejemplo: kernel $3 \times 4$, stride 2
+
+* La salida tiene el mismo tamaño en ambos!
+
+.pull-left[
+![](img/padding_strides.gif)
+
+.center[
+Entrada $5\times 5$
+]
+]
+
+.pull-right[
+![](img/padding_strides_odd.gif)
+
+.center[
+Entrada $6 \times 6$
+]
+]
+
+
+---
+
+## Pooling
+
+![](./img/Max_pooling.png)
+
+---
+
+## Arquitectura típica
+
+![](./img/Typical_cnn.png)
+
+---
+
+## Visualizando activaciones
+
+
+---
+
+## Redes convolucionales en Keras
+
+---
 
 class: middle, center, inverse
 
