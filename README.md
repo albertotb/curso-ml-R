@@ -20,7 +20,7 @@
 
  3. Aprendizaje profundo
     * Introducción a las redes neuronales (31/05, 4 horas) [[slides]](./Rmd/12-nn/12-nn.html)
-    * Introducción al aprendizaje profundo (06/06, 4 horas)
+    * Introducción al aprendizaje profundo (06/06, 4 horas) [[slides]](./Rmd/13-deep/13-deep.html)
 
 ## Bibliografía
 
