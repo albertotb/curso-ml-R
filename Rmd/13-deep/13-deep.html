@@ -65,9 +65,8 @@ z^{(i+1)} &amp;= \sigma (h^{(i+1)}) \\
 * **Diferenciación simbólica**: manipulación exacta de expresiones (mediante tablas de derivadas), pero explosión en la cantidad de términos:
 
 &lt;center&gt;
-![:scale 50%](./img/ad1.png)
+![:scale 80%](./img/ad1.png)
 &lt;/center&gt;
-
 
 
 
@@ -83,6 +82,7 @@ z^{(i+1)} &amp;= \sigma (h^{(i+1)}) \\
 &lt;center&gt;
 ![:scale 100%](./img/ad2.png)
 &lt;/center&gt;
+
 
 
 
@@ -170,50 +170,213 @@ class: middle, center, inverse
 
 * ¿Qué hacemos cuando los inputs pueden tener diferentes longitudes?
 
-* Imagen
+--
+
+* **Idea** añadir conexiones a modo de feedback (&lt;span style="color:green"&gt; `\(\rightarrow\)` &lt;/span&gt;)
+
+&lt;center&gt;
+![:scale 90%](./img/rnn1.png)
+&lt;/center&gt;
 
 
 ---
 
 ## Esquema original
 
-* Describir la de Elman
+* Modelo de **Elman**: la red mantiene un estado interno `\(h_t\)` que se va actualizando en cada iteración
+
+`\begin{equation}
+h_t = f_W ( h_{t-1}, x_t)
+\end{equation}`
+
+
+* En concreto, un posible diseño es
+
+`\begin{align}
+h_t &amp;= \tanh (W_{hh}h_{t-1} + W_{xh}x_t) \\
+y_t &amp;= W_{hy} h_t
+\end{align}`
+
+
+* Los **pesos se reutilizarn en cada instante `\(t\)`**:
+
+  * aprende patrones independientemente de su posición.
+  
+  * reducción en el número de parámetros.
+
+* Podemos desarrollar la recurrencia a lo largo de `\(t\)` (ver siguientes):
+
+---
+
+## Grafo computacional
+
+
+* Ejemplo de arquiectura **many-to-one** (ej: asignar sentimiento (+ ó -) a un tweet (secuencia de palabras))
+
+&lt;center&gt;
+![:scale 90%](./img/rnn_m2o.png)
+&lt;/center&gt;
 
 
 ---
 
-## Ejemplo
+## Grafo computacional
+
+* Ejemplo de arquiectura **many-to-many** (ej: predicción de una señal: en cada `\(x_t\)` predecimos `\(x_{t+1}\)` con el valor `\(y_t\)`))
+
+&lt;center&gt;
+![:scale 90%](./img/rnn_m2m.png)
+&lt;/center&gt;
+
+---
+
+## Ejemplo (many to many)
+
+* Predicción del siguiente carácter.
+
+* Representamos cada carácter mediante OHE, nuestro vocabulario es: h, e, l, o `\(\in \lbrace 0, 1 \rbrace^4\)`.
+
+&lt;center&gt;
+![:scale 50%](./img/rnn_char.png)
+&lt;/center&gt;
+
+---
+
+
+## Entrenamiento
+
+* Mismo esquema de backpropagación que para las redes estándar, solo que ahora se propaga hacia atrás en el tiempo (como si la RNN estuviera desenrrollada).
+
+* Para mejorar la estabilidad, solo se propaga hacia atrás un número de pasos limitado (**truncated backpropagation**)
+
+* SGD o Adam.
+
+&lt;center&gt;
+![:scale 60%](./img/tbptt.png)
+&lt;/center&gt;
+
 
 
 ---
 
-## Grafo computacional y backpropagación truncada
+## Problema de la RNN original (1)
+
+* La backpropagación desde `\(h_t\)` a `\(h_{t-1}\)` necesita multiplicar por `\(W\)`.
+
+&lt;center&gt;
+![:scale 70%](./img/gf.png)
+&lt;/center&gt;
+
+* Al hacerlo a lo largo del tiempo:
+
+&lt;center&gt;
+![:scale 80%](./img/gf2.png)
+&lt;/center&gt;
+
+* Calcular el gradiente para `\(h_0\)` implica multiplicaciones de `\(W\)`.
+
+
+---
+
+
+## Problema de la RNN original (2)
+
+* Calcular el gradiente para `\(h_0\)` implica multiplicaciones de `\(W\)`:
+
+  * El mayor valor singular (autovalor) de `\(W\)` es `\(&gt; 1\)`: explosión del gradiente.
+    
+      * Solución: acotar manualmente el gradiente (**gradient clipping**).
+      
+  * El mayor valor singular (autovalor) de `\(W\)` es `\(&lt; 1\)`: desvanecimiento del gradiente.
+  
+      * Solución: nueva arquitecturas (LSTM, GRU).
+
 
 
 
 ---
 
-## Problema de la RNN original
-
-* Explosión y desvanecimiento de gradientes
-
-
----
-
-## Conexiones residuales
-
-
----
-
-## Gated Recurrent Unit (GRU)
-
----
 
 ## Long-Short Term Memory network (LSTM)
 
+* Introducidas por Hochreiter en 1997, aunque no se usaron mucho hasta esta década (aplicaciones en NLP).
+
+* Añadimos un nuevo estado (cell, `\(c_t\)`) y varias compuertas (gates) para mejorar el flujo del gradiente.
+
+
+&lt;center&gt;
+![:scale 30%](./img/lstm1.png)
+&lt;/center&gt;
 
 
 ---
+
+## LSTM (2)
+
+* Compuerta de **olvido** (forget).
+
+* Decide qué partes olvidar del estado anterior.
+
+&lt;center&gt;
+![:scale 50%](./img/lstm2.png)
+&lt;/center&gt;
+
+`\begin{equation}
+f_t = \sigma (W_f \left[ h_{t-1}, x_t \right] + b_f)
+\end{equation}`
+
+
+---
+
+## LSTM (3)
+
+* Compuerta de **actualización** (update).
+
+* Decide qué modificar para el nuevo estado.
+
+&lt;center&gt;
+![:scale 50%](./img/lstm3.png)
+&lt;/center&gt;
+
+
+`\begin{align}
+i_t &amp;= \sigma (W_i \left[ h_{t-1}, x_t \right] + b_i) \\
+\tilde{C}_t &amp;= \tanh (W_C \left[ h_{t-1}, x_t \right] + b_C)
+\end{align}`
+
+---
+
+## LSTM (4)
+
+* Compuerta de **salida** (output)
+
+&lt;center&gt;
+![:scale 50%](./img/lstm4.png)
+&lt;/center&gt;
+
+
+`\begin{align}
+o_t &amp;= \sigma (W_o \left[ h_{t-1}, x_t \right] + b_o) \\
+h_t &amp;= o_t * \tanh (C_t)
+\end{align}`
+
+
+---
+
+## LSTM en resumen
+
+* Las ecuaciones completas son
+
+&lt;center&gt;
+![:scale 30%](./img/lstm_ecs.png)
+&lt;/center&gt;
+
+* Ahora para hacer backpropagación de `\(c_t\)` a `\(c_{t-1}\)` no hace falta multiplicar por `\(W\)`!!
+
+&lt;center&gt;
+![:scale 50%](./img/lstm_5.png)
+&lt;/center&gt;
+
 
 
 
@@ -226,13 +389,16 @@ class: middle, center, inverse
 
 * Las RNNs originales son simples pero no funcionan bien.
 
-* Más común: utilizar **LSTM** o **GRU** para "mejorar" el gradiente.
+* Más común: utilizar **LSTM**  para "mejorar" el gradiente.
 
-* El flujo de gradiente hacia atrás puede explotar o desvanecerse en las RNNs: la **explosión** se controla acotando el gradiente (clipping). El **desvanecimiento** mediante conexiones aditivas (LSTM, GRU).
+* El flujo de gradiente hacia atrás puede explotar o desvanecerse en las RNNs: la **explosión** se controla acotando el gradiente (clipping). El **desvanecimiento** mediante conexiones aditivas (LSTM).
 
 * Las búsqueda de arquitecturas más simples es área de investigación actual.
 
 * Todavía hay escasos avances teóricos, se necesita más investigación.
+
+* Las **gated recurrent units** (GRU) son algo más sencillas aunque siguen el mismo mecanismo de compuertas (https://www.aclweb.org/anthology/D14-1179)
+
 
 
 ---
@@ -370,9 +536,6 @@ $$
 * https://fasttext.cc/docs/en/crawl-vectors.html en castellano, entrenados sobre los artículos de la Wikipedia y CommonCrawl.
 
 
----
-
-## Clasificación de textos
 
 ---
 
@@ -391,7 +554,19 @@ $$
 
 ## Traducción automática
 
+* Modelos **seq2seq**: composición de many-to-one + one-to-many.
 
+* `\(x_1, \ldots, x_T\)` es la frase en el idioma original.
+
+* `\(y_1, \ldots, y_{T'}\)` es la frase en el idioma de destino.
+
+&lt;center&gt;
+![:scale 80%](./img/seq2seq.png)
+&lt;/center&gt;
+
+* Sequence to Sequence Learning with Neural Networks: https://arxiv.org/abs/1409.3215
+
+* Actualmente usado en **Google Traslate**: https://ai.google/research/pubs/pub45610
 ---
 
 ## Subtitulación de imágenes
