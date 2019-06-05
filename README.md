@@ -4,7 +4,7 @@
 
  1. Fundamentos de Aprendizaje Automático
     * Conceptos generales de aprendizaje bayesiano y Montecarlo (18/03 y 22/03, 6 horas) [[slides]](./slides/01-bayes.pdf)
-    * Conceptos generales sobre aprendizaje supervisado: GLMs (22/03 y 25/03, 6 horas) [[slides]](./Rmd/02-supervised/02-supervised.html)
+    * Conceptos generales sobre aprendizaje supervisado (22/03 y 25/03, 6 horas) [[slides]](./Rmd/02-supervised/02-supervised.html)
     * Conceptos generales sobre aprendizaje no supervisado: PCA (01/04, 4 horas) [[slides]](./Rmd/03-unsupervised/03-unsupervised.html)
 
  2. Aplicaciones prácticas de Aprendizaje Automático
@@ -12,13 +12,12 @@
     * Algoritmos de clasificación: KNN, Naive Bayes, ... (12/04, 4 horas) [[slides]](./Rmd/05-classification/05-classification.html)
     * Arboles de decisión, bosques aleatorios y boosting (22/04, 4 horas) [[slides]](./Rmd/06-trees/06-trees.html)
     * Support vector machines (25/04, 4 horas) [[slides]](./Rmd/07-svm/07-svm.html)
-    * Análisis de conglomerados: cuantización vectorial (10/05, 4 horas) [[slides]](./Rmd/08-clustering/08-clustering.html)
+    * Algoritmos de clustering: cuantización vectorial (10/05, 4 horas) [[slides]](./Rmd/08-clustering/08-clustering.html)
     * DLMs (16/05, 4 horas) [[slides]](./slides/09-dlms.pdf)
     * Modelos gráficos probabilísticos (17/05, 4 horas) [[slides]](./Rmd/10-pgms/10-pgms.html)
     * Algoritmos bayesianos para clasificación y regresión (27/05, 4 horas) [[slides]](./Rmd/11-bayes/11-bayes.html)
 
-
- 3. Aprendizaje profundo
+ 3. Redes Neuronales
     * Introducción a las redes neuronales (31/05, 4 horas) [[slides]](./Rmd/12-nn/12-nn.html)
     * Introducción al aprendizaje profundo (06/06, 4 horas) [[slides]](./Rmd/13-deep/13-deep.html)
 
