@@ -6,7 +6,7 @@ Importar y transformar datos
  * stringr: manipular texto
  * lubridate: fechas
  * forcats: factores
- 
+
  Visualization
  -------------
  * ggplot2: todo tipo de gráficos
@@ -46,11 +46,12 @@ Modelos
  * kernlab: procesos gaussianos, reducción de dimensionalidad
  * Rtsne: fast tSNE using C optimization routines
  * NMF: non-negative matrix factorization for recommendations and clustering
- 
+ * keras: deep learning
+
 Texto
 -----
  * word2vec: vectorización, word embeddings, etc.
- 
+
 Datasets
 -------
  * coil20: images of objects taken from various angles
