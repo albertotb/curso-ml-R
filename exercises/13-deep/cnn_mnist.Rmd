@@ -1,0 +1,55 @@
+---
+title: "Redes Neuronales para clasificación de dígitos"
+author: Victor Gallego, Roi Naveiro y Alberto Torres
+date: "30/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Cargamos los paquetes necesarios
+```{r}
+library(keras)
+```
+
+
+## Funciones auxiliares
+
+* show_digit: Hace una gráfica del dígito en cuestión.
+```{r, message=F}
+show_digit = function(img){
+  img = t( apply(img, 2, rev) )
+  image( img )
+}
+```
+
+
+## Lectura de Datos
+
+1. Carga los datos de train y test en memoria
+
+2. Convertir las imágenes, de tamaño 28x28, a un array de tamaño 28x28x1. (Pista: función `array_reshape` de keras)
+
+3. Normalizar al intervalo [0, 1]
+
+4. Convertir la etiqueta $l \in \{0, 1, \dots, 9\}$ a un vector de tamaño 10 de ceros y unos (función  `to_categorical()`)
+
+
+## Definición y entrenamiento de un modelo convolucional profundo
+
+1. Define una red convolucional:
+
+  1. Capa convolucional de 32 filtros, kernel $3\times 3$ y activaciones ReLU
+  2. Capa convolucional de 64 filtros, kernel $3\times 3$ y activaciones ReLU
+  3. Max pooling de tamaño $2 \times 2$
+  4. Dropout ($0.25$)
+  5. Capa densa de 128 unidades y activación ReLU
+  6. Dropout ($0.5$)
+  7. Capa de salida
+  
+
+2. Entrenar el modelo durante 12 épocas, con un tamaño de minibatch 128 usando ADAM

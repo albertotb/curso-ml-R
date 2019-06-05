@@ -1,0 +1,158 @@
+---
+title: "Análisis de sentimiento de reviews IMDB"
+author: Victor Gallego y Alberto Torres
+date: "30/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+En esta práctica realizaremos un problema de clasificación (sentimiento positivo onegativo) sobre una base de datos de reviews de películas.
+
+1. Cargamos los paquetes necesarios y parámetros
+```{r}
+library(keras)
+library(dplyr)
+library(ggplot2)
+library(purrr)
+
+# Parametros
+maxlen <- 40
+```
+
+2. Ejecuta el siguiente fragmento y explora train_data y train_labels. Escoge un vocabulario de 10000 palabras como input a dataset_imdb
+
+```{r }
+imdb <- dataset_imdb(num_words = 10000)
+
+c(train_data, train_labels) %<-% imdb$train
+c(test_data, test_labels) %<-% imdb$test
+
+
+word_index <- dataset_imdb_word_index()
+
+
+```
+
+3. Con ayuda del siguiente fragmento, puedes ver el texto original.
+
+```{r}
+word_index_df <- data.frame(
+  word = names(word_index),
+  idx = unlist(word_index, use.names = FALSE),
+  stringsAsFactors = FALSE
+)
+
+# The first indices are reserved  
+word_index_df <- word_index_df %>% mutate(idx = idx + 3)
+word_index_df <- word_index_df %>%
+  add_row(word = "<PAD>", idx = 0)%>%
+  add_row(word = "<START>", idx = 1)%>%
+  add_row(word = "<UNK>", idx = 2)%>%
+  add_row(word = "<UNUSED>", idx = 3)
+
+word_index_df <- word_index_df %>% arrange(idx)
+
+decode_review <- function(text){
+  paste(map(text, function(number) word_index_df %>%
+              filter(idx == number) %>%
+              select(word) %>% 
+              pull()),
+        collapse = " ")
+}
+
+
+decode_review(train_data[[1]])
+
+```
+
+
+## Preparación de los datos
+
+4. Ejecuta el siguiente fragmento para añadir padding a todas las secuencias. ¿Cuál ha sido el efecto?
+
+```{r}
+train_data <- pad_sequences(
+  train_data,
+  value = word_index_df %>% filter(word == "<PAD>") %>% select(idx) %>% pull(),
+  padding = "post",
+  maxlen = 256
+)
+
+test_data <- pad_sequences(
+  test_data,
+  value = word_index_df %>% filter(word == "<PAD>") %>% select(idx) %>% pull(),
+  padding = "post",
+  maxlen = 256
+)
+
+
+```
+
+
+## Definición del modelo
+
+5. Construye la siguiente red:
+  - Capa de embedding: desde vocab_size a 16
+  - Capa de promedio (global_average_pooling)
+  - Capa densa de 16 unidades, con relu como no-linealidad
+  - Capa densa a 1 unidad, con la no-linealidad adecuada para emitir una probabilidad.
+  
+¿ Cuáles son las dimensiones a la salida de la capa de promedio? (usa summary()).
+
+¿ Cuál es la capa con mayor carga de parámetros?
+
+
+```{r }
+
+vocab_size <- 
+
+model <- keras_model_sequential()
+model %>% 
+  
+
+model %>% summary()
+```
+
+
+6. Entrena con Adam, y escoge accuracy como métrica auxiliar.
+
+```{r}
+model %>% compile(
+  optimizer =,
+  loss = ,
+  metrics = 
+)
+```
+
+7. Escoge como validación los 10000 ejemplos de train
+
+```{r}
+
+
+```
+
+8. Entrena con 25 épocas y 512 como tamaño de batch
+
+```{r }
+history <- model %>% fit(
+  
+)
+
+```
+
+
+9. Evalua los resultados en el test set
+
+```{r}
+
+```
+
+
+
+10. Explora otras arquitecturas
+
+```{r }
+
+
+```

@@ -1,0 +1,133 @@
+---
+title: "Solar"
+author: Victor Gallego, Roi Naveiro y Alberto Torres
+date: "30/5/2019"
+output: pdf_document
+---
+
+```{r setup}
+library(lubridate)
+library(readr)
+library(dplyr)
+library(stringr)
+library(keras)
+```
+
+1. Leer el fichero `oahu_min.csv`. Contiene datos de múltiples piranómetros que miden la radiación solar en el aeropuerto de Hawaii, entre el 19/03/2010 y el 31/10/2011
+
+```{r}
+df <- read_csv('../../data/oahu_min.csv', 
+               locale = locale(tz = "Pacific/Honolulu"))
+  
+```
+
+2. Seleccionar las columnas `Datetime` y todas las que empiezan por "GH" (radiación "Global Horizontal") excepto "GH_AP3" (piranómetro defectuoso)
+
+```{r}
+df <- df %>% 
+  select(Datetime, starts_with("GH"), -GH_AP3) %>%
+  rename_all(~str_remove(., "GH_"))
+```
+
+3. Crear un dataframe con 3 lags o desplazamientos
+
+```{r}
+df2 <- df
+nlags <- 3
+for (t in 1:nlags) {
+  df1 <- mutate(df, Datetime = Datetime + minutes(t))
+  df2 <- inner_join(df1, df2, by = 'Datetime', 
+                    suffix = c("", paste0("_t-", t)))
+}
+```
+
+5. Partir en entrenamiento, validación y test:
+
+  * Entrenamiento, hasta 2011-06-01
+  * Validación, de 2011-06-01 hasta 2011-09-01
+  * Test, a partir de 2011-09-01
+
+```{r}
+end_train <- as.Date("2011-06-01")
+end_val   <- as.Date("2011-09-01")
+
+train <- filter(df2, Datetime < end_train)
+val   <- filter(df2, Datetime > end_train, Datetime < end_val)
+test  <- filter(df2, Datetime > end_val)
+```
+
+6. Crear las matrices X e y, de la siguiente forma:
+
+  * X: todos los piranómetros en el tiempo t-1, t-2 y t-3
+  * y: el piranómetro "GH_DH1" en el tiempo t
+
+```{r}
+X_train <- as.matrix(select(train, contains("t-")))
+y_train <- as.matrix(select(train, DH1))
+
+X_test <- as.matrix(select(test, contains("t-")))
+y_test <- as.matrix(select(test, DH1))
+
+X_val <- as.matrix(select(val, contains("t-")))
+y_val <- as.matrix(select(val, DH1))
+```
+
+
+7. Convertir las matrices X en un array de tamaño (n_filas, n_sensores, n_lags)
+
+```{r}
+dim(X_train) <- c(nrow(X_train), ncol(X_train)/nlags, nlags)
+dim(X_test)  <- c(nrow(X_test),  ncol(X_test)/nlags,  nlags)
+dim(X_val)   <- c(nrow(X_val),   ncol(X_val)/nlags,   nlags)
+
+X_train <- aperm(X_train, c(1, 3, 2))
+X_test  <- aperm(X_test,  c(1, 3, 2))
+X_val   <- aperm(X_val,   c(1, 3, 2))
+```
+
+
+8. Inicializar una red neuronal con 2 capas ocultas, 
+
+  1. LSTM, 50 unidades, activación ReLU
+  
+  2. Densa, 128 unidades en la capa oculta, activaciones ReLU y regularización $l_2$ ($\lambda = 0.01$)
+
+```{r}
+# Initialize a sequential model
+model <-  keras_model_sequential()
+
+# Add layers to the model
+model %>% 
+     layer_lstm(units = 50, activation = 'relu', 
+                input_shape = c(nlags, 16)) %>%
+    layer_dense(units = 128, activation = 'relu') %>%
+    layer_dense(units = 1, activation = 'linear')
+```
+
+```{r}
+summary(model)
+```
+
+9. Entrenar la red durante 30 épocas usando como función de pérdida el MAE y el optimizador ADAM, con un tamaño de mini-batch de 128. ¿Cual es el error de entrenamiento y de validación final?
+
+```{r}
+model %>% compile(
+  loss = "mae",
+  optimizer = optimizer_adam()
+)
+```
+
+```{r warning=FALSE}
+history <- model %>% fit(
+  X_train, y_train, 
+  epochs = 30, batch_size = 128, 
+  validation_data = list(X_val, y_val),
+  verbose = 1
+)
+```
+
+10. Calcular el error en el conjunto de test
+
+```{r}
+evaluate(model, X_test, y_test)
+```
