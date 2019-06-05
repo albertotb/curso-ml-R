@@ -34,15 +34,7 @@ maxlen <- 40
 ¿Cuántos caracteres únicos hay?
 
 ```{r }
-text <- read_lines('../../data/munis.txt') %>%
-  str_to_lower() %>%
-  str_c(collapse = "\n") %>%
-  tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
-print(sprintf("corpus length: %d", length(text)))
-chars <- text %>%
-  unique() %>%
-  sort()
-print(sprintf("total chars: %d", length(chars)))  
+
 
 ```
 
@@ -80,14 +72,13 @@ Como optimizador, escoge Adam con una tasa de aprendizaje de 0.01
 
 ```{r}
 model <- keras_model_sequential()
+
 model %>%
-  layer_lstm(32, input_shape = c(maxlen, length(chars))) %>%
-  layer_dense(length(chars)) %>%
-  layer_activation("softmax")
-optimizer <- optimizer_adam(lr = 0.01)
+  
+
+optimizer <- 
+
 model %>% compile(
-  loss = "categorical_crossentropy", 
-  optimizer = optimizer
 )
 ```
 
@@ -98,7 +89,6 @@ model %>% compile(
 ¿Qué ocurre si cambias el parámetro diversity?
 
 ```{r }
-
 sample_mod <- function(preds, temperature = 1){
   preds <- log(preds)/temperature
   exp_preds <- exp(preds)

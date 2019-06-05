@@ -1,0 +1,168 @@
+---
+title: "Predicción de tasa de interés en USA mediante LSTM"
+author: Victor Gallego y Alberto Torres
+date: "30/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+Esta práctica abordará la predicción de una serie temporal típica en econometría mediante RNNs
+
+1. Cargamos los paquetes necesarios
+```{r}
+library(keras)
+
+```
+
+
+2. Cargamos los datos de data/data_interest.csv y representamos la serie temporal
+
+```{r}
+
+# introducir codigo
+
+```
+
+
+3. Preparamos los datos. Los diferenciamos
+
+```{r}
+# introducir codigo
+
+```
+
+
+4. Creamos un dataframe de dos columnas, la segunda el dato actual (x_t) y la primera el dato anterior (x_{t-1}) (retardado)
+
+
+```{r}
+# introducir codigo
+
+```
+
+5.  Partimos los datos en conjunto de entrenamiento (70%) y de test (30%)
+
+```{r}
+# introducir codigo
+
+```
+
+
+6. Normalizamos datos entre -1 y 1
+
+```{r}
+
+# introducir codigo
+
+
+y_train = Scaled$scaled_train[, 2]
+x_train = Scaled$scaled_train[, 1]
+
+y_test = Scaled$scaled_test[, 2]
+x_test = Scaled$scaled_test[, 1]
+
+```
+
+
+7. Transformación inversa para deshacer el reescalado anterior (hará falta para mostrar las predicciones  de manera más entendible)
+
+```{r}
+invert_scaling = function(scaled, scaler, feature_range = c(0, 1)){
+  min = scaler[1]
+  max = scaler[2]
+  t = length(scaled)
+  mins = feature_range[1]
+  maxs = feature_range[2]
+  inverted_dfs = numeric(t)
+  
+  for( i in 1:t){
+    X = (scaled[i]- mins)/(maxs - mins)
+    rawValues = X *(max - min) + min
+    inverted_dfs[i] <- rawValues
+  }
+  return(inverted_dfs)
+}
+```
+
+8. Pasamos el input a 3-dim para hacerlo comaptible con la librería keras y especificamos algunos parámetros
+
+```{r}
+dim(x_train) <- c(length(x_train), 1, 1)
+
+
+X_shape2 = dim(x_train)[2]
+X_shape3 = dim(x_train)[3]
+batch_size = 1                # Tamaño de los minilotes
+units = 1                     # Número de unidades en la lstm
+```
+
+
+9. Definición del modelo
+
+Incluye una capa lstm seguida de una densa. ¿Cuál debe ser la dimensión de salida? 
+
+Nota: en la LSTM impón stateful = TRUE
+
+¿Cuántos parámetros tiene el modelo?
+
+```{r}
+model <- keras_model_sequential() 
+model%>%
+  # introducir codigo
+  
+  
+
+# Compilamos y mostramos el modelo
+model %>% compile(
+  loss = 'mean_squared_error',
+  optimizer = optimizer_adam( lr= 0.02, decay = 1e-6 ),  
+  metrics = c('accuracy')
+)
+
+summary(model)
+
+```
+
+10. Ajustamos el modelo con 50 epocas
+
+```{r}
+Epochs = 50   
+for(i in 1:Epochs ){
+  model %>% fit(x_train, y_train, epochs=1, batch_size=batch_size, verbose=1, shuffle=FALSE)
+  model %>% reset_states()
+}
+```
+
+11. Hacemos las predicciones
+
+```{r}
+L = length(x_test)
+scaler = Scaled$scaler
+predictions = numeric(L)
+for(i in 1:L){
+  X = x_test[i]
+  dim(X) = c(1,1,1)
+  yhat = model %>% predict(X, batch_size=batch_size)
+  # deshacemos el reescalado
+  yhat = invert_scaling(yhat, scaler,  c(-1, 1))
+  # deshacemos la diferenciacion
+  yhat  = yhat + Series[(n+i)]
+  # guardamos
+  predictions[i] <- yhat
+}
+
+# Dibujamos los valores
+plot(Series, typ='l',main="Datos", 
+     xlab="Mes", ylab="Tasa de interés USA")
+lines(c(rep(NA,135-40), predictions), col='red')
+```
+
+
+12. Calcula el MAE sobre el test set.
+
+¿Cómo es el MAE en un modelo de persistencia? (para predecir x_{t+1} usamos el dato en x_t)
+```{r}
+
+```
+

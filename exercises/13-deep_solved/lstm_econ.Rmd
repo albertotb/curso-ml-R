@@ -1,15 +1,25 @@
-# Cargamos primero los paquetes necesarios: keras y tensorflow
+---
+title: "Predicción de tasa de interés en USA mediante LSTM"
+author: Victor Gallego y Alberto Torres
+date: "30/05/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+Esta práctica abordará la predicción de una serie temporal típica en econometría mediante RNNs
+
+1. Cargamos los paquetes necesarios
+```{r}
 library(keras)
-library(tensorflow)
 
-# Para instalarlos:
-# devtools::install_github("rstudio/keras")
-# library(keras)
-# install_keras()
+```
 
-# Cargamos después los datos que son las tasas de interés mensuales de USA de Enero 2007 
-# hasta hoy, obtenidos  de https://stats.oecd.org/viewhtml.aspx?datasetcode=MEI_FIN&lang=en
-df <- read.csv('data.csv')
+
+2. Cargamos los datos y representamos la serie temporal
+
+```{r}
+df <- read.csv('../../data/data_interest.csv')
 
 # Mostramos las primeras  observaciones y dibujamos la serie temporal
 Series <- df$Value
@@ -17,11 +27,21 @@ head(Series)
 plot(Series, typ='l',main="Datos", 
      xlab="Mes", ylab="Tasa de interés USA")
 
+```
 
-# Preparamos los datos. Los diferenciamos
+
+3. Preparamos los datos. Los diferenciamos
+
+```{r}
 diffed = diff(Series, differences = 1)
 head(diffed)
+```
 
+
+4. Creamos un dataframe de dos columnas, la segunda el dato actual (x_t) y la primera el dato anterior (x_{t-1}) (retardado)
+
+
+```{r}
 # Construimos los datos retardados
 lag_transform <- function(x, k= 1){
   
@@ -34,15 +54,22 @@ lag_transform <- function(x, k= 1){
 supervised = lag_transform(diffed, 1)
 head(supervised)
 
+```
 
-# Partimos los datos en conjunto de entrenamiento (70%) y de test (30%)
+5.  Partimos los datos en conjunto de entrenamiento (70%) y de test (30%)
+
+```{r}
+#
 N = nrow(supervised)
 n = round(N *0.7, digits = 0)
 train = supervised[1:n, ]
 test  = supervised[(n+1):N,  ]
+```
 
 
-# Normalizamos los datos entre -1 y 1
+6. Normalizamos datos entre -1 y 1
+
+```{r}
 scale_data = function(train, test, feature_range = c(0, 1)) {
   x = train
   fr_min = feature_range[1]
@@ -64,9 +91,12 @@ x_train = Scaled$scaled_train[, 1]
 y_test = Scaled$scaled_test[, 2]
 x_test = Scaled$scaled_test[, 1]
 
+```
 
-# Transformación inversa para deshacer el reescalado anterior (hará falta para mostrar las predicciones
-# de manera más entendible)
+
+7. Transformación inversa para deshacer el reescalado anterior (hará falta para mostrar las predicciones  de manera más entendible)
+
+```{r}
 invert_scaling = function(scaled, scaler, feature_range = c(0, 1)){
   min = scaler[1]
   max = scaler[2]
@@ -82,21 +112,30 @@ invert_scaling = function(scaled, scaler, feature_range = c(0, 1)){
   }
   return(inverted_dfs)
 }
+```
 
+8. Pasamos el input a 3-dim para hacerlo comaptible con la librería keras y especificamos algunos parámetros
 
-
-# Pasamos el input a 3-dim para hacerlo comaptible con la librería keras
+```{r}
 dim(x_train) <- c(length(x_train), 1, 1)
 
-# Especificamos algunos parámetros
+
 X_shape2 = dim(x_train)[2]
 X_shape3 = dim(x_train)[3]
 batch_size = 1                # Tamaño de los minilotes
 units = 1                     # Número de unidades en la lstm
+```
 
-#=========================================================================================
 
-# Definimos el modelo
+9. Definición del modelo
+
+Incluye una capa lstm seguida de una densa. ¿Cuál debe ser la dimensión de salida? 
+
+Nota: en la LSTM impón stateful = TRUE
+
+¿Cuántos parámetros tiene el modelo?
+
+```{r}
 model <- keras_model_sequential() 
 model%>%
   layer_lstm(units, batch_input_shape = c(batch_size, X_shape2, X_shape3), stateful= TRUE)%>%
@@ -111,16 +150,21 @@ model %>% compile(
 
 summary(model)
 
-# Ajustamos el modelo
+```
+
+10. Ajustamos el modelo con 50 epocas
+
+```{r}
 Epochs = 50   
 for(i in 1:Epochs ){
   model %>% fit(x_train, y_train, epochs=1, batch_size=batch_size, verbose=1, shuffle=FALSE)
   model %>% reset_states()
 }
+```
 
+11. Hacemos las predicciones
 
-
-# Hacemos las predicciones
+```{r}
 L = length(x_test)
 scaler = Scaled$scaler
 predictions = numeric(L)
@@ -137,5 +181,23 @@ for(i in 1:L){
 }
 
 # Dibujamos los valores
+plot(Series, typ='l',main="Datos", 
+     xlab="Mes", ylab="Tasa de interés USA")
 lines(c(rep(NA,135-40), predictions), col='red')
+```
+
+
+12. Calcula el MAE sobre el test set.
+
+¿Cómo es el MAE en un modelo de persistencia? (para predecir x_{t+1} usamos el dato en x_t)
+```{r}
+
+true_labels <- Series[(n+1):(n+L)]
+MAE_lstm = mean(abs(predictions - true_labels))
+print(MAE_lstm)
+
+
+MAE_base = mean(abs(Series[(n):(n+L-1)] - true_labels  ))
+print(MAE_base)
+```
 
