@@ -907,13 +907,11 @@ class: middle, center, inverse
 
 ## Enlaces de interés
 
-* https://reddit.com/r/LearnMachineLearning: nivel introductorio/medio.
+* https://reddit.com/r/LearnMachineLearning: nivel introductorio/medio
 
-* https://reddit.com/r/machinelearning: discusiones sobre artículos y temas de actualidad.
+* https://reddit.com/r/machinelearning: discusiones sobre artículos y temas de actualidad
 
-* https://medium.com/topic/machine-learning: artículos hacia audiencia general.
-
-* ???
+* https://medium.com/topic/machine-learning: artículos hacia audiencia general
 
 
 
