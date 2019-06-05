@@ -1,0 +1,43 @@
+---
+title: "Solar"
+author: Victor Gallego, Roi Naveiro y Alberto Torres
+date: "30/5/2019"
+output: pdf_document
+---
+
+```{r setup}
+library(lubridate)
+library(readr)
+library(dplyr)
+library(stringr)
+library(keras)
+```
+
+1. Leer el fichero `oahu_min.csv`. Contiene datos de múltiples piranómetros que miden la radiación solar en el aeropuerto de Hawaii, entre el 19/03/2010 y el 31/10/2011
+
+2. Seleccionar las columnas `Datetime` y todas las que empiezan por "GH" (radiación "Global Horizontal") excepto "GH_AP3" (piranómetro defectuoso)
+
+3. Crear un dataframe con 3 lags o desplazamientos
+
+5. Partir en entrenamiento, validación y test:
+
+  * Entrenamiento, hasta 2011-06-01
+  * Validación, de 2011-06-01 hasta 2011-09-01
+  * Test, a partir de 2011-09-01
+
+6. Crear las matrices X e y, de la siguiente forma:
+
+  * X: todos los piranómetros en el tiempo t-1, t-2 y t-3
+  * y: el piranómetro "GH_DH1" en el tiempo t
+
+7. Convertir las matrices X en un array de tamaño (n_filas, n_sensores, n_lags)
+
+8. Inicializar una red neuronal con 2 capas ocultas, 
+
+  1. LSTM, 50 unidades, activación ReLU
+  
+  2. Densa, 128 unidades en la capa oculta, activaciones ReLU y regularización $l_2$ ($\lambda = 0.01$)
+
+9. Entrenar la red durante 30 épocas usando como función de pérdida el MAE y el optimizador ADAM, con un tamaño de mini-batch de 128. ¿Cual es el error de entrenamiento y de validación final?
+
+10. Calcular el error en el conjunto de test

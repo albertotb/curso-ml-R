@@ -1,6 +1,6 @@
 ---
 title: "Solar"
-author: "Alberto Torres Barrán"
+author: Victor Gallego, Roi Naveiro y Alberto Torres
 date: "30/5/2019"
 output: pdf_document
 ---
@@ -12,7 +12,6 @@ library(dplyr)
 library(stringr)
 library(keras)
 ```
-
 
 1. Leer el fichero `oahu_min.csv`. Contiene datos de múltiples piranómetros que miden la radiación solar en el aeropuerto de Hawaii, entre el 19/03/2010 y el 31/10/2011
 
@@ -30,7 +29,7 @@ df <- df %>%
   rename_all(~str_remove(., "GH_"))
 ```
 
-3. Crear otro dataframe desplazado, es decir, donde la columna `Datatime` tome los valores `Datetime` + 1 minuto 
+3. Crear un dataframe con 3 lags o desplazamientos
 
 ```{r}
 df2 <- df
@@ -59,7 +58,7 @@ test  <- filter(df2, Datetime > end_val)
 
 6. Crear las matrices X e y, de la siguiente forma:
 
-  * X: todos los piranómetros en el tiempo t-1
+  * X: todos los piranómetros en el tiempo t-1, t-2 y t-3
   * y: el piranómetro "GH_DH1" en el tiempo t
 
 ```{r}
@@ -73,6 +72,9 @@ X_val <- as.matrix(select(val, contains("t-")))
 y_val <- as.matrix(select(val, DH1))
 ```
 
+
+7. Convertir las matrices X en un array de tamaño (n_filas, n_sensores, n_lags)
+
 ```{r}
 dim(X_train) <- c(nrow(X_train), ncol(X_train)/nlags, nlags)
 dim(X_test)  <- c(nrow(X_test),  ncol(X_test)/nlags,  nlags)
@@ -84,7 +86,11 @@ X_val   <- aperm(X_val,   c(1, 3, 2))
 ```
 
 
-7. Inicializar una red neuronal con 1 capa oculta, 128 unidades en la capa oculta, activaciones ReLU y regularización $l_2$ ($\lambda = 0.01$)
+8. Inicializar una red neuronal con 2 capas ocultas, 
+
+  1. LSTM, 50 unidades, activación ReLU
+  
+  2. Densa, 128 unidades en la capa oculta, activaciones ReLU y regularización $l_2$ ($\lambda = 0.01$)
 
 ```{r}
 # Initialize a sequential model
@@ -102,7 +108,7 @@ model %>%
 summary(model)
 ```
 
-8. Entrenar la red durante 10 épocas usando como función de pérdida el MAE y el optimizador ADAM, con un tamaño de mini-batch de 128. ¿Cual es el error de entrenamiento y de validación final?
+9. Entrenar la red durante 30 épocas usando como función de pérdida el MAE y el optimizador ADAM, con un tamaño de mini-batch de 128. ¿Cual es el error de entrenamiento y de validación final?
 
 ```{r}
 model %>% compile(
@@ -120,7 +126,7 @@ history <- model %>% fit(
 )
 ```
 
-9. Calcular el error en el conjunto de test
+10. Calcular el error en el conjunto de test
 
 ```{r}
 evaluate(model, X_test, y_test)
