@@ -71,6 +71,7 @@ cat(nrow(x_test), 'test samples\n')
 
 ```{r}
 # Convert class vectors to binary class matrices
+num_classes <- 10
 y_train <- to_categorical(y_train, num_classes)
 y_test <- to_categorical(y_test, num_classes)
 ```
@@ -102,7 +103,7 @@ model <- keras_model_sequential() %>%
 # Compile model
 model %>% compile(
   loss = loss_categorical_crossentropy,
-  optimizer = optimizer_adams(),
+  optimizer = optimizer_adam(),
   metrics = c('accuracy')
 )
 ```
@@ -111,7 +112,6 @@ model %>% compile(
 
 ```{r}
 batch_size <- 128
-num_classes <- 10
 epochs <- 12
 
 # Train model
