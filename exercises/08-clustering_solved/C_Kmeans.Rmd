@@ -73,7 +73,6 @@ data_red = data[sample(nrow(data), 100000), ]
 ```
 
 ```{r}
-#register_google(key = "AIzaSyB3ZZe82aH3eQzPEIx4SNaMDCl1mrM5iY4")
 nyc <- get_stamenmap(bbox = c(left = -74.45, bottom = 40.35, 
                                   right = -73.65, top = 41.1), 
                          zoom = 10)
